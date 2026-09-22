@@ -1,0 +1,17 @@
+<resources>
+    <style name="DarkAppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#E6A36F</item>
+        <item name="android:colorControlActivated">#E6A36F</item>
+        <item name="android:colorControlNormal">#C0B09F</item>
+        <item name="android:textColorPrimary">#F4E9DD</item>
+        <item name="android:textColorSecondary">#C0B09F</item>
+        <item name="android:colorBackground">#211D19</item>
+        <item name="android:colorBackgroundFloating">#2D2722</item>
+        <item name="android:windowBackground">#211D19</item>
+        <item name="android:statusBarColor">#211D19</item>
+        <item name="android:navigationBarColor">#211D19</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>

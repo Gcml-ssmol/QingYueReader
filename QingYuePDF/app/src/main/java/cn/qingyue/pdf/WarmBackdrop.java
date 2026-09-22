@@ -40,7 +40,7 @@ public final class WarmBackdrop extends Drawable {
             clip.addRoundRect(area, radius, radius, android.graphics.Path.Direction.CW);
             canvas.clipPath(clip);
             paint.setShader(new LinearGradient(area.left, area.top, area.right, area.bottom,
-                    Color.rgb(255, 235, 213), Color.rgb(255, 216, 181), Shader.TileMode.CLAMP));
+                    AppColors.isDark() ? AppColors.SURFACE : Color.rgb(255, 235, 213), AppColors.isDark() ? AppColors.SOFT : Color.rgb(255, 216, 181), Shader.TileMode.CLAMP));
             canvas.drawRect(area, paint);
             paint.setShader(null);
             paint.setColor(Color.argb(34, 241, 154, 91));
@@ -52,7 +52,7 @@ public final class WarmBackdrop extends Drawable {
             canvas.drawCircle(area.left + w * .62f, area.bottom + h * .75f, h * 1.2f, paint);
         } else {
             paint.setShader(new LinearGradient(area.left, area.top, area.left, area.bottom,
-                    Color.rgb(255, 248, 237), Color.rgb(255, 243, 228), Shader.TileMode.CLAMP));
+                    AppColors.isDark() ? AppColors.BACKGROUND : Color.rgb(255, 248, 237), AppColors.isDark() ? AppColors.SURFACE : Color.rgb(255, 243, 228), Shader.TileMode.CLAMP));
             canvas.drawRect(area, paint);
             // Keep decoration at the edges, leaving the document list uncluttered.
             float r = Math.min(w * .52f, h * .48f);

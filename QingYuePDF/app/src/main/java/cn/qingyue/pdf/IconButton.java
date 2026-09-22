@@ -11,13 +11,12 @@ import android.widget.Toast;
 
 /** Compact, density-independent toolbar icons with a full-size touch target. */
 public final class IconButton extends View {
-    private static final int DEFAULT_TINT = AppColors.INK;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF rect = new RectF();
     private final String kind;
     private boolean active;
-    private int tint = DEFAULT_TINT;
+    private int tint = AppColors.INK;
     private boolean customTint;
 
     public IconButton(Context context, String kind, String label) {
@@ -78,13 +77,13 @@ public final class IconButton extends View {
         float opacity = isEnabled() ? 1f : 0.32f;
         paint.setStyle(Paint.Style.FILL);
         if (active || isPressed() || isFocused()) {
-            paint.setColor(isPressed() ? 0xfff7d4b5 : active ? AppColors.SOFT : AppColors.BACKGROUND);
+            paint.setColor(isPressed() || active ? AppColors.SOFT : AppColors.BACKGROUND);
             paint.setAlpha(Math.round(255 * opacity));
             float inset = dp(3);
             rect.set(inset, inset, getWidth() - inset, getHeight() - inset);
             canvas.drawRoundRect(rect, dp(12), dp(12), paint);
         }
-        paint.setColor(customTint ? tint : active ? AppColors.ACCENT_DARK : DEFAULT_TINT);
+        paint.setColor(customTint ? tint : active ? AppColors.ACCENT_DARK : AppColors.INK);
         paint.setAlpha(Math.round(((paint.getColor() >>> 24) & 255) * opacity));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(1.8f);
