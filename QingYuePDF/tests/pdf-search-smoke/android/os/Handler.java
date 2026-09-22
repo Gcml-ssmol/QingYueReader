@@ -1,0 +1,1 @@
+package android.os; import java.util.concurrent.*;public class Handler {private final ExecutorService e=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"test-callback");t.setDaemon(true);return t;});public Handler(Looper l){}public boolean post(Runnable r){e.submit(r);return true;}public void removeCallbacksAndMessages(Object o){} }

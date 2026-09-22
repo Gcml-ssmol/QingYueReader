@@ -1,0 +1,22 @@
+[
+  {
+    "file": "SampleDoc.doc",
+    "url": "https://raw.githubusercontent.com/apache/poi/REL_5_5_1/test-data/document/SampleDoc.doc",
+    "sha256": "717585c0a88f20862c86220163dd03da87cd743970354c6b29add32725f2e833"
+  },
+  {
+    "file": "simple.doc",
+    "url": "https://raw.githubusercontent.com/apache/poi/REL_5_5_1/test-data/document/simple.doc",
+    "sha256": "4876e828e62d490fa188c7c4e47013e2e0dfdf02f5903dfd374bc0d2b2049ca1"
+  },
+  {
+    "file": "Word6.doc",
+    "url": "https://raw.githubusercontent.com/apache/poi/REL_5_5_1/test-data/document/Word6.doc",
+    "sha256": "58ea3347378e85e7c8d19ad64e74ad533b2f51b30f047594b434f380712f8b50"
+  },
+  {
+    "file": "SampleDoc.docx",
+    "url": "https://raw.githubusercontent.com/apache/poi/REL_5_5_1/test-data/document/SampleDoc.docx",
+    "sha256": "ea2c517bd7be4628887eb97f630334b93b894f4522d2c0adae263e602d76df92"
+  }
+]

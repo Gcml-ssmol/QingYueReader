@@ -1,0 +1,1 @@
+package android.graphics; public class Path{public enum FillType{WINDING,EVEN_ODD}public enum Op{INTERSECT}public Path(){}public Path(Path p){}public void moveTo(float x,float y){}public void lineTo(float x,float y){}public void close(){}public void setFillType(FillType f){}public void computeBounds(RectF r,boolean e){}public boolean op(Path p,Op o){return true;}}

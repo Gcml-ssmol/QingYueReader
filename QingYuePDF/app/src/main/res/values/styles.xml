@@ -1,0 +1,35 @@
+<resources>
+    <style name="BaseAppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#D8702A</item>
+        <item name="android:colorControlActivated">#D8702A</item>
+        <item name="android:colorControlNormal">#917B68</item>
+        <item name="android:colorControlHighlight">#33D8702A</item>
+        <item name="android:textColorPrimary">#36291F</item>
+        <item name="android:textColorSecondary">#917B68</item>
+        <item name="android:colorBackground">#FFF5E9</item>
+        <item name="android:colorBackgroundFloating">#FFFCF6</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">#FFF5E9</item>
+        <!-- Android 6 cannot draw dark navigation controls, so keep their background dark. -->
+        <item name="android:navigationBarColor">#36291F</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">#FFF5E9</item>
+        <item name="android:alertDialogTheme">@style/AppDialogTheme</item>
+    </style>
+    <style name="AppTheme" parent="BaseAppTheme" />
+    <style name="AppDialogTheme" parent="android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#D8702A</item>
+        <item name="android:colorControlActivated">#D8702A</item>
+        <item name="android:colorControlNormal">#917B68</item>
+        <item name="android:colorControlHighlight">#33D8702A</item>
+        <item name="android:textColorPrimary">#36291F</item>
+        <item name="android:textColorSecondary">#917B68</item>
+        <item name="android:colorBackground">#FFFCF6</item>
+        <item name="android:colorBackgroundFloating">#FFFCF6</item>
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:windowElevation">12dp</item>
+        <item name="android:backgroundDimAmount">0.22</item>
+    </style>
+</resources>

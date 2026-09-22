@@ -1,0 +1,1 @@
+package android.graphics; public class Matrix{public Matrix(){}public void getValues(float[] f){f[0]=f[4]=f[8]=1;}public void setValues(float[] f){}}

@@ -1,0 +1,8 @@
+晴阅审查/验证/
+work/
+outputs/
+**/build-local/
+**/build-test/
+**/*.keystore
+**/*.apk
+**/*.apk.idsig
