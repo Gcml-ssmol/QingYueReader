@@ -3,14 +3,14 @@
 总窗口：01a0c923-3730-7632-b7e1-aa879c4227f8。
 基线提交：579315de66c5b6efb8fadab35bea7eb05557abd8。
 用户选择：尽量覆盖全部建议；暂不连接Android设备，先代码审查和APK。
-六个新开发任务均指定 gpt-5.6-sol / ultra；只在独立Git工作树开发。
+六个新开发任务最初指定 gpt-5.6-sol / ultra；用户最新要求已将六个任务的后续消息统一设置为 gpt-5.6-sol / high，新建任务与子代理也必须沿用 high。只在独立Git工作树开发。
 
 | 模块 | 任务 | 已解析ID/创建ID | 工作树 | 状态 |
 | --- | --- | --- | --- | --- |
 | library | 晴阅开发：文档库、恢复与导入 | 01a0c935-3505-7453-aaa2-0250ca631f53 / client-new-thread:ba7d4395-f61d-4868-aacd-beae28d5ab93 | C:/Users/xsh12/.codex/worktrees/a7a1/笔记app | 开发中，API已草拟 |
 | notes | 晴阅开发：多页笔记与编辑器 | 01a0c93b-fc23-74e1-8183-aef0b2d24ce0 / client-new-thread:22423509-8ef7-4cda-b756-0e2f419ecdda | C:/Users/xsh12/.codex/worktrees/fd7e/笔记app | 开发中，API已草拟 |
-| reader | 晴阅开发：PDF阅读、检索与导出 | client-new-thread:fbc924a6-a8d8-4ed1-a82f-fc88ad530473 | C:/Users/xsh12/.codex/worktrees/17b0/笔记app | 开发中 |
-| learning | 晴阅开发：双栏、录音与复习 | client-new-thread:3dffcc4d-7882-4075-ba9b-8dcac8bbb340 | C:/Users/xsh12/.codex/worktrees/bb89/笔记app | 开发中 |
+| reader | 晴阅开发：PDF阅读、检索与导出 | 01a0c93c-8e3c-73c3-9d8d-7a4b2fb10885 / client-new-thread:fbc924a6-a8d8-4ed1-a82f-fc88ad530473 | C:/Users/xsh12/.codex/worktrees/17b0/笔记app | 开发中，已下发元数据保存预审问题 |
+| learning | 晴阅开发：双栏、录音与复习 | 01a0c93d-824c-71d0-8526-75545fa78aa4 / client-new-thread:3dffcc4d-7882-4075-ba9b-8dcac8bbb340 | C:/Users/xsh12/.codex/worktrees/bb89/笔记app | 开发中，已要求真实接入备份引用重映射 |
 | recognition | 晴阅开发：离线OCR与全库搜索 | 01a0c93d-8b09-7b53-8a0e-ecef4d737932 / client-new-thread:a95dbd58-1885-42ea-9ddc-7c60a056c1fb | C:/Users/xsh12/.codex/worktrees/c914/笔记app | 开发中，Tesseract4Android离线chi_sim+eng |
 | sync | 晴阅开发：可选同步与数据迁移 | 01a0c93f-33e2-7140-a348-68674a16f79b / client-new-thread:1817d296-fb87-4e27-b4e0-6d09e40a5e52 | C:/Users/xsh12/.codex/worktrees/be27/笔记app | 开发中 |
 
@@ -35,3 +35,6 @@
 总回归脚本已由sol ultra子代理完成并运行基线：PASS=15 FAIL=0 SKIP=0（计数包含纯Java编译）。根窗口主题新增类全量Java编译通过，尚未全局接入。
 
 交付格式：outputs/1.8.0/qingyue-pdf-1.8.0.apk、QingYuePDF/、QingYuePDF-1.8.0-source.zip、验证说明-1.8.0.txt，以及功能完成矩阵/审批记录。
+
+第一轮根窗口预审已发回 library：恢复与旧 Activity 索引保存竞争、永久删除回滚失败仍清理唯一副本、备份遗漏 pending 新版、损坏索引下完整备份遗漏载荷、LearningRemapper 未接、回收站恢复忽略保存失败、UTF-8 宽松解码覆盖损坏原文。固定快照：work/review-library/snapshot-20260922-214157313。上述问题修复并复测前不得批准合并。
+第一轮 reader 预审已发送：元数据初始异步加载与用户编辑竞争、损坏读取后的写保护、真实不可变快照、关闭时不可丢弃已排队保存。需交付提交后复核。

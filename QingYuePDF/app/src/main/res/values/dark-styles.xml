@@ -13,5 +13,19 @@
         <item name="android:navigationBarColor">#211D19</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:alertDialogTheme">@style/DarkAppDialogTheme</item>
+    </style>
+    <style name="DarkAppDialogTheme" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#E6A36F</item>
+        <item name="android:colorControlActivated">#E6A36F</item>
+        <item name="android:colorControlNormal">#C0B09F</item>
+        <item name="android:textColorPrimary">#F4E9DD</item>
+        <item name="android:textColorSecondary">#C0B09F</item>
+        <item name="android:colorBackground">#2D2722</item>
+        <item name="android:colorBackgroundFloating">#2D2722</item>
+        <item name="android:windowBackground">@drawable/dialog_background_dark</item>
+        <item name="android:windowElevation">12dp</item>
+        <item name="android:backgroundDimAmount">0.35</item>
     </style>
 </resources>
