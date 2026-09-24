@@ -1,0 +1,47 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/InkStrokeRenderer.java",
+    "before": "998805e70b9589e7551d906db945632001b6db06f4569c1a7ea7e8facff39e98",
+    "after": "16af612a7de64e64f5820e88d07d044342b762d78a8556049766dfcf735cc360"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "f099d4efe98c84c28f0c90e5be4dba48763306213218f301e06cf3b40f621c8d",
+    "after": "3fcd680a6d7ac655b0f79004c115043ad59f770dcd932f520d4a541af596f1cb"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfReaderView.java",
+    "before": "974c5002c5784ac562fa61bbfb552e57f399ff13dd845aa01907021c3255b0b6",
+    "after": "f83ca922fdf09ffd1cebeb25d95bae18945dd74d3f9f6ae21e10f2c8293747e8"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfRenderPlan.java",
+    "before": "ad90cc3ce7ac5370f119def1855893be4def7ee52e45d8b75ce162ac0f103ba8",
+    "after": "9deb0ebd440bd9304ec72fdd4696520d4cae0c8198594b12955259c4c420be92"
+  },
+  {
+    "file": "tests/render-performance/android/graphics/Canvas.java",
+    "before": null,
+    "after": "8a004de6fc81811dc4e3107039bf385cfeb675d22ffff38464600d41f4b809a5"
+  },
+  {
+    "file": "tests/render-performance/android/graphics/Paint.java",
+    "before": null,
+    "after": "8c81c5def811c4686c568e2b93dbd5668aec400523ddc133fbd070e71e4d75c7"
+  },
+  {
+    "file": "tests/render-performance/android/graphics/Path.java",
+    "before": null,
+    "after": "e037ad19c25d9cac458fba8b6f61877dbcedbb890a87a259d4add1274050a795"
+  },
+  {
+    "file": "tests/render-performance/RenderPerformanceTest.java",
+    "before": null,
+    "after": "bfe22cd28e233b9c861d4ae7ffa67625bce7b3d6dce63cd2bfaba59f40fd24e1"
+  },
+  {
+    "file": "tests/render-performance/run.ps1",
+    "before": null,
+    "after": "cd348e5702886eb339dd7c4373879bec024aceb78da7a8b17be00f1e1e7f8a8b"
+  }
+]

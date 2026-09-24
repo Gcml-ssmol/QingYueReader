@@ -1,0 +1,32 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+    "before": "e561f9014d0c18d3de05d8c3e7a712d0750315b989575c30554313862b4ae662",
+    "after": "4e4931f0f7baf89fa76093ba84667eaaf00621a90f9e64be9b6e991039e65963"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java",
+    "before": "384378dbeee53e663b0d6005e72f4ac93e12f80ea405519e9ab838fd881ac469",
+    "after": "bec8664161131892ce349a483bac21a249e35f88c17a9a00875ba9fab15a47bc"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java",
+    "before": null,
+    "after": "b7b50ca24f86c80fa7cbba11ebb19e940eb889811333226726c60cf3015cf29d"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionPlacement.java",
+    "before": null,
+    "after": "efa617660c8cb064c875fda972e1ca376d775e4b066889349686e0622ffe586a"
+  },
+  {
+    "file": "tests/note-action-menu/NoteActionPlacementTest.java",
+    "before": null,
+    "after": "84e96e6931a37780709228f8b724af92a30db26a80d745a3173f6d4a13bb9445"
+  },
+  {
+    "file": "tests/note-action-menu/run.ps1",
+    "before": null,
+    "after": "fdc8960f2fd048a22b8778269a1987770fa4b7ca2c13e009ab5af628f0fa4edc"
+  }
+]

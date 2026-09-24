@@ -31,6 +31,18 @@ public final class PageLayout {
     public double height(int page) { return heights[page]; }
     public double totalHeight() { return totalHeight; }
 
+    /** Returns a recalibrated layout after a page is opened; untouched pages keep estimates. */
+    public PageLayout withHeight(int page, float heightOverWidth) {
+        if (page < 0 || page >= size() || !(heightOverWidth > 0) || Float.isInfinite(heightOverWidth)) {
+            throw new IllegalArgumentException("Invalid page geometry");
+        }
+        if (Math.abs(heights[page] - heightOverWidth) < 0.0001) return this;
+        float[] ratios = new float[size()];
+        for (int i = 0; i < ratios.length; i++) ratios[i] = (float) heights[i];
+        ratios[page] = heightOverWidth;
+        return new PageLayout(ratios);
+    }
+
     /** Gaps select the nearer page; an exact midpoint selects the preceding page. */
     public int pageAt(double documentY) {
         checkNotNaN(documentY);

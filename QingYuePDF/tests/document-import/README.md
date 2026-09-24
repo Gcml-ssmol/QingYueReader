@@ -7,10 +7,13 @@ Run from the workspace with:
 ```
 
 `DocumentImportTest` runs the **same production `DocumentText` extractor**, not a mock.
-It passes 17 checks covering genuine Word 97 binary DOC, Word 6 DOC, DOCX, a HWPF-written
+It passes 23 checks covering genuine Word 97 binary DOC, Word 6 DOC, DOCX, a HWPF-written
 Chinese DOC, UTF-8 / UTF-16 BOM / GB18030 text, paragraphs/tabs/line breaks, deleted
 DOCX text, renamed files identified by content, corrupt OLE, fake DOC, DTDs in UTF-8
-and UTF-16, empty/binary TXT, and text/decompression limits. Sample document fixtures
+and UTF-16, empty/binary TXT, shared-text normalization and limits, cooperative
+cancellation, and text/decompression limits. `ImportSessionTest` adds 28 checks for
+state replay, progress, exclusive result claims, failed-commit retry, idempotent completion,
+discard, and cancellation. Sample document fixtures
 come from Apache POI `REL_5_5_1`; exact URLs and SHA-256 values are in
 `fixtures/sources.json`. Apache license/NOTICE files are bundled in `third-party/licenses`.
 The generated Chinese DOC and other adversarial fixtures stay in the supplied build directory.

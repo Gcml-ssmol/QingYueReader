@@ -1,0 +1,303 @@
+[
+  {
+    "file": "assets/baiduprotect-sec.dex",
+    "size": 2494,
+    "magic": "e7f066e3788e1a50",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect1.i.dex",
+    "size": 5583,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect1.jar",
+    "size": 2233001,
+    "magic": "0b8ccd5804ab2938",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect10.i.dex",
+    "size": 8280,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect10.jar",
+    "size": 3247364,
+    "magic": "0b8ccd58048fea08",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect11.i.dex",
+    "size": 6804,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect11.jar",
+    "size": 2530950,
+    "magic": "0b8ccd5804abea8a",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect12.i.dex",
+    "size": 5105,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect12.jar",
+    "size": 1755202,
+    "magic": "0b8ccd5874afef08",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect13.i.dex",
+    "size": 3652,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect13.jar",
+    "size": 959388,
+    "magic": "0b8ccd58048f2a98",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect14.i.dex",
+    "size": 3926,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect14.jar",
+    "size": 1245576,
+    "magic": "0b8ccd5806e3b189",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect15.i.dex",
+    "size": 2273,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect15.jar",
+    "size": 552760,
+    "magic": "0b8ccd5804abaa0a",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect16.i.dex",
+    "size": 2534,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect16.jar",
+    "size": 707582,
+    "magic": "0b8ccd5802eb230a",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect17.i.dex",
+    "size": 477,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect17.jar",
+    "size": 91604,
+    "magic": "0b8c7d3208a7f008",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect2.i.dex",
+    "size": 2911,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect2.jar",
+    "size": 865198,
+    "magic": "0b8ccd58048fea08",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect3.i.dex",
+    "size": 3806,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect3.jar",
+    "size": 1159298,
+    "magic": "0b8ccd58048bea08",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect4.i.dex",
+    "size": 10797,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect4.jar",
+    "size": 3869970,
+    "magic": "0b8ccd58068771b8",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect5.i.dex",
+    "size": 2644,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect5.jar",
+    "size": 725700,
+    "magic": "0b8ccd5804afea9a",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect6.i.dex",
+    "size": 5027,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect6.jar",
+    "size": 1943439,
+    "magic": "0b8ccd5804efea98",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect7.i.dex",
+    "size": 3262,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect7.jar",
+    "size": 1138207,
+    "magic": "0b8ccd5804efe918",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect8.i.dex",
+    "size": 1774,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect8.jar",
+    "size": 627359,
+    "magic": "0b8ccd5454afea1a",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect9.i.dex",
+    "size": 8610,
+    "magic": "504b030414000808",
+    "readableDex": false
+  },
+  {
+    "file": "assets/baiduprotect9.jar",
+    "size": 3444249,
+    "magic": "0b8ccd5804ab2a88",
+    "readableDex": false
+  },
+  {
+    "file": "classes.dex",
+    "size": 4816508,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes10.dex",
+    "size": 4448576,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes11.dex",
+    "size": 85144,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes12.dex",
+    "size": 1677192,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes13.dex",
+    "size": 789608,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes2.dex",
+    "size": 766436,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes3.dex",
+    "size": 2381320,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes4.dex",
+    "size": 3181920,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes5.dex",
+    "size": 7277212,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes6.dex",
+    "size": 3837440,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes7.dex",
+    "size": 904252,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes8.dex",
+    "size": 645224,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  },
+  {
+    "file": "classes9.dex",
+    "size": 2268996,
+    "ownedClasses": 0,
+    "ownedMethods": 0,
+    "readableDex": true
+  }
+]

@@ -3,4 +3,8 @@
         <item name="android:navigationBarColor">#FFF5E9</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
+    <style name="CreamAppTheme" parent="BaseCreamAppTheme">
+        <item name="android:navigationBarColor">#FFF8EF</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
 </resources>

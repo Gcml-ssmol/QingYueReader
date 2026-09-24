@@ -1,0 +1,23 @@
+N: android=http://schemas.android.com/apk/res/android (line=16)
+  N: app=http://schemas.android.com/apk/res-auto (line=16)
+    E: LinearLayout (line=16)
+      A: http://schemas.android.com/apk/res/android:orientation(0x010100c4)=1
+      A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f090791 [id/fl_page]
+      A: http://schemas.android.com/apk/res/android:tag(0x010100d1)="layout/layout_tab_page_0" (Raw: "layout/layout_tab_page_0")
+      A: http://schemas.android.com/apk/res/android:background(0x010100d4)=?0x7f040357
+      A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-1
+      A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-1
+        E: LinearLayout (line=23)
+          A: http://schemas.android.com/apk/res/android:orientation(0x010100c4)=1
+          A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-1
+          A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-1
+            E: com.google.android.material.tabs.TabLayout (line=28)
+              A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f09183a [id/tab_layout]
+              A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-1
+              A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+              A: http://schemas.android.com/apk/res-auto:tabMode(0x7f040865)=0
+            E: androidx.viewpager2.widget.ViewPager2 (line=34)
+              A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f091ce8 [id/view_pager]
+              A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-1
+              A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=0.000000dp
+              A: http://schemas.android.com/apk/res/android:layout_weight(0x01010181)=1

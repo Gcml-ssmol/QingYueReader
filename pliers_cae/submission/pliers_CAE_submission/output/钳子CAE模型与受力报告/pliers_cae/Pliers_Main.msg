@@ -1,0 +1,3309 @@
+1
+
+   Abaqus 6.14-2                                  Date 24-Sep-2026   Time 22:25:40
+   For use by Supplied By SSQ under license from Dassault Systemes or its subsidiary.
+
+ Quasistatic pliers contact, per-handle force 20 to 100 N                        
+                                                                                 
+ STEP    1     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                0.100    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-07
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.250    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INITIAL VALUE OF TIME AVERAGE FORCE                               1.000E-02
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INITIAL VALUE OF TIME AVERAGE MOMENT                              1.000E-02
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM CUT-BACKS ALLOWED IN AN INCREMENT                                 5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                     200
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      2.78    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     ELEMENT OPERATIONS WILL BE CARRIED OUT IN PARALLEL USING   2 PROCESSORS
+
+     PARALLEL CONTACT TRACKING ENABLED
+
+
+     COLLECTING MODEL CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+ 
+     INITIAL ELEMENT LOAD BALANCE
+        COMPUTE NODE   1   PROCESS    NUMBER OF ELEMENTS
+                              1            18944
+                              2            19927
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.08E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.4000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.6000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                  128 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                  128 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     1
+
+   MAX. PENETRATION ERROR 612.624E-12   AT NODE LEFT_JAW.413 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -117.232E-03   AT NODE RIGHT_JAW.12944 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE ESTIMATED CONTACT FORCE ERROR IS OUTSIDE OF CONVERGENCE TOLERANCES.
+
+ AVERAGE FORCE                      2.001E-02   TIME AVG. FORCE       2.001E-02
+ LARGEST RESIDUAL FORCE             0.162       AT NODE      13211   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.357E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        5.357E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.556E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.888E-04   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.123E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.123E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.02E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.4000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.5000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                   18 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                   18 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     2
+
+   MAX. PENETRATION ERROR 60.2466E-12  AT NODE LEFT_JAW.20245 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -2.06415     AT NODE LEFT_JAW.20553 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE ESTIMATED CONTACT FORCE ERROR IS OUTSIDE OF CONVERGENCE TOLERANCES.
+
+ AVERAGE FORCE                      2.007E-02   TIME AVG. FORCE       2.007E-02
+ LARGEST RESIDUAL FORCE             -1.33       AT NODE      20553   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.         5.437E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.       -8.028E-05   AT NODE         20   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.573E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.247E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.187E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -6.351E-07   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.3000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                   14 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                   14 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     3
+
+   MAX. PENETRATION ERROR -30.0582E-12  AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -2.14457     AT NODE LEFT_JAW.1342 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE ESTIMATED CONTACT FORCE ERROR IS OUTSIDE OF CONVERGENCE TOLERANCES.
+
+ AVERAGE FORCE                      1.995E-02   TIME AVG. FORCE       1.995E-02
+ LARGEST RESIDUAL FORCE              1.14       AT NODE      20324   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.478E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        4.065E-05   AT NODE         20   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.540E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.539E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.219E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     3.222E-07   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.8000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.9000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                   14 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                    2 POINTS CHANGED FROM OPEN TO CLOSED
+                   12 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     4
+
+   MAX. PENETRATION ERROR 992.828E-09   AT NODE RIGHT_JAW.15094 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -1.78979     AT NODE RIGHT_JAW.15092 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE ESTIMATED CONTACT FORCE ERROR IS OUTSIDE OF CONVERGENCE TOLERANCES.
+
+ AVERAGE FORCE                      1.984E-02   TIME AVG. FORCE       1.984E-02
+ LARGEST RESIDUAL FORCE              1.14       AT NODE      15092   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.504E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.649E-05   AT NODE         20   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.509E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.702E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.240E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     2.101E-07   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.8000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.9000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                    6 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                    6 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     5
+
+   MAX. PENETRATION ERROR -21.7931E-12  AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -1.34234     AT NODE RIGHT_JAW.15094 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE ESTIMATED CONTACT FORCE ERROR IS OUTSIDE OF CONVERGENCE TOLERANCES.
+
+ AVERAGE FORCE                      1.976E-02   TIME AVG. FORCE       1.976E-02
+ LARGEST RESIDUAL FORCE             0.797       AT NODE      15094   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.520E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.722E-05   AT NODE         14   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.486E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.591E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.252E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.244E-07   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.4000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.5000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -7.12413E-12 AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -1.83208E-06 AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      1.975E-02   TIME AVG. FORCE       1.975E-02
+ LARGEST RESIDUAL FORCE             3.297E-06   AT NODE      24097   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.524E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        6.542E-06   AT NODE         14   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.485E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -5.621E-08   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.255E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     2.978E-08   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   6 TOTAL ITERATIONS, OF WHICH
+   5 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.100    
+ STEP TIME COMPLETED       0.100    ,  TOTAL TIME COMPLETED        0.100    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.3000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -13.6030E-12  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -5.41591E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      4.438E-02   TIME AVG. FORCE       3.207E-02
+ LARGEST RESIDUAL FORCE             7.577E-04   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.        -5.529E-03   AT NODE         13   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST CORRECTION TO DISP.       -5.764E-06   AT NODE         13   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.485E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -7.575E-04   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION     -1.259E-05   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.445E-08   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.3000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 1.36599E-15 AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 539.715E-12   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      4.438E-02   TIME AVG. FORCE       3.207E-02
+ LARGEST RESIDUAL FORCE            -3.765E-09   AT NODE      23210   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.        -5.529E-03   AT NODE         13   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST CORRECTION TO DISP.        4.092E-10   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      5.485E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.058E-07   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION     -1.259E-05   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.854E-12   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.150    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.200    
+ STEP TIME COMPLETED       0.200    ,  TOTAL TIME COMPLETED        0.200    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.150    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.4000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 16.2838E-12  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 6.59621E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      7.725E-02   TIME AVG. FORCE       4.713E-02
+ LARGEST RESIDUAL FORCE            -1.430E-03   AT NODE      23213   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.        -8.290E-03   AT NODE         13   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST CORRECTION TO DISP.        3.632E-06   AT NODE         15   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      8.905E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.430E-03   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION     -1.886E-05   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     2.962E-08   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 5.47421E-15 AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.55059E-09 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      7.725E-02   TIME AVG. FORCE       4.713E-02
+ LARGEST RESIDUAL FORCE             8.173E-09   AT NODE      23210   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.        -8.290E-03   AT NODE         13   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST CORRECTION TO DISP.       -7.714E-10   AT NODE       7392   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      8.905E-02
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            5.696E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION     -1.886E-05   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     2.395E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.225    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.150    ,  FRACTION OF STEP COMPLETED  0.350    
+ STEP TIME COMPLETED       0.350    ,  TOTAL TIME COMPLETED        0.350    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.225    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 2.97921E-12 AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 1.20338E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.126       TIME AVG. FORCE       6.693E-02
+ LARGEST RESIDUAL FORCE            -3.208E-03   AT NODE      23213   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.144E-06   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.131    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            3.209E-03   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     2.600E-09   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.8000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.8000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 14.5852E-15  AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 5.93448E-09 AT NODE RIGHT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.126       TIME AVG. FORCE       6.693E-02
+ LARGEST RESIDUAL FORCE             2.891E-08   AT NODE      23210   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.       -1.731E-09   AT NODE       7392   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.131    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.910E-06   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     5.988E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.250    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.225    ,  FRACTION OF STEP COMPLETED  0.575    
+ STEP TIME COMPLETED       0.575    ,  TOTAL TIME COMPLETED        0.575    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.250    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                    1 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                    1 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     1
+
+   MAX. PENETRATION ERROR 1.71272E-12 AT NODE LEFT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -1.51387E-03 AT NODE LEFT_JAW.1341 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINT ERRORS ARE WITHIN THE TOLERANCES.
+
+ AVERAGE FORCE                      0.181       TIME AVG. FORCE       8.977E-02
+ LARGEST RESIDUAL FORCE             4.514E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.382E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.525E-06   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.186    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -4.517E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.287E-10   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  5.00E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 30.5232E-15  AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 12.0123E-09  AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.181       TIME AVG. FORCE       8.977E-02
+ LARGEST RESIDUAL FORCE             4.346E-08   AT NODE      23210   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.382E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        3.646E-09   AT NODE       4170   DOF  1
+   INSTANCE: BLOCK                                                                           
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.186    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.943E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -8.535E-12   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   1 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.250    ,  FRACTION OF STEP COMPLETED  0.825    
+ STEP TIME COMPLETED       0.825    ,  TOTAL TIME COMPLETED        0.825    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.175    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.7000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.8000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 1.24368E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 304.861E-09   AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.220       TIME AVG. FORCE       0.112    
+ LARGEST RESIDUAL FORCE             2.827E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.673E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        9.528E-07   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.249    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.828E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.608E-10   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.8000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.9000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 22.8489E-15  AT NODE RIGHT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 9.12629E-09 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.220       TIME AVG. FORCE       0.112    
+ LARGEST RESIDUAL FORCE            -2.145E-08   AT NODE      23213   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.         9.673E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.526E-09   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.249    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.241E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -5.381E-12   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.175    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         1.00    
+1
+
+   Abaqus 6.14-2                                  Date 24-Sep-2026   Time 22:26:37
+   For use by Supplied By SSQ under license from Dassault Systemes or its subsidiary.
+
+ Quasistatic pliers contact, per-handle force 20 to 100 N                        
+                                                                                 
+ STEP    2     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       2     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                0.100    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-07
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.250    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. FORCE     IS TIME AVG. FORCE     IN PREVIOUS STEP
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. MOMENT    IS TIME AVG. MOMENT    IN PREVIOUS STEP
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM CUT-BACKS ALLOWED IN AN INCREMENT                                 5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                     200
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      2.78    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     ELEMENT OPERATIONS WILL BE CARRIED OUT IN PARALLEL USING   2 PROCESSORS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+ 
+     INITIAL ELEMENT LOAD BALANCE
+        COMPUTE NODE   1   PROCESS    NUMBER OF ELEMENTS
+                              1            20695
+                              2            18176
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 8.43005E-09 AT NODE RIGHT_JAW.20245 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -3.16292E-03 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.245       TIME AVG. FORCE       0.245    
+ LARGEST RESIDUAL FORCE             3.868E-03   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.528E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        5.528E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.679    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -3.752E-04   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.1000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.1000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 178.599E-15   AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 70.4818E-09  AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.245       TIME AVG. FORCE       0.245    
+ LARGEST RESIDUAL FORCE            -5.733E-08   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.528E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.282E-07   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.680    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.279E-07   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     8.162E-11   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.100    
+ STEP TIME COMPLETED       0.100    ,  TOTAL TIME COMPLETED         1.10    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.1000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 397.156E-15   AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 97.7978E-09  AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.275       TIME AVG. FORCE       0.260    
+ LARGEST RESIDUAL FORCE             7.603E-04   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.528E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.563E-07   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.680    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            7.600E-04   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.409E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.150    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.200    
+ STEP TIME COMPLETED       0.200    ,  TOTAL TIME COMPLETED         1.20    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.150    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 842.543E-15   AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 215.854E-09   AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.308       TIME AVG. FORCE       0.276    
+ LARGEST RESIDUAL FORCE             1.426E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         8.292E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        4.808E-07   AT NODE         10   DOF  2
+   INSTANCE: LEFT_JAW                                                                        
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.721    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.425E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.886E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -8.637E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.1000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 15.8928E-15  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 6.17519E-09 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.308       TIME AVG. FORCE       0.276    
+ LARGEST RESIDUAL FORCE             1.241E-08   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         8.292E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        7.692E-10   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.721    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            5.150E-07   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.886E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.733E-12   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.225    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.150    ,  FRACTION OF STEP COMPLETED  0.350    
+ STEP TIME COMPLETED       0.350    ,  TOTAL TIME COMPLETED         1.35    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.225    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.1000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 2.17929E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 540.271E-09   AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.357       TIME AVG. FORCE       0.296    
+ LARGEST RESIDUAL FORCE             3.208E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.081E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.766    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -3.210E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.820E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 41.5624E-15  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 16.2792E-09  AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.357       TIME AVG. FORCE       0.296    
+ LARGEST RESIDUAL FORCE             3.641E-08   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.731E-09   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.766    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.779E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     6.085E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.250    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.225    ,  FRACTION OF STEP COMPLETED  0.575    
+ STEP TIME COMPLETED       0.575    ,  TOTAL TIME COMPLETED         1.58    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.250    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.72E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.1000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+                    1 SEVERE DISCONTINUITIES OCCURRED DURING THIS ITERATION.
+                    1 POINTS CHANGED FROM CLOSED TO OPEN
+
+               CONVERGENCE CHECKS FOR SEVERE DISCONTINUITY ITERATION     1
+
+   MAX. PENETRATION ERROR 3.61837E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -10.0639E-03  AT NODE RIGHT_JAW.1341 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINT ERRORS ARE WITHIN THE TOLERANCES.
+
+ AVERAGE FORCE                      0.412       TIME AVG. FORCE       0.319    
+ LARGEST RESIDUAL FORCE             4.514E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.382E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.522E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.822    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -4.518E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.542E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.9000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -326.062E-15   AT NODE RIGHT_JAW.11723 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR -50.3658E-09  AT NODE RIGHT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.412       TIME AVG. FORCE       0.319    
+ LARGEST RESIDUAL FORCE             7.251E-08   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.382E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.       -2.454E-08   AT NODE       2238   DOF  1
+   INSTANCE: BLOCK                                                                           
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.822    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            2.758E-06   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     9.040E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   1 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.250    ,  FRACTION OF STEP COMPLETED  0.825    
+ STEP TIME COMPLETED       0.825    ,  TOTAL TIME COMPLETED         1.83    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.175    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 2.46385E-12 AT NODE LEFT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 593.840E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.451       TIME AVG. FORCE       0.341    
+ LARGEST RESIDUAL FORCE             2.828E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.676E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        9.536E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.887    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.828E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.558E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 46.0279E-15  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 18.0155E-09  AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.451       TIME AVG. FORCE       0.341    
+ LARGEST RESIDUAL FORCE             3.687E-08   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.676E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.526E-09   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.887    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.133E-06   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     5.427E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.175    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         2.00    
+1
+
+   Abaqus 6.14-2                                  Date 24-Sep-2026   Time 22:27:11
+   For use by Supplied By SSQ under license from Dassault Systemes or its subsidiary.
+
+ Quasistatic pliers contact, per-handle force 20 to 100 N                        
+                                                                                 
+ STEP    3     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       3     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                0.100    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-07
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.250    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. FORCE     IS TIME AVG. FORCE     IN PREVIOUS STEP
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. MOMENT    IS TIME AVG. MOMENT    IN PREVIOUS STEP
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM CUT-BACKS ALLOWED IN AN INCREMENT                                 5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                     200
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      2.78    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     ELEMENT OPERATIONS WILL BE CARRIED OUT IN PARALLEL USING   2 PROCESSORS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+ 
+     INITIAL ELEMENT LOAD BALANCE
+        COMPUTE NODE   1   PROCESS    NUMBER OF ELEMENTS
+                              1            20439
+                              2            18432
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.1000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -16.9238E-09  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -6.59829E-03 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.475       TIME AVG. FORCE       0.475    
+ LARGEST RESIDUAL FORCE             7.907E-03   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.529E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        5.529E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.32    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            3.883E-04   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.1000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 292.957E-15   AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 139.918E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.475       TIME AVG. FORCE       0.475    
+ LARGEST RESIDUAL FORCE            -1.169E-07   AT NODE       2600   DOF  1
+   INSTANCE: BLOCK                                                                           
+ LARGEST INCREMENT OF DISP.         5.529E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.287E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.32    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.108E-07   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.180E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.100    
+ STEP TIME COMPLETED       0.100    ,  TOTAL TIME COMPLETED         2.10    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.9000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 725.933E-15   AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 176.752E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.505       TIME AVG. FORCE       0.490    
+ LARGEST RESIDUAL FORCE             7.604E-04   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.530E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.565E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.32    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -7.601E-04   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.154E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.150    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.200    
+ STEP TIME COMPLETED       0.200    ,  TOTAL TIME COMPLETED         2.20    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.150    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.3000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 1.46144E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 369.263E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.538       TIME AVG. FORCE       0.506    
+ LARGEST RESIDUAL FORCE             1.426E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         8.295E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        4.813E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.36    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.425E-03   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.886E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -8.184E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.225    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.150    ,  FRACTION OF STEP COMPLETED  0.350    
+ STEP TIME COMPLETED       0.350    ,  TOTAL TIME COMPLETED         2.35    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.225    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.8000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 3.59403E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 896.761E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.587       TIME AVG. FORCE       0.526    
+ LARGEST RESIDUAL FORCE             3.208E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.083E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.41    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            3.208E-03   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.794E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.9000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.1000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 69.0777E-15  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 26.4385E-09  AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.587       TIME AVG. FORCE       0.526    
+ LARGEST RESIDUAL FORCE            -5.314E-08   AT NODE      23213   DOF  1
+   INSTANCE: LEFT_JAW                                                                        
+ LARGEST INCREMENT OF DISP.         1.244E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.731E-09   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.41    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.649E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     6.141E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.250    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.225    ,  FRACTION OF STEP COMPLETED  0.575    
+ STEP TIME COMPLETED       0.575    ,  TOTAL TIME COMPLETED         2.58    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.250    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   3.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   3.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 5.55587E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.33822E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.642       TIME AVG. FORCE       0.550    
+ LARGEST RESIDUAL FORCE             4.515E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.383E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.524E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.46    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -4.519E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.390E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 104.777E-15   AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 40.9045E-09  AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.642       TIME AVG. FORCE       0.550    
+ LARGEST RESIDUAL FORCE             8.195E-08   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.383E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.436E-09   AT NODE       7392   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.46    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.585E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     8.622E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.250    ,  FRACTION OF STEP COMPLETED  0.825    
+ STEP TIME COMPLETED       0.825    ,  TOTAL TIME COMPLETED         2.83    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.175    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.3000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 3.77439E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 897.559E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.681       TIME AVG. FORCE       0.572    
+ LARGEST RESIDUAL FORCE             2.828E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.679E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        9.544E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.53    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.829E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.486E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.175    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         3.00    
+1
+
+   Abaqus 6.14-2                                  Date 24-Sep-2026   Time 22:27:38
+   For use by Supplied By SSQ under license from Dassault Systemes or its subsidiary.
+
+ Quasistatic pliers contact, per-handle force 20 to 100 N                        
+                                                                                 
+ STEP    4     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       4     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                0.100    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-07
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.250    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. FORCE     IS TIME AVG. FORCE     IN PREVIOUS STEP
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. MOMENT    IS TIME AVG. MOMENT    IN PREVIOUS STEP
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM CUT-BACKS ALLOWED IN AN INCREMENT                                 5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                     200
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      2.78    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     ELEMENT OPERATIONS WILL BE CARRIED OUT IN PARALLEL USING   2 PROCESSORS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+ 
+     INITIAL ELEMENT LOAD BALANCE
+        COMPUTE NODE   1   PROCESS    NUMBER OF ELEMENTS
+                              1            19707
+                              2            19164
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.3000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.20000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.5000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -25.9094E-09  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -10.0140E-03  AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.706       TIME AVG. FORCE       0.706    
+ LARGEST RESIDUAL FORCE             1.220E-02   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.531E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        5.531E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.96    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            3.999E-04   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.1000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 577.128E-15   AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 277.488E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.706       TIME AVG. FORCE       0.706    
+ LARGEST RESIDUAL FORCE             2.003E-07   AT NODE        143   DOF  1
+   INSTANCE: BLOCK                                                                           
+ LARGEST INCREMENT OF DISP.         5.531E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.294E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.96    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -9.637E-08   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.467E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.100    
+ STEP TIME COMPLETED       0.100    ,  TOTAL TIME COMPLETED         3.10    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 1.03132E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 229.956E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.735       TIME AVG. FORCE       0.720    
+ LARGEST RESIDUAL FORCE             7.604E-04   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.531E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.565E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       1.96    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            7.606E-04   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -3.449E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.150    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.200    
+ STEP TIME COMPLETED       0.200    ,  TOTAL TIME COMPLETED         3.20    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.150    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 2.11820E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 529.641E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.768       TIME AVG. FORCE       0.736    
+ LARGEST RESIDUAL FORCE             1.426E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         8.297E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        4.817E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.00    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -1.425E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.886E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -7.903E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.225    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.150    ,  FRACTION OF STEP COMPLETED  0.350    
+ STEP TIME COMPLETED       0.350    ,  TOTAL TIME COMPLETED         3.35    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.225    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.4000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.5000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 5.06950E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.25035E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.817       TIME AVG. FORCE       0.757    
+ LARGEST RESIDUAL FORCE             3.208E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.245E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.084E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.04    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -3.208E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.736E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.250    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.225    ,  FRACTION OF STEP COMPLETED  0.575    
+ STEP TIME COMPLETED       0.575    ,  TOTAL TIME COMPLETED         3.58    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.250    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.3000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 7.76573E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.90144E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.873       TIME AVG. FORCE       0.780    
+ LARGEST RESIDUAL FORCE             4.516E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.383E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.526E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.10    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -4.515E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.448E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 144.547E-15   AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 55.1082E-09  AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.873       TIME AVG. FORCE       0.780    
+ LARGEST RESIDUAL FORCE             1.049E-07   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.383E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.872E-09   AT NODE         20   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.10    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.422E-06   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.143E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     8.705E-12   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.250    ,  FRACTION OF STEP COMPLETED  0.825    
+ STEP TIME COMPLETED       0.825    ,  TOTAL TIME COMPLETED         3.83    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.175    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 5.06655E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.17208E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.912       TIME AVG. FORCE       0.802    
+ LARGEST RESIDUAL FORCE             2.828E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.682E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        9.550E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.17    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.830E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.200E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.404E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.175    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         4.00    
+1
+
+   Abaqus 6.14-2                                  Date 24-Sep-2026   Time 22:27:59
+   For use by Supplied By SSQ under license from Dassault Systemes or its subsidiary.
+
+ Quasistatic pliers contact, per-handle force 20 to 100 N                        
+                                                                                 
+ STEP    5     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       5     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                0.100    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-07
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.250    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. FORCE     IS TIME AVG. FORCE     IN PREVIOUS STEP
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INIT. VALUE OF TIME AVG. MOMENT    IS TIME AVG. MOMENT    IN PREVIOUS STEP
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM CUT-BACKS ALLOWED IN AN INCREMENT                                 5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                     200
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      2.78    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     ELEMENT OPERATIONS WILL BE CARRIED OUT IN PARALLEL USING   2 PROCESSORS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+ 
+     INITIAL ELEMENT LOAD BALANCE
+        COMPUTE NODE   1   PROCESS    NUMBER OF ELEMENTS
+                              1            18432
+                              2            20439
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.3000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR -35.0515E-09  AT NODE LEFT_JAW.11723 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR -13.4161E-03  AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.936       TIME AVG. FORCE       0.936    
+ LARGEST RESIDUAL FORCE             1.670E-02   AT NODE      24099   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.533E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        5.533E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.60    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            4.131E-04   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THE MOMENT    IS ZERO EVERYWHERE BUT THE MOMENT    RESIDUAL OR
+          THE ROTATION CORRECTION IS NON-ZERO
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.3000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+   MAX. PENETRATION ERROR 977.558E-15   AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+   MAX. CONTACT FORCE ERROR 470.017E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.936       TIME AVG. FORCE       0.936    
+ LARGEST RESIDUAL FORCE             3.220E-07   AT NODE        143   DOF  1
+   INSTANCE: BLOCK                                                                           
+ LARGEST INCREMENT OF DISP.         5.533E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.302E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.60    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            7.805E-08   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.728E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.100    
+ STEP TIME COMPLETED       0.100    ,  TOTAL TIME COMPLETED         4.10    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.2000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 1.37334E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 302.218E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.965       TIME AVG. FORCE       0.951    
+ LARGEST RESIDUAL FORCE             7.606E-04   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         5.533E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        2.567E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.60    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -7.606E-04   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.257E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -3.363E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.150    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.200    
+ STEP TIME COMPLETED       0.200    ,  TOTAL TIME COMPLETED         4.20    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.150    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.4000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 2.79010E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 688.546E-09   AT NODE LEFT_JAW.24097 OF CONTACT 
+   PAIR (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                      0.998       TIME AVG. FORCE       0.967    
+ LARGEST RESIDUAL FORCE             1.426E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         8.300E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        4.821E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.64    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT            1.425E-03   AT NODE          1   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      1.886E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -7.763E-11   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.225    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.150    ,  FRACTION OF STEP COMPLETED  0.350    
+ STEP TIME COMPLETED       0.350    ,  TOTAL TIME COMPLETED         4.35    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.225    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.3000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          2
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 6.58170E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.60216E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                       1.05       TIME AVG. FORCE       0.987    
+ LARGEST RESIDUAL FORCE             3.209E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.245E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.085E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.68    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -3.209E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.829E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.710E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+          TIME INCREMENT MAY NOW INCREASE TO    0.250    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.225    ,  FRACTION OF STEP COMPLETED  0.575    
+ STEP TIME COMPLETED       0.575    ,  TOTAL TIME COMPLETED         4.57    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.250    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.1000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.2000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 9.93499E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 2.39955E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                       1.10       TIME AVG. FORCE        1.01    
+ LARGEST RESIDUAL FORCE             4.517E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         1.383E-02   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        1.527E-06   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.74    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -4.516E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      3.144E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.421E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.250    ,  FRACTION OF STEP COMPLETED  0.825    
+ STEP TIME COMPLETED       0.825    ,  TOTAL TIME COMPLETED         4.82    
+  
+     ASYNCHRONOUS OUTPUT DATABASE FRAME FLUSH STARTED
+  
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.175    
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+  NUMBER OF EQUATIONS =   175002     NUMBER OF FLOATING PT. OPERATIONS =  4.71E+10
+
+  USING THE DIRECT SOLVER WITH   2 PROCESSORS
+
+     CHECK POINT   START OF SOLVER    
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   2.4000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   2.4000    
+       ELAPSED WALLCLOCK TIME (SEC) =          1
+  
+     ASYNCHRONOUS TRACKING ELEMENT LOOP STARTED
+  
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+   MAX. PENETRATION ERROR 6.60952E-12 AT NODE RIGHT_JAW.1310 OF CONTACT PAIR 
+   (ASSEMBLY_RIGHT_JAW_JAW,ASSEMBLY_BLOCK_RIGHT)
+   MAX. CONTACT FORCE ERROR 1.58576E-06 AT NODE LEFT_JAW.24097 OF CONTACT PAIR 
+   (ASSEMBLY_LEFT_JAW_JAW,ASSEMBLY_BLOCK_LEFT)
+          THE CONTACT CONSTRAINTS HAVE CONVERGED.
+
+ AVERAGE FORCE                       1.14       TIME AVG. FORCE        1.03    
+ LARGEST RESIDUAL FORCE             2.829E-03   AT NODE      23213   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST INCREMENT OF DISP.         9.685E-03   AT NODE         13   DOF  1
+   INSTANCE: RIGHT_JAW                                                                       
+ LARGEST CORRECTION TO DISP.        9.564E-07   AT NODE         10   DOF  2
+   INSTANCE: RIGHT_JAW                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT       2.80    
+                                                (FROM FORCE     FIELD)
+ LARGEST RESIDUAL MOMENT           -2.827E-03   AT NODE          2   DOF  6
+   INSTANCE:                                                                                 
+ LARGEST INCREMENT OF ROTATION      2.201E-05   AT NODE          2   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -1.541E-10   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          ALL ROTATION CORRECTIONS ARE ZERO
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.175    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         5.00    
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+     ANALYSIS SUMMARY:
+     TOTAL OF         30  INCREMENTS
+                       0  CUTBACKS IN AUTOMATIC INCREMENTATION
+                      51  ITERATIONS INCLUDING CONTACT ITERATIONS IF PRESENT
+                      51  PASSES THROUGH THE EQUATION SOLVER OF WHICH 
+                      51  INVOLVE MATRIX DECOMPOSITION, INCLUDING
+                       0  DECOMPOSITION(S) OF THE MASS MATRIX
+                       1  REORDERING OF EQUATIONS TO MINIMIZE WAVEFRONT
+                       0  ADDITIONAL RESIDUAL EVALUATIONS FOR LINE SEARCHES
+                       0  ADDITIONAL OPERATOR EVALUATIONS FOR LINE SEARCHES
+                       2  WARNING MESSAGES DURING USER INPUT PROCESSING
+                       0  WARNING MESSAGES DURING ANALYSIS
+                       0  ANALYSIS WARNINGS ARE NUMERICAL PROBLEM MESSAGES
+                       0  ANALYSIS WARNINGS ARE NEGATIVE EIGENVALUE MESSAGES
+                       0  ERROR MESSAGES
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =   268.10    
+       SYSTEM TIME (SEC)    =   11.500    
+       TOTAL CPU TIME (SEC) =   279.60    
+       WALLCLOCK TIME (SEC) =        157

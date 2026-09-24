@@ -1,0 +1,11 @@
+QingYue OCR Droid Sans Regular is a modified font made from Android Open Source Project
+DroidSansFallback.ttf and DroidSansMono.ttf (Apache License 2.0).
+
+Modifications: scaled DroidSansMono glyphs from 2048 to 256 units per em; appended
+their glyphs, metrics, and missing Unicode mappings to DroidSansFallback; renamed
+the font family and PostScript names. Generated with fontTools 4.65.0. The exact
+source hashes, generation script, and final hash are recorded in
+third-party/ocr/FONT-PROVENANCE.md.
+
+The original NOTICE and complete Apache License 2.0 text are in
+DroidSansFallback-AOSP-NOTICE.txt.

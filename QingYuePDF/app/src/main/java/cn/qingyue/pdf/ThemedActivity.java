@@ -11,7 +11,9 @@ public class ThemedActivity extends Activity {
     @Override protected void onCreate(Bundle state) {
         AppColors.apply(this);
         paletteRevision = AppColors.revision();
-        int style = getResources().getIdentifier(AppColors.isDark() ? "DarkAppTheme" : "AppTheme", "style", getPackageName());
+        String theme = AppColors.isClassic() ? (AppColors.isDark() ? "DarkAppTheme" : "AppTheme")
+                : (AppColors.isDark() ? "CreamDarkAppTheme" : "CreamAppTheme");
+        int style = getResources().getIdentifier(theme, "style", getPackageName());
         if (style != 0) setTheme(style);
         super.onCreate(state);
     }
@@ -25,7 +27,8 @@ public class ThemedActivity extends Activity {
     @Override protected void onPostResume() { super.onPostResume(); applyChrome(); }
     private void applyChrome() {
         getWindow().setStatusBarColor(AppColors.BACKGROUND);
-        getWindow().setNavigationBarColor(Build.VERSION.SDK_INT >= 27 ? AppColors.BACKGROUND : 0xff36291f);
+        getWindow().setNavigationBarColor(Build.VERSION.SDK_INT >= 27 ? AppColors.BACKGROUND
+                : AppColors.isClassic() ? 0xff36291f : 0xff2d241e);
         View decor = getWindow().getDecorView();
         int flags = decor.getSystemUiVisibility();
         flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;

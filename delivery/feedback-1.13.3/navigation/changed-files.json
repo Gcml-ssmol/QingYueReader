@@ -1,0 +1,77 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/MainActivity.java",
+    "before": "32f34226c02042757de24a4ab579d62982210545be164baf5627ff8e304cb13b",
+    "after": "497074fd66a4dc88bd4d1e56c764405284de2e678d009b92ecb60abe207f2675"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+    "before": "88c437cb11fd1a97105919ca2655d412a697287c1a677b4691a11024347db5c6",
+    "after": "b770a5eeac42f786768d15e4ad0cf3d7050576bf07e422fff91ec5f464aaa96c"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePagePreviewView.java",
+    "before": "f7b31abb6357b9a9c12f33878a2a065d7d84daa84dbca11f5e76c0545d29d8cf",
+    "after": "c99205c6923c491574f789918c11f4cf631f5e724046b32fdd18e9f966453786"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java",
+    "before": null,
+    "after": "be732bec2bbf1e3bd3e2e7bfb52ee5683198bc0ffd873caf0105bc1b7ddbbd8e"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfPageSidebar.java",
+    "before": null,
+    "after": "699929238becaaaf32c5f12be20985fe1b13991069242cf6c9389cc0f07f3d1c"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfThumbnailProvider.java",
+    "before": "8d1697c2c007c5a7b8a2117407feaa0f1402048fa706501055df17a83df9e5c4",
+    "after": "25c1b99d4941911f77f178e18d419b5d066e0c480fdf4cfd47f83b3c9f640c25"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ReaderActions.java",
+    "before": "e3b32fa476ebcacd79ce45ebe35780a09a66a5263e2fd7d04c3ba515f0c54a2f",
+    "after": "7f5ef3dd82c4ff92567952a6c8efb964e9b105fad6f3e75ec650e1c51a99a6b8"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ReaderDocument.java",
+    "before": "4639732661c0a5f273ec32e07cb7da0172f8a8504aefa0a0659e7a1ef5ab1975",
+    "after": "4db844dfcc1a098d8835ac146ab230c4864a1a0a00ff60a46f737f8cc8726072"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ReaderNavigationDialog.java",
+    "before": "49004713260d0344a32e6016f67982d21c0a4b531ca9dcb484d491d983b2f7cd",
+    "after": "92072b6f58d18d1760129975b37220e38f9619f337b0aeff593772f5e14fc9ec"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ReaderSidebarLayout.java",
+    "before": null,
+    "after": "9ab4cf192c420085fbdecaaa69e785a7c5a388a5eab02d2472c10737c5acef73"
+  },
+  {
+    "file": "tests/navigation-layout/NavigationLayoutTest.java",
+    "before": null,
+    "after": "1db30658db3479f3d9cf116d6246fdfd47034637a20f8f3f0daf8f7130a925bb"
+  },
+  {
+    "file": "tests/navigation-layout/run.ps1",
+    "before": null,
+    "after": "5fb13498c84a162cc5225c576e9d262e40086ff02fceda88e430789dcef7d265"
+  },
+  {
+    "file": "tests/reader-core/ReaderModuleTest.java",
+    "before": "5b6fe137bf730bdabe5b212904cf135cdcd26a08d20d07670971c3c52ee57d2c",
+    "after": "7969fe21fdd5172cc8131e871b16ddf6412af622b9a0eaa2092924747527a64b"
+  },
+  {
+    "file": "tests/thumbnail-lifecycle/android/graphics/pdf/PdfRenderer.java",
+    "before": "f3b7a46ed123a9c86a761d539224056e1c8b9211c10a552e199c64ad9d0dbbd1",
+    "after": "a1707d9f569d5bb034aeb38d67c53e971437d5a5858d5a503795e1fdfbec4636"
+  },
+  {
+    "file": "tests/thumbnail-lifecycle/ThumbnailLifecycleSmoke.java",
+    "before": "cb62410ff26e345f9c347d6a226fd809b108fa8512961cb5cd9d69eab5194517",
+    "after": "59d3ab4367a7dde0cf823038f2a5013df7196ff2279c3d5303ddc48d4908403d"
+  }
+]

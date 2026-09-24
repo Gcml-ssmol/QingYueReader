@@ -33,15 +33,32 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** An explicitly submitted, cancellable document search. Closing releases its worker. */
 public final class PdfSearchDialog extends Dialog {
     public interface Selection { void selected(int page); }
+    public interface HitSelection { void selected(PdfTextSearch.Result result,int hitIndex); }
+    public static final class Session {
+        private String query="",message="";private final ArrayList<PdfTextSearch.Result> results=new ArrayList<>();
+        private boolean complete,limited;
+        public String query(){return query;}
+        public List<PdfTextSearch.Result> results(){return Collections.unmodifiableList(new ArrayList<>(results));}
+        public boolean complete(){return complete;}
+        public boolean limited(){return limited;}
+    }
+    private static final LinkedHashMap<String,Session> SAVED=new LinkedHashMap<String,Session>(6,.75f,true){
+        @Override protected boolean removeEldestEntry(Map.Entry<String,Session> entry){return size()>4;}
+    };
 
     private final Activity owner;
     private final File file;
     private final Selection selection;
+    private final HitSelection hitSelection;
+    private final Session session;
     private final PdfTextSearch searcher;
     private final ArrayList<PdfTextSearch.Result> results = new ArrayList<>();
     private final String initialQuery;
@@ -58,20 +75,31 @@ public final class PdfSearchDialog extends Dialog {
     private int generation, layoutWidth, layoutHeight;
     private String submittedQuery = "";
 
-    private PdfSearchDialog(Activity owner, File file, String previousQuery, Selection selection) {
+    private PdfSearchDialog(Activity owner, File file, String previousQuery, Selection selection,HitSelection hitSelection,Session supplied) {
         super(owner, dialogTheme(owner));
         this.owner = owner;
         this.file = file;
         this.selection = selection;
-        this.initialQuery = previousQuery == null ? "" : previousQuery;
+        this.hitSelection=hitSelection;
+        this.session=supplied==null?saved(file):supplied;
+        String requested=previousQuery==null?"":previousQuery.trim();
+        this.initialQuery=requested.length()==0?session.query:requested;
         this.searcher = new PdfTextSearch(owner.getApplicationContext());
     }
 
     public static PdfSearchDialog show(Activity owner, File file, String previousQuery, Selection selection) {
-        PdfSearchDialog dialog = new PdfSearchDialog(owner, file, previousQuery, selection);
+        PdfSearchDialog dialog = new PdfSearchDialog(owner, file, previousQuery, selection,null,null);
         dialog.show();
         return dialog;
     }
+
+    public static PdfSearchDialog showDetailed(Activity owner,File file,Session session,HitSelection selection){
+        PdfSearchDialog dialog=new PdfSearchDialog(owner,file,session==null?"":session.query,null,selection,session==null?new Session():session);dialog.show();return dialog;
+    }
+
+    public Session getSession(){return session;}
+    /** Process-scoped bounded session used when an Activity is recreated. */
+    public static Session retainedSession(File file){return saved(file);}
 
     /** The current field value, including an unsubmitted edit, for the next opening. */
     public String getQuery() {
@@ -203,9 +231,11 @@ public final class PdfSearchDialog extends Dialog {
             // Editing the query clears rows immediately, but guard a queued click as well.
             if (closed || position < 0 || position >= results.size()
                     || !getQuery().equals(submittedQuery)) return;
-            int page = results.get(position).page;
+            PdfTextSearch.Result result=results.get(position);int page = result.page;
             dismiss();
-            if (!owner.isFinishing() && !owner.isDestroyed() && selection != null) selection.selected(page);
+            if (!owner.isFinishing() && !owner.isDestroyed()){
+                if(hitSelection!=null)hitSelection.selected(result,result.hits.isEmpty()?-1:0);else if(selection != null) selection.selected(page);
+            }
         });
         resultArea.addView(resultList, new FrameLayout.LayoutParams(-1, -1));
         empty = text("查找关键词，点按结果即可跳转到对应页面。\n\n仅搜索 PDF 的文字内容，扫描图片暂不支持文字识别。", 13, AppColors.MUTED);
@@ -221,6 +251,11 @@ public final class PdfSearchDialog extends Dialog {
         content.addView(resultArea, new LinearLayout.LayoutParams(-1, 0, 1));
         setContentView(content);
         content.requestFocus();
+
+        if(initialQuery.equals(session.query)&&!session.results.isEmpty()){
+            results.addAll(session.results);submittedQuery=session.query;adapter.notifyDataSetChanged();
+            status.setText(session.message.length()==0?"已保留上次搜索的 "+results.size()+" 页结果":session.message);
+        }
 
         queryField.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -261,6 +296,7 @@ public final class PdfSearchDialog extends Dialog {
         hideKeyboard();
         final int token = ++generation;
         submittedQuery = query;
+        session.query=query;session.complete=false;session.limited=false;session.message="";session.results.clear();
         results.clear();
         adapter.notifyDataSetChanged();
         empty.setText("正在查找文档中的文字…");
@@ -272,6 +308,7 @@ public final class PdfSearchDialog extends Dialog {
                 if (!accept(token)) return;
                 if (batch != null && !batch.isEmpty()) {
                     results.addAll(batch);
+                    session.results.addAll(batch);
                     adapter.notifyDataSetChanged();
                 }
                 progress.setIndeterminate(total <= 0);
@@ -297,6 +334,7 @@ public final class PdfSearchDialog extends Dialog {
                 } else {
                     status.setText("找到 " + results.size() + " 页 · 点按结果跳转");
                 }
+                session.complete=true;session.limited=limited;session.message=status.getText().toString();
             }
         });
     }
@@ -311,6 +349,7 @@ public final class PdfSearchDialog extends Dialog {
         searcher.cancel();
         setRunning(false);
         status.setText("搜索已停止 · 保留 " + results.size() + " 页结果");
+        session.message=status.getText().toString();session.complete=false;
         empty.setText("搜索已停止，尚未找到匹配页面。\n\n点击放大镜可重新搜索。");
     }
 
@@ -361,7 +400,11 @@ public final class PdfSearchDialog extends Dialog {
             if (observer.isAlive()) observer.removeOnGlobalLayoutListener(layoutListener);
         }
         layoutListener = null;
+        synchronized(SAVED){SAVED.put(key(file),session);}
     }
+
+    private static Session saved(File file){synchronized(SAVED){Session value=SAVED.get(key(file));return value==null?new Session():value;}}
+    private static String key(File file){try{return file==null?"":file.getCanonicalPath()+"#"+file.length()+"#"+file.lastModified();}catch(java.io.IOException ignored){return file==null?"":file.getAbsolutePath()+"#"+file.length()+"#"+file.lastModified();}}
 
     @Override public void dismiss() { release(); super.dismiss(); }
     @Override protected void onStop() { release(); super.onStop(); }

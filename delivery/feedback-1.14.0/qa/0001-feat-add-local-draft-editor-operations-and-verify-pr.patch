@@ -1,0 +1,905 @@
+From ed64c9de177d0aa7bb2fb2e91903ea69e6c6400e Mon Sep 17 00:00:00 2001
+From: Codex QA <codex-qa@local>
+Date: Thu, 24 Sep 2026 23:28:27 +0800
+Subject: [PATCH] feat: add local draft editor operations and verify production
+ gestures
+
+---
+ .../main/java/cn/qingyue/pdf/IconButton.java  |   6 +
+ .../java/cn/qingyue/pdf/NoteActionMenu.java   |  35 +--
+ .../java/cn/qingyue/pdf/NoteActivity.java     | 230 ++++++++++++++----
+ .../qingyue/pdf/NoteEditorPresentation.java   |  16 ++
+ .../java/cn/qingyue/pdf/NotePageSidebar.java  |  20 +-
+ .../java/cn/qingyue/pdf/NotePenPresets.java   |  36 +++
+ delivery/1.14.0-editor-reference-qa.md        |  84 +++++++
+ tests/note-view-qa/README.md                  |   2 +-
+ tests/note-view-qa/run.ps1                    |   2 +-
+ .../src/android/graphics/Path.java            |   2 +-
+ tests/note-view-qa/src/android/view/View.java |   2 +-
+ .../src/cn/qingyue/pdf/NoteViewQaTest.java    |  89 ++++++-
+ .../src/cn/qingyue/pdf/Support.java           |   2 +-
+ 13 files changed, 453 insertions(+), 73 deletions(-)
+ create mode 100644 app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java
+ create mode 100644 app/src/main/java/cn/qingyue/pdf/NotePenPresets.java
+ create mode 100644 delivery/1.14.0-editor-reference-qa.md
+
+diff --git a/app/src/main/java/cn/qingyue/pdf/IconButton.java b/app/src/main/java/cn/qingyue/pdf/IconButton.java
+index a3a6cba..d85dd9e 100644
+--- a/app/src/main/java/cn/qingyue/pdf/IconButton.java
++++ b/app/src/main/java/cn/qingyue/pdf/IconButton.java
+@@ -193,6 +193,12 @@ public final class IconButton extends View {
+             case "arrow":
+                 line(c, 4, 20, 20, 4); poly(c, false, 11, 4, 20, 4, 20, 13);
+                 break;
++            case "lasso":
++                rect.set(3,3,20,17);c.drawOval(rect,paint);path.reset();path.moveTo(17,16);path.cubicTo(23,19,11,24,9,18);c.drawPath(path,paint);break;
++            case "read":
++                path.reset();path.moveTo(2,12);path.cubicTo(7,3,17,3,22,12);path.cubicTo(17,21,7,21,2,12);c.drawPath(path,paint);c.drawCircle(12,12,3,paint);break;
++            case "penbox":
++                rect.set(3,7,21,21);c.drawRoundRect(rect,2,2,paint);line(c,7,3,7,17);line(c,12,2,12,17);line(c,17,4,17,17);break;
+             case "select":
+                 poly(c, true, 5, 3, 19, 12, 12, 13, 9, 20);
+                 line(c, 12, 13, 17, 21);
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java b/app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java
+index 01e16be..3f671a9 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java
+@@ -17,26 +17,31 @@ final class NoteActionMenu {
+ 
+     static Dialog show(Context context, View anchor, int page, int count, Runnable sources,
+                        Runnable pdf, Runnable png, Runnable append, Runnable settings) {
++        return showActions(context, anchor, "笔记操作",
++                new Action("↗", "查看来源", "打开笔记里的来源链接", sources),
++                new Action("PDF", "导出 PDF", "导出全部 " + count + " 页", pdf),
++                new Action("PNG", "导出 PNG", "仅导出当前第 " + page + " 页", png),
++                new Action("+", "追加空白页", "在第 " + count + " 页之后继续书写", append),
++                new Action("⚙", "笔记设置", "插页、页面方向与书写选项", settings));
++    }
++
++    static final class Action {
++        final String symbol, heading, detail; final Runnable run;
++        Action(String symbol, String heading, String detail, Runnable run) {
++            this.symbol=symbol; this.heading=heading; this.detail=detail; this.run=run;
++        }
++    }
++    static Dialog showActions(Context context, View anchor, String heading, Action... actions) {
+         Dialog dialog = new Dialog(context);
+         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+         LinearLayout content = NoteDialogs.column(context);
+         content.setPadding(dp(context, 16), dp(context, 12), dp(context, 16), dp(context, 12));
+         content.setBackground(NoteDialogs.shape(context, AppColors.SURFACE, 22));
+-
+-        TextView title = NoteDialogs.label(context, "笔记操作", 18, AppColors.INK);
++        TextView title = NoteDialogs.label(context, heading, 18, AppColors.INK);
+         title.setTypeface(null, 1);
+         title.setPadding(dp(context, 6), dp(context, 3), 0, dp(context, 9));
+         content.addView(title);
+-        row(context, content, dialog, "↗", "查看来源", "打开笔记里的来源链接", sources);
+-        row(context, content, dialog, "PDF", "导出 PDF", "导出全部 " + count + " 页", pdf);
+-        row(context, content, dialog, "PNG", "导出 PNG", "仅导出当前第 " + page + " 页", png);
+-        View divider = new View(context);
+-        divider.setBackgroundColor(AppColors.BORDER);
+-        LinearLayout.LayoutParams dividerSize = new LinearLayout.LayoutParams(-1, dp(context, 1));
+-        dividerSize.setMargins(dp(context, 6), dp(context, 6), dp(context, 6), dp(context, 6));
+-        content.addView(divider, dividerSize);
+-        row(context, content, dialog, "+", "追加空白页", "在第 " + count + " 页之后继续书写", append);
+-        row(context, content, dialog, "⚙", "笔记设置", "插页、页面方向与书写选项", settings);
++        for(Action action: actions) row(context, content, dialog, action.symbol, action.heading, action.detail, action.run);
+ 
+         ScrollView scroll = new ScrollView(context);
+         scroll.setFillViewport(false);
+@@ -77,10 +82,12 @@ final class NoteActionMenu {
+         line.setGravity(Gravity.CENTER_VERTICAL);
+         line.setPadding(dp(context, 7), dp(context, 6), dp(context, 7), dp(context, 6));
+         line.setBackground(NoteDialogs.shape(context, AppColors.SURFACE, 12));
+-        line.setClickable(true);
++        line.setClickable(action != null);
++        line.setEnabled(action != null);
++        line.setAlpha(action == null ? .42f : 1f);
+         line.setFocusable(true);
+         line.setContentDescription(heading + "，" + detail);
+-        line.setOnClickListener(v -> { dialog.dismiss(); action.run(); });
++        if(action != null) line.setOnClickListener(v -> { dialog.dismiss(); action.run(); });
+         TextView badge = NoteDialogs.label(context, symbol, symbol.length() > 1 ? 11 : 20, AppColors.ACCENT_DARK);
+         badge.setTypeface(null, 1);
+         badge.setGravity(Gravity.CENTER);
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteActivity.java b/app/src/main/java/cn/qingyue/pdf/NoteActivity.java
+index 97cc354..2a3fbc9 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteActivity.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteActivity.java
+@@ -66,7 +66,10 @@ public final class NoteActivity extends ThemedActivity {
+     private float penSize = 2f, markerSize = 18f, eraserSize = 30f;
+     private boolean stylusOnly, twoFingerUndo, resumed, destroyed, headerCollapsed, sourceConsumed;
+     private boolean horizontalPages;
+-    private TextView pagesButton;
++    private TextView pagesButton, textButton;
++    private IconButton readModeButton, selectionButton;
++    private boolean readOnly, wholeStrokeEraser, lassoFreeform=true;
++    private int lassoFilter=NoteCanvasView.LASSO_ALL;
+     private long pendingSourceItemId;
+     private PopupWindow popup;
+     private Dialog dialog;
+@@ -87,6 +90,7 @@ public final class NoteActivity extends ThemedActivity {
+         common = getSharedPreferences("MainActivity", MODE_PRIVATE);
+         preferences = getSharedPreferences("note_tools", MODE_PRIVATE);
+         horizontalPages=preferences.getBoolean("horizontalPages",false);
++        wholeStrokeEraser=preferences.getBoolean("wholeStrokeEraser",false);lassoFreeform=preferences.getBoolean("lassoFreeform",true);lassoFilter=preferences.getInt("lassoFilter",NoteCanvasView.LASSO_ALL);
+         noteId = getIntent().getStringExtra("id"); name = getIntent().getStringExtra("name");
+         if (name == null || name.trim().isEmpty()) name = "未命名笔记";
+         stylusOnly = common.getBoolean("stylusOnly", true);
+@@ -96,7 +100,7 @@ public final class NoteActivity extends ThemedActivity {
+         markerSize = clamp(preferences.getFloat("marker", 18f), 4f, 60f);
+         eraserSize = clamp(preferences.getFloat("eraser", 30f), 8f, 100f);
+         pendingSourceItemId=state==null?getIntent().getLongExtra("pendingSourceItemId",0):state.getLong("pendingSourceItemId",getIntent().getLongExtra("pendingSourceItemId",0));
+-        if (state != null) { tool = state.getString("tool", "pen"); headerCollapsed = state.getBoolean("collapsed", false); pendingExport = state.getString("pendingExport"); sourceConsumed=state.getBoolean("sourceConsumed",false); }
++        if (state != null) { tool = state.getString("tool", "pen"); headerCollapsed = state.getBoolean("collapsed", false); pendingExport = state.getString("pendingExport"); sourceConsumed=state.getBoolean("sourceConsumed",false); readOnly=state.getBoolean("readOnly",false); }
+         if (colorTool(tool)) color = ToolPreferences.color(preferences, tool, "color", common.getInt("inkColor", ToolPreferences.BLACK));
+         root = NoteDialogs.column(this); root.setBackgroundColor(AppColors.BACKGROUND); root.setFitsSystemWindows(true); setContentView(root);
+         try { editLease=DocumentEditLease.acquire(this,noteId); document = NoteStore.load(this, noteId); }
+@@ -115,7 +119,7 @@ public final class NoteActivity extends ThemedActivity {
+             @Override public void changed() { updateTools(); }
+             @Override public void pageAdded() { toast("已插入第 " + (document.currentPage()+1) + " 页"); refreshPageSidebars(true); schedulePageSync(); }
+             @Override public void pageChanged() { refreshCurrentPage(); schedulePageSync(); }
+-            @Override public void viewportPageChanged(int page) { refreshCurrentPage(); if(undo!=null){undo.setEnabled(canvas.canUndo());redo.setEnabled(canvas.canRedo());} }
++            @Override public void viewportPageChanged(int page) { refreshCurrentPage(); if(undo!=null){undo.setEnabled(!readOnly&&canvas.canUndo());redo.setEnabled(!readOnly&&canvas.canRedo());} }
+             @Override public void viewportSettled() { pageSyncHandler.removeCallbacks(pendingPageSync); syncLibraryPages(); }
+             @Override public void readingScrolled() { if (!headerCollapsed) setCollapsed(true); }
+             @Override public void error(String message) { if (!destroyed) { if (status != null) {status.setText("保存或操作失败"); status.setTextColor(0xffb75448);} if (resumed) showDialog(ReaderDialogs.message(NoteActivity.this, "笔记提示", message, true)); else toast(message); } }
+@@ -184,10 +188,15 @@ public final class NoteActivity extends ThemedActivity {
+     private void showActionMenu(View anchor) {
+         if (canvas == null) return;
+         dismissPopup();
+-        showDialog(NoteActionMenu.show(this, anchor, document.currentPage() + 1, document.pageCount(),
+-                this::showSources, () -> beginExport(true), () -> beginExport(false),
+-                () -> { canvas.finishGesture(); canvas.insertPage(document.pageCount()); refreshPageSidebars(true); },
+-                this::settings));
++        ArrayList<NoteActionMenu.Action> actions=new ArrayList<>();
++        actions.add(action("↗","查看来源","返回摘录所在的文档位置",this::showSources));
++        actions.add(action("PDF","导出 PDF",NoteEditorPresentation.pdfScope(document),()->beginExport(true)));
++        actions.add(action("PNG","导出 PNG",document.infinite()?"导出当前画布内容":"导出当前第 "+(document.currentPage()+1)+" 页",()->beginExport(false)));
++        actions.add(action("◉",readOnly?"返回编辑":"只读浏览","手指和手写笔都只移动画布",this::toggleReadOnly));
++        actions.add(action("%","缩放与定位",document.infinite()?"最高 1000% · 可回到画布原点":"缩放与页面适配",this::showCanvasNavigation));
++        if(hasPageNavigation())actions.add(action("▤",document.infinite()?"画布管理":"页面操作",document.infinite()?"切换、复制、清空或删除独立画布":"插入、复制、清空、删除与调序",()->showNotePageActions(document.currentPage())));
++        actions.add(action("⚙","笔记设置","笔盒、套索、橡皮与书写选项",this::settings));
++        showActions(anchor,document.infinite()?"草稿操作":"笔记操作",actions);
+     }
+ 
+     private void beginExport(boolean pdf) {
+@@ -214,24 +223,29 @@ public final class NoteActivity extends ThemedActivity {
+         LinearLayout strip = NoteDialogs.row(this); strip.setPadding(dp(6), 0, dp(5), 0);
+         final int toolbarHeight = AppColors.isClassic() ? 48 : 60;
+         if (!AppColors.isClassic()) strip.setBackground(NoteDialogs.shape(this, AppColors.SURFACE, 17));
+-        sidebarToggle=icon("sidebar","展开页面缩略图",v->showPages());if(!AppColors.isClassic())sidebarToggle.setVisualLabel("页面");strip.addView(sidebarToggle,new LinearLayout.LayoutParams(dp(50),dp(toolbarHeight)));
++        sidebarToggle=icon(hasPageNavigation()?"sidebar":"fit",hasPageNavigation()?"展开页面或独立画布列表":"画布缩放与定位",v->showPages());if(!AppColors.isClassic())sidebarToggle.setVisualLabel(hasPageNavigation()?(document.infinite()?"画布":"页面"):"定位");strip.addView(sidebarToggle,new LinearLayout.LayoutParams(dp(50),dp(toolbarHeight)));
+         HorizontalScrollView scroll = new HorizontalScrollView(this); scroll.setHorizontalScrollBarEnabled(false); scroll.setFillViewport(false);
+         LinearLayout bar = NoteDialogs.row(this);
+-        String[] kinds = {"hand", "pen", "ballpoint", "pencil", "marker", "eraser", "select", "line", "circle", "rectangle", "arrow"};
+-        String[] labels = {"移动画布", "钢笔", "圆珠笔", "铅笔", "荧光笔", "橡皮", "选择与调整图片和文本", "直线", "圆形", "矩形", "箭头"};
++        String[] kinds = {"hand", "pen", "ballpoint", "pencil", "marker", "eraser", "lasso", "select", "line", "circle", "rectangle", "arrow"};
++        String[] labels = {"移动画布", "钢笔", "圆珠笔", "铅笔", "荧光笔", "橡皮", "套索", "选择与调整图片和文本", "直线", "圆形", "矩形", "箭头"};
+         for (int i = 0; i < kinds.length; i++) {
+             final String kind = kinds[i];
+             IconButton button = icon(kind, labels[i], v -> {
++                if(kind.equals("lasso")&&kind.equals(tool)){showLassoOptions();return;}
+                 if (kind.equals(tool) && adjustable(kind)) { toolSettings(kind, v); return; }
+                 selectTool(kind);
+                 if (kind.equals("select")) toast("点击图片或文本后拖动，拖动四角调整大小");
+             });
+-            if (adjustable(kind)) button.setOnLongClickListener(v -> {selectTool(kind); toolSettings(kind, v); return true;});
++            if("lasso".equals(kind))button.setOnLongClickListener(v->{selectTool(kind);showLassoOptions();return true;});
++            else if (adjustable(kind)) button.setOnLongClickListener(v -> {selectTool(kind); toolSettings(kind, v); return true;});
+             if (!AppColors.isClassic()) button.setVisualLabel("hand".equals(kind) ? "手指" : "select".equals(kind) ? "选择" : labels[i]);
+             tools.put(kind, button);
+             bar.addView(button, new LinearLayout.LayoutParams(dp(AppColors.isClassic() ? 44 : 50), dp(AppColors.isClassic() ? 44 : toolbarHeight)));
+         }
+         divider(bar);
++        selectionButton=icon("lasso","选区操作：复制、剪切、粘贴、缩放与颜色",v->showSelectionActions());addIcon(bar,selectionButton);
++        addIcon(bar,icon("penbox","笔盒与常用笔预设",v->showPenBox()));
++        readModeButton=icon("read","只读浏览",v->toggleReadOnly());addIcon(bar,readModeButton);
+         undo = icon("undo", "撤销上一步", v -> {if (canvas != null) canvas.undo();});
+         redo = icon("redo", "重做上一步", v -> {if (canvas != null) canvas.redo();}); addIcon(bar, undo); addIcon(bar, redo);
+         colorButton = new ColorSwatch(this, color, "颜色与调色盘");
+@@ -239,8 +253,8 @@ public final class NoteActivity extends ThemedActivity {
+         bar.addView(colorButton, new LinearLayout.LayoutParams(dp(44), dp(44)));
+         divider(bar);
+         imageButton = icon("image", "插入图片", v -> pickImage()); addIcon(bar, imageButton);
+-        TextView textButton = NoteDialogs.label(this, "文本", 14, AppColors.ACCENT_DARK);textButton.setGravity(Gravity.CENTER);textButton.setContentDescription("插入或编辑文本框");textButton.setOnClickListener(v -> editText());bar.addView(textButton,new LinearLayout.LayoutParams(dp(48),dp(44)));
+-        trash = icon("trash", "删除选中的图片或文本", v -> {if (canvas != null) canvas.deleteSelected();}); addIcon(bar, trash);
++        textButton = NoteDialogs.label(this, "文本", 14, AppColors.ACCENT_DARK);textButton.setGravity(Gravity.CENTER);textButton.setContentDescription("插入或编辑文本框");textButton.setOnClickListener(v -> editText());bar.addView(textButton,new LinearLayout.LayoutParams(dp(48),dp(44)));
++        trash = icon("trash", "删除选中的对象", v -> {if (canvas != null&&!readOnly) {if(canvas.selectionCount()>0)canvas.deleteSelection();else canvas.deleteSelected();}}); addIcon(bar, trash);
+         stylus = icon("stylus", "仅手写笔绘制", v -> {
+             stylusOnly = !stylusOnly; common.edit().putBoolean("stylusOnly", stylusOnly).apply(); applyTool();
+             toast(stylusOnly ? "仅手写笔绘制；手指移动画布" : "已允许手指绘制；双指移动画布");
+@@ -262,9 +276,10 @@ public final class NoteActivity extends ThemedActivity {
+         headerCollapsed = collapsed; if (header == null || headerToggle == null) return;
+         dismissPopup(); header.setVisibility(collapsed ? View.GONE : View.VISIBLE); headerToggle.setRotation(collapsed ? 0 : 180);
+         headerToggle.setContentDescription(collapsed ? "展开笔记标题与设置" : "收起标题栏");
++        if(!collapsed)NoteMotion.enter(header);
+     }
+     private void editText(){
+-        if(canvas==null)return;canvas.finishGesture();NoteDocument.Item selected=canvas.selectedText();
++        if(canvas==null||readOnly)return;canvas.finishGesture();NoteDocument.Item selected=canvas.selectedText();
+         LinearLayout body=NoteDialogs.column(this);body.setPadding(dp(20),dp(8),dp(20),0);
+         EditText content=new EditText(this);content.setHint("输入文字，可换行");content.setMinLines(3);content.setMaxLines(12);content.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);content.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16000)});if(selected!=null)content.setText(selected.text);body.addView(content);
+         EditText sizeInput=new EditText(this);sizeInput.setHint("字号 8–72");sizeInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);sizeInput.setText(String.valueOf(selected==null?20:(int)selected.width));body.addView(sizeInput);
+@@ -272,7 +287,17 @@ public final class NoteActivity extends ThemedActivity {
+         android.widget.Spinner colors=new android.widget.Spinner(this);android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,names);colors.setAdapter(adapter);if(selected!=null){for(int i=0;i<palette.length;i++)if(palette[i]==selected.color)colors.setSelection(i);}body.addView(colors);
+         android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this).setTitle(selected==null?"插入文本框":"编辑文本框").setView(body).setNegativeButton("取消",null).setPositiveButton("保存",null).create();dialog.setOnShowListener(v -> dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {int size;try{size=Integer.parseInt(sizeInput.getText().toString().trim());}catch(NumberFormatException e){size=20;}size=Math.max(8,Math.min(72,size));if(content.getText().toString().trim().isEmpty()){content.setError("请输入文字");return;}canvas.putText(content.getText().toString(),size,palette[colors.getSelectedItemPosition()]);tool="select";applyTool();dialog.dismiss();}));dialog.show();showDialog(dialog);
+     }
+-    private void chooseZoom(){if(canvas==null)return;String[] choices={"50%","75%","100%","125%","150%","200%","250%","300%","适应页面"};new android.app.AlertDialog.Builder(this).setTitle("缩放 · 当前 "+canvas.zoomPercent()+"%").setItems(choices,(d,index)->{if(index==8)canvas.fit();else canvas.setZoomPercent(new int[]{50,75,100,125,150,200,250,300}[index]);}).show();}
++    private void chooseZoom() {
++        if(canvas==null)return;canvas.finishGesture();
++        final int maximum=document.infinite()?1000:300;
++        LinearLayout content=NoteDialogs.column(this);content.setPadding(dp(20),dp(8),dp(20),0);
++        EditText value=new EditText(this);value.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);value.setSingleLine(true);value.setText(String.valueOf(canvas.zoomPercent()));value.setSelectAllOnFocus(true);
++        content.addView(NoteDialogs.label(this,"缩放比例 50–"+maximum+"%",14,AppColors.MUTED));content.addView(value);
++        android.app.AlertDialog choice=new android.app.AlertDialog.Builder(this).setTitle("画布缩放").setView(content).setNegativeButton("取消",null).setPositiveButton("应用",null).create();
++        choice.setOnShowListener(v->choice.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(button->{int percent;try{percent=Integer.parseInt(value.getText().toString().trim());}catch(NumberFormatException e){value.setError("请输入有效百分比");return;}if(percent<50||percent>maximum){value.setError("范围为50–"+maximum+"%");return;}canvas.setZoomPercent(percent);choice.dismiss();}));
++        choice.show();showDialog(choice);
++    }
++
+     private void consumeSource(String uri){
+         if(sourceConsumed||canvas==null||destroyed||canvas.getWidth()<=0||canvas.getHeight()<=0)return;
+         try{
+@@ -303,24 +328,129 @@ public final class NoteActivity extends ThemedActivity {
+     private void settings() {
+         if (canvas == null) return;
+         dismissPopup(); canvas.finishGesture();
+-        Dialog pageSettings=new android.app.AlertDialog.Builder(this).setTitle("笔记设置").setItems(new String[]{"插入空白页（当前页前 / 后）", "页面浏览（当前："+(horizontalPages?"左右翻页":"纵向连续")+"）", "笔迹与操作设置"},(d,which)->{if(which==0)showNoteInsertionOptions(document.currentPage());else if(which==1){horizontalPages=!horizontalPages;preferences.edit().putBoolean("horizontalPages",horizontalPages).apply();canvas.setHorizontalPages(horizontalPages);toast("已切换为"+(horizontalPages?"左右翻页":"纵向连续")+"浏览");}else toolOptions();}).create();pageSettings.show();showDialog(pageSettings);
++        ArrayList<NoteActionMenu.Action> actions=new ArrayList<>();
++        actions.add(action("✎","常用笔盒","收藏笔种、颜色和粗细，最多 8 支",this::showPenBox));
++        actions.add(action("○","套索设置","自由 / 矩形与四类对象筛选",readOnly?null:this::showLassoOptions));
++        actions.add(action("⌫","橡皮设置",wholeStrokeEraser?"当前：整笔擦除":"当前：局部擦除",readOnly?null:()->{selectTool("eraser");toolSettings("eraser",tools.get("eraser"));}));
++        actions.add(action("✎","笔迹与操作","手写笔绘制、双指撤销等",this::toolOptions));
++        if(!document.infinite()){
++            actions.add(action("▤","页面操作","插入、复制、清空、删除与调序",()->showNotePageActions(document.currentPage())));
++            actions.add(action("↕","页面浏览",horizontalPages?"当前：左右翻页":"当前：纵向连续",()->{horizontalPages=!horizontalPages;preferences.edit().putBoolean("horizontalPages",horizontalPages).apply();canvas.setHorizontalPages(horizontalPages);toast("已切换为"+(horizontalPages?"左右翻页":"纵向连续")+"浏览");}));
++        }else {if(hasPageNavigation())actions.add(action("▤","独立画布管理","这些历史画布彼此独立，不连续拼接",()->showNotePageActions(document.currentPage())));actions.add(action("⌫","清空画布","删除当前画布的全部对象，可撤销",readOnly?null:()->confirmPageChange(document.currentPage(),false)));}
++        showActions(root,"笔记设置",actions);
++    }
++
++    private NoteActionMenu.Action action(String symbol,String title,String detail,Runnable run){return new NoteActionMenu.Action(symbol,title,detail,run);}
++    private void showActions(View anchor,String title,ArrayList<NoteActionMenu.Action> actions){dismissPopup();showDialog(NoteActionMenu.showActions(this,anchor,title,actions.toArray(new NoteActionMenu.Action[0])));}
++    private void showActions(String title,NoteActionMenu.Action... actions){dismissPopup();showDialog(NoteActionMenu.showActions(this,root,title,actions));}
++    private void toggleReadOnly(){if(canvas==null)return;canvas.finishGesture();readOnly=!readOnly;applyTool();toast(readOnly?"只读浏览：手指和手写笔都不绘制":"已返回编辑");}
++    private boolean hasPageNavigation(){return NoteEditorPresentation.hasPageNavigation(document);}
++    private String pagePosition(){return NoteEditorPresentation.pagePosition(document);}
++    private void showCanvasNavigation(){
++        if(canvas==null)return;
++        ArrayList<NoteActionMenu.Action> actions=new ArrayList<>();
++        actions.add(action("%","缩放比例","当前 "+canvas.zoomPercent()+"%"+(document.infinite()?" · 最高 1000%":" · 最高 300%"),this::chooseZoom));
++        actions.add(action("□","适配视图",document.infinite()?"恢复画布默认位置与缩放":"让当前纸张适合窗口",()->canvas.fit()));
++        if(document.infinite())actions.add(action("◎","回到原点","保留缩放比例，返回当前画布中心",()->canvas.resetOrigin()));
++        if(document.infinite()&&hasPageNavigation())actions.add(action("▤","切换独立画布",pagePosition(),this::showPages));
++        actions.add(action("◉",readOnly?"返回编辑":"只读浏览","手写笔和手指都只移动画布",this::toggleReadOnly));
++        showActions(root,document.infinite()?"无限画布":"页面视图",actions);
++    }
++    private void showLassoOptions(){
++        if(canvas==null||readOnly)return;
++        showActions("套索",
++                action("○","自由套索",lassoFreeform?"当前使用 · 沿轮廓圈选":"按任意形状圈选",()->setLassoMode(true)),
++                action("□","矩形套索",!lassoFreeform?"当前使用 · 框选区域":"拖出矩形圈选",()->setLassoMode(false)),
++                action("≡","选择哪些对象","笔迹、图形、文本、图片",this::showLassoFilters),
++                action("⋯","选区操作","复制、剪切、粘贴、缩放、改色和层级",this::showSelectionActions));
++    }
++    private void setLassoMode(boolean freeform){lassoFreeform=freeform;preferences.edit().putBoolean("lassoFreeform",freeform).apply();selectTool("lasso");toast(freeform?"沿轮廓圈选对象，拖动选区可移动":"拖出矩形圈选对象，拖动选区可移动");}
++    private void showLassoFilters(){
++        final int[] flags={NoteCanvasView.LASSO_HANDWRITING,NoteCanvasView.LASSO_GRAPHICS,NoteCanvasView.LASSO_TEXT,NoteCanvasView.LASSO_IMAGE};
++        final boolean[] selected=new boolean[4];for(int i=0;i<4;i++)selected[i]=(lassoFilter&flags[i])!=0;
++        Dialog choice=new android.app.AlertDialog.Builder(this).setTitle("套索对象类型").setMultiChoiceItems(new String[]{"笔迹（含荧光笔）","图形","文本框","图片"},selected,(d,index,value)->selected[index]=value)
++                .setNegativeButton("取消",null).setPositiveButton("应用",(d,which)->{int mask=0;for(int i=0;i<4;i++)if(selected[i])mask|=flags[i];if(mask==0){toast("至少选择一种对象类型");return;}lassoFilter=mask;preferences.edit().putInt("lassoFilter",mask).apply();canvas.setLassoFilter(mask);}).create();choice.show();showDialog(choice);
++    }
++    private int selectedObjectCount(){return canvas==null?0:canvas.selectionCount()>0?canvas.selectionCount():canvas.hasSelection()?1:0;}
++    private void selectionAction(Runnable run){if(canvas==null||readOnly)return;canvas.finishGesture();run.run();updateTools();}
++    private void showSelectionActions(){
++        if(canvas==null)return;canvas.finishGesture();final boolean selected=!readOnly&&canvas.hasSelection();
++        showActions("选区 · "+selectedObjectCount()+" 项",
++                action("○","圈选对象","使用套索圈选多个对象",readOnly?null:()->selectTool("lasso")),
++                action("＋","复制","保留原对象，放入当前笔记剪贴板",selected?()->selectionAction(()->canvas.copySelection()):null),
++                action("✂","剪切","移除选区，可撤销",selected?()->selectionAction(()->canvas.cutSelection()):null),
++                action("▣","粘贴",canvas.hasClipboard()?"粘贴到当前画布或页面":"当前笔记剪贴板为空",!readOnly&&canvas.hasClipboard()?()->selectionAction(()->{canvas.pasteSelection();tool="lasso";}):null),
++                action("%","缩小至 80%","以选区中心缩放",selected?()->selectionAction(()->canvas.scaleSelection(.8f)):null),
++                action("%","放大至 125%","以选区中心缩放",selected?()->selectionAction(()->canvas.scaleSelection(1.25f)):null),
++                action("●","修改颜色","修改可着色的笔迹、图形和文字",selected?this::showSelectionColors:null),
++                action("↑","置顶","放到其他对象前面",selected?()->selectionAction(()->canvas.bringSelectionForward()):null),
++                action("↓","置底","放到其他对象后面",selected?()->selectionAction(()->canvas.sendSelectionBackward()):null),
++                action("⌫","删除选区","可撤销",selected?()->selectionAction(()->canvas.deleteSelection()):null));
++    }
++    private void showSelectionColors(){
++        int[] colors={color,0xff36302b,0xff2464d6,0xffe53935,0xff16805b,0xfff6c343,0xff8e44ad};
++        ArrayList<NoteActionMenu.Action> choices=new ArrayList<>();for(int i=0;i<colors.length;i++){final int ink=colors[i];choices.add(action("●",(i==0?"当前颜色 · ":"")+hex(ink),"应用于可着色对象",()->selectionAction(()->canvas.recolorSelection(ink))));}showActions(root,"选区颜色",choices);
++    }
++    private void showPenBox(){
++        ArrayList<NotePenPresets.Preset> presets=NotePenPresets.read(preferences.getString("penBox",null));ArrayList<NoteActionMenu.Action> actions=new ArrayList<>();
++        for(NotePenPresets.Preset preset:presets)actions.add(action("✎",preset.title(),"点击使用此笔",readOnly?null:()->usePreset(preset)));
++        actions.add(action("+","收藏当前笔",NotePenPresets.supported(tool)?NotePenPresets.name(tool)+" · "+hex(color)+" · "+String.format(Locale.CHINA,"%.1f pt",size(tool)):"请先选择钢笔、圆珠笔、铅笔或荧光笔",!readOnly&&NotePenPresets.supported(tool)?this::saveCurrentPreset:null));
++        actions.add(action("−","整理笔盒","移除不常用的笔；最多收藏 8 支",presets.isEmpty()?null:this::managePenBox));
++        showActions(root,"常用笔盒 · "+presets.size()+"/8",actions);
++    }
++    private void usePreset(NotePenPresets.Preset preset){
++        if(readOnly)return;tool=preset.tool;color=preset.color;if("pen".equals(tool))penSize=preset.width;else if("marker".equals(tool))markerSize=preset.width;else preferences.edit().putFloat(tool+"Size",preset.width).apply();applyTool();toast("已使用 "+preset.title());
++    }
++    private void saveCurrentPreset(){
++        ArrayList<NotePenPresets.Preset> presets=NotePenPresets.read(preferences.getString("penBox",null));
++        NotePenPresets.Preset preset=new NotePenPresets.Preset(tool,color,size(tool));if(!NotePenPresets.valid(preset))return;
++        if(NotePenPresets.contains(presets,preset)){toast("这支笔已经在笔盒中");return;}if(presets.size()>=NotePenPresets.LIMIT){toast("笔盒已满，请先移除一支笔");return;}
++        presets.add(preset);preferences.edit().putString("penBox",NotePenPresets.write(presets)).apply();toast("已收藏当前笔");
++    }
++    private void managePenBox(){
++        ArrayList<NotePenPresets.Preset> presets=NotePenPresets.read(preferences.getString("penBox",null));ArrayList<NoteActionMenu.Action> choices=new ArrayList<>();
++        for(int i=0;i<presets.size();i++){final int index=i;choices.add(action("−","移除 "+presets.get(i).title(),"只从笔盒移除，不改笔记内容",()->{presets.remove(index);preferences.edit().putString("penBox",NotePenPresets.write(presets)).apply();toast("已从笔盒移除");}));}showActions(root,"整理笔盒",choices);
++    }
++    private void showNotePageActions(int page){
++        if(canvas==null||!hasPageNavigation())return;final int count=document.pageCount();if(page<0||page>=count)return;
++        showActions(document.infinite()?"独立画布 "+(page+1):"第 "+(page+1)+" 页",
++                action("+",document.infinite()?"切换画布":"插入空白页",document.infinite()?"这些画布彼此独立，不连续拼接":"在本页之前或之后插入",document.infinite()?this::showPages:readOnly?null:()->showNoteInsertionOptions(page)),
++                action("▣",document.infinite()?"复制本画布":"复制本页","创建独立副本并保留原内容",readOnly?null:()->runPageOperation(page,count,()->canvas.duplicatePage())),
++                action("↑",document.infinite()?"上移画布":"上移一页","调整列表顺序",!readOnly&&page>0?()->runPageOperation(page,count,()->canvas.movePage(page,page-1)):null),
++                action("↓",document.infinite()?"下移画布":"下移一页","调整列表顺序",!readOnly&&page+1<count?()->runPageOperation(page,count,()->canvas.movePage(page,page+1)):null),
++                action("⌫",document.infinite()?"清空本画布":"清空本页","移除当前全部对象，可撤销",readOnly?null:()->confirmPageChange(page,false)),
++                action("−",document.infinite()?"删除本画布":"删除本页",count>1?"移除当前画布或纸张及内容":"至少保留一张画布或纸张",!readOnly&&count>1?()->confirmPageChange(page,true):null));
++    }
++    private void runPageOperation(int page,int count,Runnable operation){
++        if(canvas==null||destroyed||readOnly)return;if(document.pageCount()!=count||page<0||page>=count){toast("页面已变化，请重新选择");return;}
++        canvas.finishGesture();canvas.selectPage(page);operation.run();refreshPageSidebars(true);updateTools();
++    }
++    private void confirmPageChange(int page,boolean delete){
++        if(canvas==null||readOnly)return;final int count=document.pageCount();if(page<0||page>=count||delete&&count<=1)return;
++        final int objects=document.pageItems(page).size();String subject=document.infinite()?"第 "+(page+1)+" 张无限画布":"第 "+(page+1)+" 页";
++        Dialog confirm=new android.app.AlertDialog.Builder(this).setTitle((delete?"删除":"清空")+(document.infinite()?"画布":"页面"))
++                .setMessage((delete?"将删除":"将清空")+subject+"的 "+objects+" 个对象。"+(delete?"此删除不能撤销；其他页面或独立画布会保留。":"纸张会保留，可用撤销恢复。"))
++                .setNegativeButton("取消",null).setPositiveButton(delete?"删除":"清空",(d,which)->runPageOperation(page,count,()->{if(delete)canvas.deletePage();else canvas.clearPage();})).create();confirm.show();showDialog(confirm);
+     }
++
++
+     private void toolOptions(){showDialog(NoteDialogs.settings(this, stylusOnly, twoFingerUndo, (pen, undoEnabled) -> {
+             stylusOnly = pen; twoFingerUndo = undoEnabled;
+             common.edit().putBoolean("stylusOnly", pen).putBoolean("twoFingerUndo", undoEnabled).apply(); applyTool();
+         }, () -> {if (canvas != null) canvas.fit();}));
+     }
+     private NotePageSidebar createPageSidebar(boolean modal){
+-        return new NotePageSidebar(this,document,noteId,new NotePageSidebar.Actions(){
++        NotePageSidebar sidebar=new NotePageSidebar(this,document,noteId,new NotePageSidebar.Actions(){
+             public void select(int page){if(canvas==null)return;canvas.selectPage(page);refreshPageSidebars(true);if(modal&&dialog!=null)dialog.dismiss();}
+-            public void move(int from,int to){if(canvas!=null){canvas.movePage(from,to);refreshPageSidebars(true);}}
++            public void move(int from,int to){if(canvas!=null&&!readOnly){canvas.movePage(from,to);refreshPageSidebars(true);}}
+             public void insert(int page){showNoteInsertionOptions(page);}
+-            public void append(){if(canvas!=null){canvas.finishGesture();canvas.insertPage(document.pageCount());refreshPageSidebars(true);}}
++            public void manage(int page){showNotePageActions(page);}
++            public void append(){if(canvas!=null&&!readOnly){canvas.finishGesture();canvas.insertPage(document.pageCount());refreshPageSidebars(true);}}
+             public void close(){if(modal){if(dialog!=null)dialog.dismiss();}else{pagesExpanded=false;preferences.edit().putBoolean("pagesExpanded",false).apply();updatePageSidebar();}}
+-        });
++        });sidebar.setEditingEnabled(!readOnly);return sidebar;
+     }
+     private void showNoteInsertionOptions(int page){
+-        if(canvas==null||destroyed)return;
++        if(canvas==null||destroyed||readOnly||document.infinite())return;
+         dismissPopup();canvas.finishGesture();final NoteCanvasView target=canvas;final int count=document.pageCount();
+         if(page<0||page>=count)return;
+         showDialog(PageInsertionDialog.show(this,page,count,index->{
+@@ -328,57 +458,61 @@ public final class NoteActivity extends ThemedActivity {
+             target.insertPage(index);refreshPageSidebars(true);
+         }));
+     }
+-    private void refreshPageSidebars(boolean force){if(pageSidebar!=null)pageSidebar.refresh(force);if(dialogSidebar!=null)dialogSidebar.refresh(force);}
++    private void refreshPageSidebars(boolean force){if(force)updatePageSidebar();if(pageSidebar!=null)pageSidebar.refresh(force);if(dialogSidebar!=null)dialogSidebar.refresh(force);}
+     private void refreshCurrentPage(){
+-        if(pagesButton!=null)pagesButton.setText((document.currentPage()+1)+"/"+document.pageCount());
++        if(pagesButton!=null)pagesButton.setText(pagePosition());
+         if(pageSidebar!=null)pageSidebar.refreshSelection();
+         if(dialogSidebar!=null)dialogSidebar.refreshSelection();
+     }
+     private void schedulePageSync(){pageSyncHandler.removeCallbacks(pendingPageSync);pageSyncHandler.postDelayed(pendingPageSync,450);}
+     private void updatePageSidebar(){
+         if(pageSidebar==null||readingBody==null)return;int width=readingBody.getWidth()>0?Math.round(readingBody.getWidth()/getResources().getDisplayMetrics().density):getResources().getConfiguration().screenWidthDp;
+-        int rail=ReaderSidebarLayout.width(width);boolean visible=pagesExpanded&&rail>0;pageSidebar.setVisibility(visible?View.VISIBLE:View.GONE);
+-        if(sidebarToggle!=null){sidebarToggle.setActive(visible);sidebarToggle.setContentDescription(visible?"收起页面缩略图":"展开页面缩略图");}
++        int rail=ReaderSidebarLayout.width(width);boolean visible=hasPageNavigation()&&pagesExpanded&&rail>0;pageSidebar.setVisibility(visible?View.VISIBLE:View.GONE);
++        if(sidebarToggle!=null){sidebarToggle.setActive(visible);sidebarToggle.setContentDescription(!hasPageNavigation()?"画布缩放与定位":visible?"收起页面或画布列表":"展开页面或画布列表");if(!AppColors.isClassic())sidebarToggle.setVisualLabel(hasPageNavigation()?(document.infinite()?"画布":"页面"):"定位");}
+         if(visible&&pageSidebar.getLayoutParams().width!=dp(rail)){pageSidebar.getLayoutParams().width=dp(rail);pageSidebar.requestLayout();pageSidebar.refresh(true);}
+     }
+     private void showPages(){
+-        if(canvas==null)return;dismissPopup();canvas.finishGesture();
++        if(canvas==null)return;if(!hasPageNavigation()){showCanvasNavigation();return;}dismissPopup();canvas.finishGesture();
+         int width=readingBody.getWidth()>0?Math.round(readingBody.getWidth()/getResources().getDisplayMetrics().density):getResources().getConfiguration().screenWidthDp;
+-        if(ReaderSidebarLayout.canDock(width)){pagesExpanded=!pagesExpanded;preferences.edit().putBoolean("pagesExpanded",pagesExpanded).apply();updatePageSidebar();refreshPageSidebars(true);return;}
++        if(ReaderSidebarLayout.canDock(width)){pagesExpanded=!pagesExpanded;preferences.edit().putBoolean("pagesExpanded",pagesExpanded).apply();updatePageSidebar();refreshPageSidebars(true);if(pagesExpanded)NoteMotion.enter(pageSidebar);return;}
+         if(dialogSidebar!=null&&dialog!=null&&dialog.isShowing())return;
+         Dialog pages=new Dialog(this);pages.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);dialogSidebar=createPageSidebar(true);pages.setContentView(dialogSidebar);pages.show();showDialog(pages);
+-        Rect frame=new Rect();root.getWindowVisibleDisplayFrame(frame);if(pages.getWindow()!=null)pages.getWindow().setLayout(Math.min(dp(320),Math.max(dp(180),frame.width()-dp(24))),Math.max(dp(200),frame.height()-dp(48)));
++        Rect frame=new Rect();root.getWindowVisibleDisplayFrame(frame);if(pages.getWindow()!=null)pages.getWindow().setLayout(Math.max(1,Math.min(dp(320),frame.width()-dp(24))),Math.max(1,frame.height()-dp(48)));
+         pages.setOnDismissListener(v->{if(dialog==pages)dialog=null;dialogSidebar=null;});
+     }
+     private void syncLibraryPages(){if(document==null||noteId==null)return;final int count=document.pageCount(),page=document.currentPage();try{LibraryStore.mutate(getApplicationContext(),items->{for(LibraryItem item:items)if(noteId.equals(item.id)&&item.isNote()&&!item.isTrashed()){item.pages=count;item.page=page;break;}});}catch(IOException|RuntimeException failure){if(resumed)toast("页面已保存，但资料库页数暂未更新");}}
+-    private boolean adjustable(String kind) { return !"hand".equals(kind) && !"select".equals(kind); }
++    private boolean adjustable(String kind) { return !"hand".equals(kind) && !"select".equals(kind) && !"lasso".equals(kind); }
+     private boolean colorTool(String kind) { return adjustable(kind) && !"eraser".equals(kind); }
+     private float size(String kind) { return "marker".equals(kind) ? markerSize : "eraser".equals(kind) ? eraserSize : "pen".equals(kind) ? penSize : clamp(preferences.getFloat(kind + "Size", "ballpoint".equals(kind) ? 1.3f : "pencil".equals(kind) ? 2.5f : 2f), .5f, 20f); }
+     private void selectTool(String kind) {
+         dismissPopup();
+-        tool = kind;
++        readOnly=false;tool = kind;
+         if (colorTool(kind)) color = ToolPreferences.color(preferences, kind, "color", common.getInt("inkColor", ToolPreferences.BLACK));
+         applyTool();
+     }
+     private void applyTool() {
+         if (!tools.containsKey(tool)) tool = "pen";
+-        if (canvas != null) {canvas.setTool(tool, color, size(tool), stylusOnly); canvas.setTwoFingerUndoEnabled(twoFingerUndo);}
++        if (canvas != null) {canvas.setReadOnly(readOnly);canvas.setTool(readOnly?"hand":tool, color, size(tool), stylusOnly); canvas.setTwoFingerUndoEnabled(!readOnly&&twoFingerUndo); canvas.setWholeStrokeEraser(wholeStrokeEraser);canvas.setLassoFreeform(lassoFreeform);canvas.setLassoFilter(lassoFilter);}
+         if (colorTool(tool)) ToolPreferences.saveColor(preferences, tool, color);
+         preferences.edit().putFloat("pen", penSize).putFloat("marker", markerSize).putFloat("eraser", eraserSize).apply();
+         updateTools();
+     }
+     private void updateTools() {
+-        for (Map.Entry<String, IconButton> entry : tools.entrySet()) entry.getValue().setActive(entry.getKey().equals(tool));
++        for (Map.Entry<String, IconButton> entry : tools.entrySet()) {entry.getValue().setActive(!readOnly&&entry.getKey().equals(tool));entry.getValue().setEnabled(!readOnly);}
++        if(readModeButton!=null){readModeButton.setActive(readOnly);readModeButton.setContentDescription(readOnly?"只读浏览中，点击返回编辑":"进入只读浏览，手写笔也不绘制");}
++        if(selectionButton!=null&&canvas!=null){selectionButton.setActive(canvas.hasSelection());selectionButton.setContentDescription("选区操作，已选 "+selectedObjectCount()+" 项");}
++        if(colorButton!=null)colorButton.setEnabled(!readOnly);if(textButton!=null)textButton.setEnabled(!readOnly);
+         if (colorButton != null) colorButton.setColor(color);
+-        if (stylus != null) {stylus.setActive(stylusOnly); stylus.setContentDescription("仅手写笔绘制，" + (stylusOnly ? "已开启" : "已关闭"));}
+-        if (canvas != null) {undo.setEnabled(canvas.canUndo()); redo.setEnabled(canvas.canRedo()); trash.setEnabled(canvas.hasSelection());}
+-        if(canvas!=null&&pagesButton!=null)pagesButton.setText((document.currentPage()+1)+"/"+document.pageCount());
++        if (stylus != null) {stylus.setEnabled(!readOnly);stylus.setActive(stylusOnly); stylus.setContentDescription("仅手写笔绘制，" + (stylusOnly ? "已开启" : "已关闭"));}
++        if (canvas != null) {undo.setEnabled(!readOnly&&canvas.canUndo()); redo.setEnabled(!readOnly&&canvas.canRedo()); trash.setEnabled(!readOnly&&(canvas.hasSelection()||canvas.selectionCount()>0));}
++        if(pageSidebar!=null)pageSidebar.setEditingEnabled(!readOnly);if(dialogSidebar!=null)dialogSidebar.setEditingEnabled(!readOnly);
++        if(canvas!=null&&pagesButton!=null)pagesButton.setText(pagePosition());
+         refreshPageSidebars(false);
+-        if (imageButton != null) {imageButton.setEnabled(!IMAGE_JOBS.containsKey(noteId)); imageButton.setContentDescription(IMAGE_JOBS.containsKey(noteId) ? "正在导入图片" : "插入图片");}
++        if (imageButton != null) {imageButton.setEnabled(!readOnly&&!IMAGE_JOBS.containsKey(noteId)); imageButton.setContentDescription(IMAGE_JOBS.containsKey(noteId) ? "正在导入图片" : "插入图片");}
+     }
+ 
+     private void toolSettings(String kind, View anchor) {
+-        if (canvas == null) return;
++        if (canvas == null || readOnly) return;
+         dismissPopup(); canvas.finishGesture();
+         final boolean erasing = kind.equals("eraser");
+         LinearLayout shell = NoteDialogs.column(this); shell.setPadding(dp(7), dp(5), dp(7), dp(8)); shell.setFocusableInTouchMode(true);
+@@ -408,7 +542,14 @@ public final class NoteActivity extends ThemedActivity {
+         }); panel.addView(seek, new LinearLayout.LayoutParams(-1, dp(44)));
+         EditText hex = new EditText(this); hex.setTextColor(AppColors.INK); hex.setTextSize(14); hex.setSingleLine(true); hex.setSelectAllOnFocus(true); hex.setText(hex(color)); hex.setHint("#RRGGBB"); hex.setFilters(new InputFilter[]{new InputFilter.LengthFilter(7)}); hex.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_DONE | android.view.inputmethod.EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+         if (erasing) {
+-            NoteDialogs.gap(panel, 8); panel.addView(NoteDialogs.label(this, "只擦除圆圈覆盖的笔迹，保留其余部分。图片和文本请用选择工具调整或删除。", 12, AppColors.MUTED));
++            NoteDialogs.gap(panel, 8);
++            android.widget.RadioGroup modes=new android.widget.RadioGroup(this);
++            android.widget.RadioButton partial=new android.widget.RadioButton(this);partial.setId(View.generateViewId());partial.setText("局部擦除 · 保留轨迹的其余部分");modes.addView(partial);
++            android.widget.RadioButton whole=new android.widget.RadioButton(this);whole.setId(View.generateViewId());whole.setText("整笔擦除 · 移除碰到的整条笔迹");modes.addView(whole);
++            modes.check(wholeStrokeEraser?whole.getId():partial.getId());
++            modes.setOnCheckedChangeListener((group,id)->{wholeStrokeEraser=id==whole.getId();preferences.edit().putBoolean("wholeStrokeEraser",wholeStrokeEraser).apply();canvas.setWholeStrokeEraser(wholeStrokeEraser);});
++            panel.addView(modes);
++            panel.addView(NoteDialogs.label(this, "图片和文本请用套索或选择工具删除。", 12, AppColors.MUTED));
+         } else {
+             NoteDialogs.gap(panel, 12); panel.addView(NoteDialogs.label(this, "常用颜色", 12, AppColors.MUTED));
+             int[] colors = {0xff000000, 0xff666666, 0xffaaaaaa, 0xffffffff, 0xffe53935, 0xffff7043, 0xfff6c343, 0xff81c784, 0xff16805b, 0xff00acc1, 0xff2464d6, 0xff3949ab, 0xff8e44ad, 0xffd94f9b, 0xff8d6e63, 0xffffcdd2, 0xffc8e6c9, 0xffbbdefb};
+@@ -447,7 +588,7 @@ public final class NoteActivity extends ThemedActivity {
+             });
+         }
+         refresh.run();
+-        PopupWindow window = new PopupWindow(shell, dp(356), dp(erasing ? 300 : 610), true); window.setBackgroundDrawable(NoteDialogs.shape(this, AppColors.SURFACE, 20)); window.setElevation(dp(12)); window.setOutsideTouchable(true); window.setClippingEnabled(true); window.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED); window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); popup = window;
++        PopupWindow window = new PopupWindow(shell, dp(356), dp(erasing ? 420 : 610), true); window.setBackgroundDrawable(NoteDialogs.shape(this, AppColors.SURFACE, 20)); window.setElevation(dp(12)); window.setOutsideTouchable(true); window.setClippingEnabled(true); window.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED); window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); popup = window;
+         Runnable position = () -> {
+             if (popup != window || !anchor.isAttachedToWindow()) return;
+             Rect visible = new Rect(); (shell.isAttachedToWindow() ? shell : root).getWindowVisibleDisplayFrame(visible);
+@@ -455,7 +596,7 @@ public final class NoteActivity extends ThemedActivity {
+             if (decor.getWidth() > 0 && decor.getHeight() > 0 && bounded.intersect(decorPosition[0], decorPosition[1], decorPosition[0] + decor.getWidth(), decorPosition[1] + decor.getHeight())) visible.set(bounded);
+             if (visible.width() <= 0 || visible.height() <= 0) return;
+             int[] at = new int[2], screen = new int[2], inWindow = new int[2]; anchor.getLocationOnScreen(at); root.getLocationOnScreen(screen); root.getLocationInWindow(inWindow);
+-            int[] box = PopupPlacement.place(visible.left, visible.top, visible.right, visible.bottom, at[0], at[1], at[0] + anchor.getWidth(), at[1] + anchor.getHeight(), dp(356), dp(erasing ? 300 : 610), dp(10), dp(7), dp(180));
++            int[] box = PopupPlacement.place(visible.left, visible.top, visible.right, visible.bottom, at[0], at[1], at[0] + anchor.getWidth(), at[1] + anchor.getHeight(), dp(356), dp(erasing ? 420 : 610), dp(10), dp(7), dp(180));
+             int x = box[0] - screen[0] + inWindow[0], y = box[1] - screen[1] + inWindow[1];
+             if (window.isShowing()) window.update(x, y, box[2], box[3]); else {window.setWidth(box[2]); window.setHeight(box[3]); window.showAtLocation(root, Gravity.TOP | Gravity.LEFT, x, y);}
+         };
+@@ -468,11 +609,11 @@ public final class NoteActivity extends ThemedActivity {
+             if (keyboard != null && hex.hasFocus()) keyboard.hideSoftInputFromWindow(hex.getWindowToken(), 0);
+         });
+         hex.setOnEditorActionListener((view, action, event) -> {if (action == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {android.view.inputmethod.InputMethodManager keyboard = (android.view.inputmethod.InputMethodManager)getSystemService(INPUT_METHOD_SERVICE); if (keyboard != null) keyboard.hideSoftInputFromWindow(hex.getWindowToken(), 0); shell.requestFocus(); return true;} return false;});
+-        shell.requestFocus(); position.run();
++        shell.requestFocus(); position.run();NoteMotion.enter(shell);
+     }
+ 
+     private void pickImage() {
+-        if (canvas == null || IMAGE_JOBS.containsKey(noteId)) return;
++        if (canvas == null || readOnly || IMAGE_JOBS.containsKey(noteId)) return;
+         dismissPopup(); canvas.finishGesture(); canvas.save();
+         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*").addCategory(Intent.CATEGORY_OPENABLE);
+         try {startActivityForResult(intent, PICK_IMAGE);} catch (android.content.ActivityNotFoundException exception) {showDialog(ReaderDialogs.message(this, "无法选择图片", "设备没有可用的文件选择器。", true));}
+@@ -575,7 +716,7 @@ public final class NoteActivity extends ThemedActivity {
+         ImageJob(String noteId) {this.noteId = noteId;}
+     }
+ 
+-    private void showDialog(Dialog next) {if (dialog != null) dialog.dismiss(); dialog = next; next.setOnDismissListener(v -> {if (dialog == next) dialog = null;});}
++    private void showDialog(Dialog next) {if (dialog != null) dialog.dismiss(); dialog = next;if(next.getWindow()!=null)NoteMotion.enter(next.getWindow().getDecorView()); next.setOnDismissListener(v -> {if (dialog == next) dialog = null;});}
+     private void dismissPopup() {if (popup != null) popup.dismiss();}
+     private IconButton icon(String kind, String title, View.OnClickListener listener) {IconButton view = new IconButton(this, kind, title); view.setOnClickListener(listener); return view;}
+     private void addIcon(LinearLayout parent, View view) {parent.addView(view, new LinearLayout.LayoutParams(dp(44), dp(44)));}
+@@ -586,8 +727,9 @@ public final class NoteActivity extends ThemedActivity {
+     private static float clamp(float value, float minimum, float maximum) {return Float.isNaN(value) || Float.isInfinite(value) ? minimum : Math.max(minimum, Math.min(maximum, value));}
+     @Override protected void onResume() {super.onResume(); resumed = true; consumeImage();}
+     @Override protected void onPause() {resumed = false; pageSyncHandler.removeCallbacks(pendingPageSync); dismissPopup(); if (dialog != null) {dialog.dismiss(); dialog = null;} if (canvas != null) {canvas.finishGesture(); if(canvas.save())syncLibraryPages();} super.onPause();}
+-    @Override protected void onSaveInstanceState(Bundle state) {super.onSaveInstanceState(state); state.putString("tool", tool); state.putBoolean("collapsed", headerCollapsed); state.putBoolean("pagesExpanded",pagesExpanded); state.putString("pendingExport", pendingExport);state.putBoolean("sourceConsumed",sourceConsumed);state.putLong("pendingSourceItemId",pendingSourceItemId);if(document!=null)state.putInt("currentPage",document.currentPage());}
++    @Override protected void onSaveInstanceState(Bundle state) {super.onSaveInstanceState(state); state.putString("tool", tool);state.putBoolean("readOnly",readOnly); state.putBoolean("collapsed", headerCollapsed); state.putBoolean("pagesExpanded",pagesExpanded); state.putString("pendingExport", pendingExport);state.putBoolean("sourceConsumed",sourceConsumed);state.putLong("pendingSourceItemId",pendingSourceItemId);if(document!=null)state.putInt("currentPage",document.currentPage());}
+     @Override protected void onNewIntent(Intent incoming){super.onNewIntent(incoming);setIntent(incoming);if(canvas!=null&&noteId.equals(incoming.getStringExtra("id"))&&incoming.hasExtra("page")){int page=incoming.getIntExtra("page",-1);if(page>=0&&page<document.pageCount())canvas.selectPage(page);}}
++    @Override public void finish(){super.finish();NoteMotion.applyActivityTransition(this,false);}
+     @Override protected void onDestroy() {
+         destroyed = true; pageSyncHandler.removeCallbacks(pendingPageSync); dismissPopup(); if (dialog != null) {dialog.dismiss(); dialog = null;} if (canvas != null) {canvas.dispose(); canvas = null;}
+         if(editLease!=null){editLease.close();editLease=null;}
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java b/app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java
+new file mode 100644
+index 0000000..0ddd01f
+--- /dev/null
++++ b/app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java
+@@ -0,0 +1,16 @@
++package cn.qingyue.pdf;
++
++/** Labels and navigation availability for both paper notes and legacy multi-canvas notes. */
++final class NoteEditorPresentation {
++    private NoteEditorPresentation() { }
++    static boolean hasPageNavigation(NoteDocument document){return !document.infinite()||document.pageCount()>1;}
++    static String pagePosition(NoteDocument document){
++        if(!document.infinite())return (document.currentPage()+1)+"/"+document.pageCount();
++        return document.pageCount()>1?"画布 "+(document.currentPage()+1)+"/"+document.pageCount():"无限草稿";
++    }
++    static String pdfScope(NoteDocument document){
++        if(!document.infinite())return "导出全部 "+document.pageCount()+" 页";
++        return document.pageCount()>1?"导出全部 "+document.pageCount()+" 张独立画布":"导出当前画布内容";
++    }
++}
++
+diff --git a/app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java b/app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java
+index 633ee57..8019dff 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java
++++ b/app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java
+@@ -9,7 +9,7 @@ import android.widget.*;
+ 
+ /** Visible rows only; page tools never sit above the editor's toolbar. */
+ final class NotePageSidebar extends LinearLayout {
+-    interface Actions { void select(int page); void move(int from,int to); void insert(int page); void append(); void close(); }
++    interface Actions { void select(int page); void move(int from,int to); void insert(int page); void append(); void close(); default void manage(int page){insert(page);} }
+     private final NoteDocument document;
+     private final String noteId;
+     private final Actions actions;
+@@ -18,6 +18,7 @@ final class NotePageSidebar extends LinearLayout {
+     private final TextView title,insertButton,appendButton;
+     private final IconButton up,down;
+     private int previousPage=-1,previousCount=-1;
++    private boolean editingEnabled=true;
+     NotePageSidebar(Context context,NoteDocument document,String noteId,Actions actions){
+         super(context);this.document=document;this.noteId=noteId;this.actions=actions;setOrientation(VERTICAL);setPadding(dp(6),0,dp(6),0);setBackgroundColor(AppColors.SURFACE);
+         LinearLayout heading=new LinearLayout(context);heading.setGravity(Gravity.CENTER_VERTICAL);title=label("页面",12);heading.addView(title,new LayoutParams(0,dp(44),1));IconButton close=new IconButton(context,"close","收起页面栏");close.setOnClickListener(v->actions.close());heading.addView(close,new LayoutParams(dp(44),dp(44)));addView(heading);
+@@ -28,34 +29,35 @@ final class NotePageSidebar extends LinearLayout {
+                 int height=Math.round(Math.max(72,getWidth()-dp(24))*1.35f);if(row.preview.getLayoutParams().height!=height)row.preview.setLayoutParams(new LayoutParams(-1,height));updateRow(row);return row.card;
+             }};list.setAdapter(adapter);addView(list,new LayoutParams(-1,0,1));
+         LinearLayout ordering=new LinearLayout(context);ordering.setGravity(Gravity.CENTER);up=new IconButton(context,"up","将当前页上移");down=new IconButton(context,"down","将当前页下移");up.setOnClickListener(v->{int page=document.currentPage();if(page>0)actions.move(page,page-1);});down.setOnClickListener(v->{int page=document.currentPage();if(page+1<document.pageCount())actions.move(page,page+1);});ordering.addView(up,new LayoutParams(0,dp(44),1));ordering.addView(down,new LayoutParams(0,dp(44),1));addView(ordering);
+-        insertButton=label("插入空白页",12);insertButton.setTextColor(AppColors.ACCENT_DARK);insertButton.setOnClickListener(v->actions.insert(document.currentPage()));addView(insertButton,new LayoutParams(-1,dp(44)));
+-        appendButton=label("＋ 添加草稿纸",12);appendButton.setTextColor(AppColors.ACCENT_DARK);appendButton.setBackground(NoteDialogs.shape(context,AppColors.SOFT,12));appendButton.setOnClickListener(v->actions.append());addView(appendButton,new LayoutParams(-1,dp(44)));refresh(true);
++        insertButton=label(document.infinite()?"画布操作":"页面操作",12);insertButton.setTextColor(AppColors.ACCENT_DARK);insertButton.setOnClickListener(v->actions.manage(document.currentPage()));addView(insertButton,new LayoutParams(-1,dp(44)));
++        appendButton=label(document.infinite()?"＋ 追加独立画布":"＋ 添加草稿纸",12);appendButton.setTextColor(AppColors.ACCENT_DARK);appendButton.setBackground(NoteDialogs.shape(context,AppColors.SOFT,12));appendButton.setOnClickListener(v->actions.append());addView(appendButton,new LayoutParams(-1,dp(44)));refresh(true);
+     }
+     private final class Row {
+         final LinearLayout card=new LinearLayout(getContext());final NotePagePreviewView preview=new NotePagePreviewView(getContext(),document,noteId,0);
+         final TextView number=label("",12);final GradientDrawable border=new GradientDrawable();int page;
+-        Row(){card.setTag(this);card.setOrientation(VERTICAL);card.setPadding(dp(5),dp(5),dp(5),dp(3));border.setCornerRadius(dp(9));card.setBackground(border);card.addView(preview,new LayoutParams(-1,dp(120)));card.addView(number,new LayoutParams(-1,dp(30)));card.setOnClickListener(v->actions.select(page));card.setOnLongClickListener(v->{actions.insert(page);return true;});}
++        Row(){card.setTag(this);card.setOrientation(VERTICAL);card.setPadding(dp(5),dp(5),dp(5),dp(3));border.setCornerRadius(dp(9));card.setBackground(border);card.addView(preview,new LayoutParams(-1,dp(120)));card.addView(number,new LayoutParams(-1,dp(30)));card.setOnClickListener(v->actions.select(page));card.setOnLongClickListener(v->{actions.manage(page);return true;});}
+     }
+-    private void updateRow(Row row){boolean selected=row.page==document.currentPage();row.border.setColor(selected?AppColors.SOFT:AppColors.BACKGROUND);row.border.setStroke(dp(selected?2:1),selected?AppColors.ACCENT:AppColors.BORDER);row.number.setText((selected?"● ":"")+(row.page+1)+" / "+document.pageCount());row.card.setContentDescription("第 "+(row.page+1)+" 页"+(selected?"，当前页":"，点击跳转")+"，长按插入空白页");row.preview.invalidate();}
++    private void updateRow(Row row){boolean selected=row.page==document.currentPage();row.border.setColor(selected?AppColors.SOFT:AppColors.BACKGROUND);row.border.setStroke(dp(selected?2:1),selected?AppColors.ACCENT:AppColors.BORDER);row.number.setText((selected?"● ":"")+(document.infinite()?"画布 ":"")+(row.page+1)+" / "+document.pageCount());row.card.setContentDescription((document.infinite()?"独立画布 "+(row.page+1):"第 "+(row.page+1)+" 页")+(selected?"，当前":"，点击跳转")+"，长按操作菜单");row.preview.invalidate();}
+     void refresh(boolean force){
+-        int page=document.currentPage(),count=document.pageCount();title.setText("页面 · "+count);insertButton.setContentDescription("在当前第 "+(page+1)+" 页之前或之后插入空白页");appendButton.setContentDescription("在末尾追加第 "+(count+1)+" 页草稿纸");up.setEnabled(page>0);down.setEnabled(page+1<count);
++        int page=document.currentPage(),count=document.pageCount();title.setText((document.infinite()?"独立画布 · ":"页面 · ")+count);insertButton.setContentDescription((document.infinite()?"独立画布 "+(page+1):"当前第 "+(page+1)+" 页")+"的复制、清空和删除等操作");appendButton.setContentDescription(document.infinite()?"追加独立画布，不与当前画布拼接":"在末尾追加第 "+(count+1)+" 页草稿纸");up.setEnabled(editingEnabled&&page>0);down.setEnabled(editingEnabled&&page+1<count);appendButton.setEnabled(editingEnabled);
+         if(force||count!=previousCount)adapter.notifyDataSetChanged();else for(int i=0;i<list.getChildCount();i++)updateRow((Row)list.getChildAt(i).getTag());
+         if(page!=previousPage&&(page<list.getFirstVisiblePosition()||page>list.getLastVisiblePosition()))list.setSelection(page);previousPage=page;previousCount=count;
+     }
+     void refreshSelection(){
+         int page=document.currentPage(),count=document.pageCount();
+-        title.setText("页面 · "+count);up.setEnabled(page>0);down.setEnabled(page+1<count);
++        title.setText((document.infinite()?"独立画布 · ":"页面 · ")+count);up.setEnabled(editingEnabled&&page>0);down.setEnabled(editingEnabled&&page+1<count);appendButton.setEnabled(editingEnabled);
+         for(int i=0;i<list.getChildCount();i++){
+             Row row=(Row)list.getChildAt(i).getTag();
+             boolean selected=row.page==page;
+             row.border.setColor(selected?AppColors.SOFT:AppColors.BACKGROUND);
+             row.border.setStroke(dp(selected?2:1),selected?AppColors.ACCENT:AppColors.BORDER);
+-            row.number.setText((selected?"● ":"")+(row.page+1)+" / "+count);
+-            row.card.setContentDescription("第 "+(row.page+1)+" 页"+(selected?"，当前页":"，点击跳转")+"，长按插入空白页");
++            row.number.setText((selected?"● ":"")+(document.infinite()?"画布 ":"")+(row.page+1)+" / "+count);
++            row.card.setContentDescription((document.infinite()?"独立画布 "+(row.page+1):"第 "+(row.page+1)+" 页")+(selected?"，当前":"，点击跳转")+"，长按操作菜单");
+         }
+         if(page!=previousPage&&(page<list.getFirstVisiblePosition()||page>list.getLastVisiblePosition()))list.setSelection(page);
+         previousPage=page;
+     }
++    void setEditingEnabled(boolean enabled){if(editingEnabled==enabled)return;editingEnabled=enabled;refreshSelection();}
+     private TextView label(String value,int size){TextView label=new TextView(getContext());label.setText(value);label.setTextColor(AppColors.INK);label.setTextSize(size);label.setGravity(Gravity.CENTER);return label;}
+     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
+ }
+diff --git a/app/src/main/java/cn/qingyue/pdf/NotePenPresets.java b/app/src/main/java/cn/qingyue/pdf/NotePenPresets.java
+new file mode 100644
+index 0000000..61307d8
+--- /dev/null
++++ b/app/src/main/java/cn/qingyue/pdf/NotePenPresets.java
+@@ -0,0 +1,36 @@
++package cn.qingyue.pdf;
++
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Locale;
++
++/** Small local pen-box preferences, independent of note content and its file version. */
++final class NotePenPresets {
++    static final int LIMIT=8;
++    static final class Preset {
++        final String tool; final int color; final float width;
++        Preset(String tool,int color,float width){this.tool=tool;this.color=color|0xff000000;this.width=width;}
++        String title(){return name(tool)+" · "+String.format(Locale.ROOT,"#%06X · %.1f pt",color&0xffffff,width);}
++    }
++    static boolean supported(String tool){return "pen".equals(tool)||"ballpoint".equals(tool)||"pencil".equals(tool)||"marker".equals(tool);}
++    static String name(String tool){return "marker".equals(tool)?"荧光笔":"pencil".equals(tool)?"铅笔":"ballpoint".equals(tool)?"圆珠笔":"钢笔";}
++    static boolean valid(Preset p){return p!=null&&supported(p.tool)&&!Float.isNaN(p.width)&&!Float.isInfinite(p.width)&&p.width>=("marker".equals(p.tool)?4:.5)&&p.width<=("marker".equals(p.tool)?60:20);}
++    static ArrayList<Preset> read(String text){
++        ArrayList<Preset> list=new ArrayList<>();
++        if(text==null){list.add(new Preset("pen",0xff36302b,2));list.add(new Preset("ballpoint",0xff2464d6,1.3f));list.add(new Preset("marker",0xfff6c343,18));return list;}
++        if(text.length()>4096)return list;
++        for(String row:text.split(";")){
++            if(list.size()==LIMIT)break;
++            String[] fields=row.split(",");if(fields.length!=3)continue;
++            try{Preset p=new Preset(fields[0],(int)Long.parseLong(fields[1],16),Float.parseFloat(fields[2]));if(valid(p)&&!contains(list,p))list.add(p);}catch(NumberFormatException ignored){}
++        }
++        return list;
++    }
++    static boolean contains(List<Preset> list,Preset candidate){for(Preset p:list)if(p.tool.equals(candidate.tool)&&p.color==candidate.color&&Math.abs(p.width-candidate.width)<.01)return true;return false;}
++    static String write(List<Preset> list){
++        StringBuilder result=new StringBuilder();int count=0;
++        for(Preset p:list){if(!valid(p))continue;if(count++==LIMIT)break;if(result.length()>0)result.append(';');result.append(p.tool).append(',').append(Integer.toHexString(p.color)).append(',').append(Float.toString(p.width));}
++        return result.toString();
++    }
++}
++
+diff --git a/delivery/1.14.0-editor-reference-qa.md b/delivery/1.14.0-editor-reference-qa.md
+new file mode 100644
+index 0000000..93dacd2
+--- /dev/null
++++ b/delivery/1.14.0-editor-reference-qa.md
+@@ -0,0 +1,84 @@
++# 云记草稿编辑证据、晴阅 1.13.5 基线差距及 1.14.0 实施状态
++
++日期：2026-09-24。基线：outputs/1.13.5/QingYuePDF。参考文件 base.apk(2).1，com.jideos.jnotes，3.2.6.4 / 534，SHA256 4f43408309a8f8e5f32181f1de947c440c55c5cb6c60e2fd6c35db25788ba2d3。本报告不等于“已复制所有功能”。
++
++## 证据强度和约束
++
++本轮只读静态研究，未安装、运行参考包或复制其代码/图片。资源文本 R 仅证明文案存在；布局 X 证明控件/视图引用存在；DEX D 只证明可读符号，不能单凭名称推断事件处理。可读的 13 个根 DEX 没有定义 com.jideos 的业务类，包中有 assets/baiduprotect*.i.dex、*.jar 与 libbaiduprotect；35 个该类资产未呈标准 DEX 头，因此没有还原其业务方法。可读路由中有普通平板/手机 NoteDetailActivity，但没有获得无限草稿创建分支的可执行调用链。不能声称静态研究确认所有工具在无限草稿均可用。
++
++adb devices -l 为空；已知 SDK 仅 platforms/build-tools/platform-tools，没有 emulator/system-images，未发现 AVD。本轮无法动态检查其默认状态、操作顺序、付费开关、手势手感、动画时长或真正布局。
++
++## 无限草稿与普通笔记的可证实区别
++
++- R：add_default_nb_note_name = 未命名草稿（资源表239334），nb_note = 无限草稿（245191），new_nb_note = 新建无限草稿（245257），vip_function_nb_detail（252305）描述可无限扩大的画布。
++- X：fragment_nb_note_detail.xml 使用 NbControlPanel；nb_draw_panel.xml 包含 NbContentLayer、NbTempLayer。该布局有 location_last / location_refresh / location_next 浮动定位组、scale_lock_layout，以及录音简单条/播放条 include。录音播放条和 scale_lock 默认 GONE。不能据此断言录音免费可用。
++- X：普通 fragment_note_detail.xml 明确具有 page_recycler_view、翻页容器、纸张模板 include；无限分支没有这些控件引用。由此只能证明布局区别，不能断言无限草稿绝对不支持背景或其他工具。
++- X：pop_create_note_layout 有封面/纸张挑选。没有可读业务调用链将其绑定到 new_nb_note，因此“创建无限草稿只需名字”“草稿必有封面纸张”的说法都尚未证实。创建任务需保留这一不确定性。
++- 编辑工具 edit_tool_bar_v2 布局含 undo/redo、可滚动工具容器、右侧属性面板，以及多种笔、橡皮、文字、图片、图形、激光、手写转换、胶带控件；它是通用布局，不能独立证明每种工具都出现在 NbControlPanel。
++
++用户本轮已明确晴阅新建草稿默认无限画布；该产品决定不依赖推测云记运行行为。晴阅应保留已有分页笔记的独立入口和左侧页栏，不给单张无限画布强加“自动新增下一页”。
++
++## 功能矩阵
++
++状态为晴阅 1.13.5 源码核对；“缺少”指该编辑界面未提供，不代表整个应用毫无相关模块。
++
++| 功能 | 云记可证实证据 | 无限草稿归属 | 晴阅 1.13.5 | 本轮适合的动作/验证 |
++| --- | --- | --- | --- | --- |
++| 无限画布/定位 | NbControlPanel、NbContentLayer/TempLayer；location_*；detail_menu_ten_scale | 画布/定位直接 X；10倍仅通用 R | 有无限双轴坐标，50–300%，无原点按钮 | 增10倍、原点/适配；远坐标回归 |
++| 撤销/重做 | edit_tool_bar_v2 btn_undo/redo | 通用工具 X | 有，页切换清历史 | 保留；多对象每次一个undo |
++| 工具栏滚动/属性子面板 | EditToolRecyclerView + PropertyFrameLayout | 通用 X | 横向工具条；长按调色粗细 | 增明确长按提示与紧凑面板 |
++| 钢笔/圆珠笔/铅笔/荧光笔 | 各PropertyView、ink_pen_pop、pencil_pop_pad | 通用 X；运行未证 | 有对应工具，笔记为宽度/颜色路径；铅笔透明度 | 不把相同路径标为真实压感/倾斜笔刷 |
++| 笔压/倾斜/笔刷样式 | vip_function_pencil_detail；压力滑杆布局 | 通用 R/X | 笔记不保存逐点压力/倾斜 | 格式/渲染能力缺口；不能虚设开关 |
++| 笔盒预设 | include_pen_box、add_to_pen_box；vip_pencil_case_tips | 通用 X/R | 单工具参数记忆，无多预设 | 本地有限数量预设可新增 |
++| 局部/整笔橡皮 | eraser_pen_pop：像素擦除/整笔擦除 | 通用 X | 局部路径切分 | 加整笔模式；数据回归 |
++| 只擦荧光笔/胶带 | only_markpen_switch/only_tape_switch | 通用 X | 无过滤、无胶带 | 缺口单列，不虚构胶带 |
++| 压感/长按橡皮 | setting_quick_eraser、pressure_sensitivity | 通用 R/X | 笔橡皮tool支持；无压力阈值菜单 | 手写硬件和状态机需专项 |
++| 自由/矩形套索及筛选 | lasso_type_pop/phone_lasso_type_pop；lasso_style；图片/文字/图形 | 通用 X/R | 只能点选单个文字/图片 | 新增多对象自由/矩形与类型筛选 |
++| 套索变换/复制剪切粘贴/颜色 | lasso_hint_text 244072；pop_lasso；copy_and_paste_tip | 通用 X/R | 文字图片可拖动缩放；无多选复制 | 实现v3可表达的操作，旋转另列 |
++| 套索旋转/链接/转文本 | lasso_hint_text | 通用 R；付费/云依赖不确定 | 来源链接仅固定PDF回链，无通用旋转/OCR对象转换 | 不伪造按钮 |
++| 文本插入编辑 | AddTextPropertyView、popup_drag_text_menu | 通用 X | 文字框、字号颜色、拖动缩放 | 保留，支持选区批量操作 |
++| 手写即时转文字/合并文本 | handwriting_title/merge/split；HandWritePenPropertyView | 通用 R/X、会员提示 | 仅PDF/OCR体系，笔记无即时转换 | 单列缺口与依赖 |
++| 图片导入/移动缩放/裁剪 | PictureView、image_editor/image_crop布局 | 通用 X | 导入/EXIF修正/移动缩放，无裁剪UI | 保留；裁剪旋转需另实现 |
++| 标准图形 | GraphView、standard_graph_pop | 通用 X | 线/圆/矩形/箭头 | 保留明确工具，不冒充全形状库 |
++| 长按自动图形/一笔成型 | setting_graph_detect_detail 249640、graph_one_hint_text | 通用 R | 无检测器 | 算法与识别容错缺口 |
++| 激光笔 | LaserPointerPenPropertyView；new_function_laser文案 | 通用 X/R | 无临时消失轨迹 | 单列，非永久marker |
++| 胶带/贴纸/扫描 | AdhesiveTapePenPropertyView、StickerRecentlyView、scanner提示 | 通用 X/R | 无胶带/贴纸库/扫描UI | 不复制资产，分别实现才可宣称 |
++| 页追加/前后插/复制/删/排序 | detail_outline_pop_menu；insert_new_page/copy/delete_page；长按缩略图调序 | 普通页管理 X；Nb未证 | 追加/前后插/上移下移，缺复制删清空 | 只在有限页管理中增加，至少保一页 |
++| 页面清空 | clear_page文案且“无法还原” | 通用 R | 无操作入口 | 晴阅可设计可撤销清空，避免照搬破坏性行为 |
++| 背景模板/封面 | include_set_paper_template、popupwin_change_template、创建cover/paper | 普通分支直接 X；Nb未知 | 新建 blank/ruled/grid、标准尺寸/无限；不可后改模板 | 创建owner设计；逐页模板需数据升级 |
++| 连续/横向/自由移动 | include_set_page_direction；setting_edge_turning；vip_power_vertical_page_continuous | 普通页 X/R | 已有连续纵向/横向、放大拖动 | 保留1.13.5；不混入Nb分页 |
++| 只读/阅读模式 | vip_function_readMode_detail：眼睛图标、激光/搜索/文本操作 | 通用 R | hand工具，但没有明确阅读状态开关 | 显式只读，手写笔也不落笔 |
++| 多页并列/分屏/标签 | 普通tab_layout；new_function双开提示；split_fragment | 通用/普通 X/R | 单编辑画布，无双开/并列 | 布局/生命周期专项，不能假装已支持 |
++| 侧栏/鸟瞰/缩略图 | view_note_side_bar、detail_menu_preview_setting | 通用 X；Nb归属未知 | 有左栏选页、移动顺序 | 保留侧栏；无限画布应显示定位而非假页数 |
++| 笔记内搜索/书签/大纲 | layout_note_detail_search、view_sidebar_search；vip_function_search_detail | 通用 X/R | 全库文字搜索、PDF书签；笔记编辑内无搜索/书签/大纲 | 清晰缺口，不把PDF能力当笔记已有 |
++| 导出PNG/PDF/原生/范围 | popupwin_detail_export_note/exportpdf；可编辑/扁平PDF资源 | 通用 X/R；Nb具体范围未知 | 全页PDF、当前页PNG，qyb备份 | 保留本地真实导出；超大无限范围需边界 |
++| 录音/同步回放 | Nb布局直接include录音条；vip_function_record_detail | Nb直接 X；实际状态/权限未知 | 无录音模型 | 需权限/音轨/时间戳，不做空壳按钮 |
++| 录音转写 | 10秒阈值/单独付费文案；登录提示 | 通用 R | 无 | 云端/收费依赖单列 |
++| 笔记关联/内部超链接 | layout_relate_notes、link_select_note_page；vip_link_tip | 通用 X/R | 来源文字可返回PDF指定页/位置 | 保留晴阅来源特色；通用双链待做 |
++| 图层显隐锁定合并 | main_layer_*、vip_new_layer_content | 通用 R；Nb实际未证 | 单列表绘制，无独立图层 | 本轮仅对象前后层级；不称图层功能 |
++| 加密/云同步/会员资源/AI | vip_note_encryption/cloud；market与AI布局 | 通用 R/X | 本地离线，无账号或云AI | 单列依赖，不擅接服务 |
++
++## 付费/联网证据单列
++
++出现会员解锁文案的功能有录音、上下连续翻页、手写转文本、可编辑PDF导出、超链接、合并文档、加密等。vip_power列表还列出很多基础工具，因此“在会员表出现”不等于每一项完全收费。模板有“需登录后使用”；纸张类目错误提示要求网络；录音转写明确登录、单独付费。晴阅本轮沿用本地离线原则，不复制账号/会员/广告/付费条件。
++
++## 本轮编辑UI实施边界
++
++用户决定默认无限草稿。core任务实现v3可表示的套索批量操作、整笔橡皮、页复制删清空、10倍与原点；本任务接编辑UI、笔盒预设、操作面板/只读/缩放。创建任务提供NoteMotion用于短淡入微滑与Activity过渡；不对持续书写画布加动画。现有PDF来源回链、奶油橙/经典主题、离线保存与左侧有限页栏保留。
++
++研究原件：reference/feature-strings.tsv、layout-controls.txt、49份*.xmltree.txt、dex-summary.json、zip-entries.txt。可复跑 inspect_apk.py、inspect_layouts.py、inspect_dex.py。根DEX没有读到业务类定义的事实限制了调用链判断；不宣称功能全覆盖或动态体验完成。
++
++## 1.14.0 本轮实施状态（区别于上表的 1.13.5 基线差距）
++
++本轮已接入并验证的编辑能力：自由/矩形套索和笔迹/图形/文字/图片筛选；选区拖动、角点缩放与百分比缩放、复制/剪切/粘贴/删除/改色/置顶置底；局部/整笔橡皮；最多8支本地笔盒预设；有限页复制/清空/删除/调序；明确只读浏览；无限画布最高1000%、原点定位；工具面板/菜单短过渡。默认无限草稿的创建流程与动画helper由creation任务交付，数据和触控由editor任务交付，本QA/UI任务只交付自己的接线和测试。
++
++旧版多页无限笔记的每张画布仍彼此独立：左侧保留“画布 i/N”与切换/管理入口，导出PDF标明全部独立画布。新的单张无限草稿显示定位入口，不假装连续页。只读标志由Canvas执行，禁写也覆盖横向末页自动加页、硬件橡皮和公共写API。清空可撤销；删除画布/页面不能撤销，界面会展示实际目标与对象数量确认并至少保留一页。
++
++仍未实现：真实逐点压力/倾斜笔刷、独立图层与图层显隐锁定合并、选区旋转、胶带/贴纸/扫描、长按智能图形/完整标准形状库、图片裁剪旋转UI、笔记内搜索/书签/大纲、临时激光轨迹、手写即时转文字/笔记OCR入口、多窗口分屏或多页并排、音字同步/录音/转写、通用内部超链接和双链、导出密码/范围/原生可编辑PDF、云同步/账号/会员或AI服务。现有PDF来源回链、全库文字搜索、PDF OCR与书签不是这些笔记编辑功能的替代实现。
++
++最终专项结果：207条断言，包含生产Canvas触控与绘制入口、菜单回调/禁用状态、生产笔盒序列化与历史画布展示策略。新增覆盖4类对象矩形/自由套索、拖移/角点缩放/单次undo、颜色保留alpha、剪贴板新ID、轮廓几何反例、整笔/局部擦除、页复制删清空、1000%保存恢复、只读末页長拉控制组、遗留3画布逐个访问。保留1.13.5原有134条用例。
++
++真实Android API35与真实PDFBox/OCR依赖编译111个生产Java源通过。合并测试输入只存在qa/work/combined，不纳入交付。测试日志qa/work/view-test-final.log、qa/work/compile/javac.log和result.txt。
++
++桌面替身只替代Android依赖并记录绘制命令，NoteActivity/真实WindowManager的布局和动画未在设备运行。菜单字体、图片异步加载、系统大字/窄分屏、手写笔压力和实际流畅度仍需真机验收。本报告不声明已全量复制云记。
++
+diff --git a/tests/note-view-qa/README.md b/tests/note-view-qa/README.md
+index 210a322..6e97fba 100644
+--- a/tests/note-view-qa/README.md
++++ b/tests/note-view-qa/README.md
+@@ -4,5 +4,5 @@ Runs production NoteCanvasView touch dispatch/drawing and NoteActionMenu show/cl
+ 
+ Run `./run.ps1 -BuildDirectory <output>` in the integrated project. For independent delivery validation, `-ProductionDirectory <directory containing merged production Java files>` selects a read-only test input snapshot.
+ 
+-The shims are not Android rendering, WindowManager placement, disk storage, async image decoding, or font-layout verification. See delivery/1.13.5-reference-qa.md for exact coverage and device limitations. No production gesture or page-layout logic is mirrored in these tests.
++The shims are not Android rendering, WindowManager placement, disk storage, async image decoding, or font-layout verification. See delivery/1.14.0-editor-reference-qa.md for exact coverage and device limitations. No production gesture or page-layout logic is mirrored in these tests.
+ 
+diff --git a/tests/note-view-qa/run.ps1 b/tests/note-view-qa/run.ps1
+index b4b7044..63fdffc 100644
+--- a/tests/note-view-qa/run.ps1
++++ b/tests/note-view-qa/run.ps1
+@@ -5,7 +5,7 @@ if (!$ProductionDirectory) { $ProductionDirectory = Join-Path $PSScriptRoot '../
+ New-Item -ItemType Directory -Force -Path $BuildDirectory | Out-Null
+ $classes=Join-Path $BuildDirectory 'classes'
+ New-Item -ItemType Directory -Force -Path $classes | Out-Null
+-$production=@('NoteCanvasView.java','NoteActionMenu.java','NoteActionPlacement.java','NoteDocument.java','NotePageLayout.java','InkStrokeRenderer.java','InkPage.java','InkInput.java','TouchNavigation.java','TwoFingerTap.java','ZoomLimits.java') | ForEach-Object { Join-Path $ProductionDirectory $_ }
++$production=@('NoteCanvasView.java','NoteActionMenu.java','NoteActionPlacement.java','NoteDocument.java','NoteEditorOps.java','NotePenPresets.java','NoteEditorPresentation.java','NotePageLayout.java','InkStrokeRenderer.java','InkPage.java','InkInput.java','TouchNavigation.java','TwoFingerTap.java','ZoomLimits.java') | ForEach-Object { Join-Path $ProductionDirectory $_ }
+ $tests=@(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'src') -Recurse -Filter '*.java' | ForEach-Object { $_.FullName })
+ & javac -encoding UTF-8 --release 8 -d $classes @production @tests
+ if ($LASTEXITCODE -ne 0) { throw 'Production view QA compile failed' }
+diff --git a/tests/note-view-qa/src/android/graphics/Path.java b/tests/note-view-qa/src/android/graphics/Path.java
+index b89d526..07edeb2 100644
+--- a/tests/note-view-qa/src/android/graphics/Path.java
++++ b/tests/note-view-qa/src/android/graphics/Path.java
+@@ -1 +1 @@
+-package android.graphics; import java.util.*; public class Path {public enum Direction{CW}public final List<float[]> points=new ArrayList<>();public void moveTo(float x,float y){points.add(new float[]{x,y});}public void lineTo(float x,float y){points.add(new float[]{x,y});}public void cubicTo(float a,float b,float c,float d,float e,float f){points.add(new float[]{e,f});}public void close(){}public void addCircle(float x,float y,float r,Direction d){points.add(new float[]{x,y});}}
++package android.graphics; import java.util.*; public class Path {public enum Direction{CW}public final List<float[]> points=new ArrayList<>();public void moveTo(float x,float y){points.add(new float[]{x,y});}public void lineTo(float x,float y){points.add(new float[]{x,y});}public void cubicTo(float a,float b,float c,float d,float e,float f){points.add(new float[]{e,f});}public void addRect(float l,float t,float r,float b,Direction d){moveTo(l,t);lineTo(r,t);lineTo(r,b);lineTo(l,b);close();}public void close(){}public void addCircle(float x,float y,float r,Direction d){points.add(new float[]{x,y});}}
+diff --git a/tests/note-view-qa/src/android/view/View.java b/tests/note-view-qa/src/android/view/View.java
+index e0bd8e1..299fba9 100644
+--- a/tests/note-view-qa/src/android/view/View.java
++++ b/tests/note-view-qa/src/android/view/View.java
+@@ -6,7 +6,7 @@ public class View {
+  public View(Context c){context=c;}public Context getContext(){return context;}public Resources getResources(){return context.getResources();}public int getWidth(){return width;}public int getHeight(){return height;}
+  public void layout(int l,int t,int r,int b){int ow=width,oh=height;width=r-l;height=b-t;onSizeChanged(width,height,ow,oh);}protected void onSizeChanged(int w,int h,int ow,int oh){}protected void onDraw(Canvas c){}public void draw(Canvas c){onDraw(c);}
+  public boolean onTouchEvent(MotionEvent e){return false;}public boolean onHoverEvent(MotionEvent e){return false;}public boolean performClick(){if(listener!=null)listener.onClick(this);return true;}
+- public ViewParent getParent(){return null;}public void setFocusable(boolean v){}public void setClickable(boolean v){}public void setContentDescription(CharSequence s){description=s;}public CharSequence getContentDescription(){return description;}public void setLayerType(int type,Object p){}public void invalidate(){}public boolean post(Runnable r){r.run();return true;}
++ public ViewParent getParent(){return null;}public void setFocusable(boolean v){}public void setClickable(boolean v){}public void setEnabled(boolean v){}public void setAlpha(float v){}public void setContentDescription(CharSequence s){description=s;}public CharSequence getContentDescription(){return description;}public void setLayerType(int type,Object p){}public void invalidate(){}public boolean post(Runnable r){r.run();return true;}
+  public void setPadding(int l,int t,int r,int b){padding=t+b;}public void setBackground(Object d){}public void setBackgroundColor(int c){}
+  public interface OnClickListener{void onClick(View v);}public void setOnClickListener(OnClickListener l){listener=l;}
+  public void getWindowVisibleDisplayFrame(Rect r){r.set(visible.left,visible.top,visible.right,visible.bottom);}public void getLocationOnScreen(int[] p){p[0]=screenX;p[1]=screenY;}
+diff --git a/tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java b/tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java
+index 4619fed..713b93c 100644
+--- a/tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java
++++ b/tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java
+@@ -159,8 +159,95 @@ public final class NoteViewQaTest {
+         anchor.visible.set(0,0,0,0);Dialog fallback=NoteActionMenu.show(context,anchor,1,1,noop,noop,noop,noop,noop);
+         check(fallback.getWindow().width>0&&fallback.getWindow().width<=360,"zero-frame fallback uses display size");
+     }
++    static float wxScreen(Fixture f,double x)throws Exception{return (float)(400+(x-field(f.view,"cx"))*field(f.view,"zoom"));}
++    static float wyScreen(Fixture f,double y)throws Exception{return (float)(300+(y-field(f.view,"cy"))*field(f.view,"zoom"));}
++    static void worldStroke(Fixture f,double x,double y,double xx,double yy)throws Exception{stroke(f,wxScreen(f,x),wyScreen(f,y),wxScreen(f,xx),wyScreen(f,yy));}
++    static void selectBox(Fixture f)throws Exception{f.view.setTool("lasso",0,2,true);f.view.setLassoFreeform(false);worldStroke(f,-160,-160,190,110);}
++    static void editOperations()throws Exception {
++        Fixture f=new Fixture("infinite",1);
++        long ink=f.doc.newId(),text=f.doc.newId(),image=f.doc.newId(),shape=f.doc.newId();
++        f.doc.add(new NoteDocument.Item(ink,NoteDocument.STROKE,0x55ff3344,4,new double[]{-100,-100,-30,-100},""));
++        f.doc.add(new NoteDocument.Item(text,NoteDocument.TEXT,0xff334455,16,new double[]{-100,0,-20,40},"","draft text"));
++        f.doc.add(new NoteDocument.Item(image,NoteDocument.IMAGE,0xffffffff,1,new double[]{20,0,80,50},"image.png"));
++        f.doc.add(new NoteDocument.Item(shape,NoteDocument.RECTANGLE,0xff556677,3,new double[]{80,-100,140,-20},""));
++        f.view.setLassoFilter(NoteCanvasView.LASSO_ALL);selectBox(f);check(f.view.selectionCount()==4,"rectangle lasso selects four object kinds");
++        worldStroke(f,0,-25,30,15);close(f.doc.find(ink).left(),-70,.01,"group drag moves ink");close(f.doc.find(text).top(),40,.01,"group drag moves text");close(f.doc.find(image).left(),50,.01,"group drag moves image");
++        f.view.undo();close(f.doc.find(ink).left(),-100,.001,"one undo restores group drag");close(f.doc.find(image).left(),20,.001,"same undo restores image");
++        selectBox(f);worldStroke(f,140,50,180,80);check(f.doc.find(ink).width>4,"corner-handle gesture scales the selected group");check(f.doc.find(image).right()-f.doc.find(image).left()>60,"corner-handle gesture scales images too");f.view.undo();close(f.doc.find(ink).width,4,.001,"handle scale is one undo");
++        selectBox(f);f.view.scaleSelection(1.25f);close(f.doc.find(ink).width,5,.001,"selection scale adjusts width");check(f.doc.find(image).right()-f.doc.find(image).left()>60,"selection scale adjusts image bounds");f.view.undo();
++        selectBox(f);f.view.recolorSelection(0xff2464d6);check(f.doc.find(ink).color==0x552464d6,"recolor preserves marker alpha");check(f.doc.find(image).color==-1,"recolor preserves image");f.view.undo();
++        selectBox(f);f.view.copySelection();check(f.view.hasClipboard(),"copy populates local clipboard");f.view.pasteSelection();check(f.doc.items().size()==8,"paste copies all selected kinds");
++        Set<Long> ids=new HashSet<>();for(NoteDocument.Item item:f.doc.items())check(ids.add(item.id),"pasted ids are independent");
++        f.view.undo();check(f.doc.items().size()==4,"one undo removes entire pasted group");
++        selectBox(f);f.view.cutSelection();check(f.doc.items().isEmpty(),"cut removes group");f.view.undo();check(f.doc.items().size()==4,"undo cut restores group");
++        f.view.setLassoFilter(NoteCanvasView.LASSO_HANDWRITING);selectBox(f);check(f.view.selectionCount()==1,"lasso handwriting filter excludes text/images/shapes");
++        f.view.bringSelectionForward();check(f.doc.items().get(3).id==ink,"bring forward places at top");f.view.sendSelectionBackward();check(f.doc.items().get(0).id==ink,"send backward places at bottom");
++        f.view.setLassoFilter(NoteCanvasView.LASSO_ALL);f.view.setLassoFreeform(true);time+=400;
++        double[][] polygon={{-160,-160},{190,-160},{190,110},{-160,110},{-160,-160}};
++        f.view.onTouchEvent(single(0,2,wxScreen(f,polygon[0][0]),wyScreen(f,polygon[0][1])));
++        for(int i=1;i<polygon.length;i++)f.view.onTouchEvent(single(2,2,wxScreen(f,polygon[i][0]),wyScreen(f,polygon[i][1])));
++        f.view.onTouchEvent(single(1,2,wxScreen(f,-160),wyScreen(f,-160)));check(f.view.selectionCount()==4,"freeform production gesture selects group");
++        f.view.deleteSelection();check(f.doc.items().isEmpty(),"delete selection removes all kinds");f.view.undo();check(f.doc.items().size()==4,"delete selection is one undo");
++    }
++    static void eraserPagesAndInfinite()throws Exception {
++        Fixture f=new Fixture("infinite",1);
++        f.doc.add(new NoteDocument.Item(f.doc.newId(),NoteDocument.STROKE,0xff333333,4,new double[]{-100,0,100,0},""));
++        f.doc.add(new NoteDocument.Item(f.doc.newId(),NoteDocument.STROKE,0xff333333,4,new double[]{-100,120,100,120},""));
++        f.view.setTool("eraser",0,20,true);f.view.setWholeStrokeEraser(true);worldStroke(f,0,-5,0,5);
++        check(f.doc.items().size()==1&&f.doc.items().get(0).top()==120,"whole stroke eraser removes only touched full path");f.view.undo();check(f.doc.items().size()==2,"whole stroke erase is one undo");
++        f.view.setWholeStrokeEraser(false);worldStroke(f,0,-5,0,5);check(f.doc.items().size()==3,"partial eraser still retains both sides");f.view.undo();
++        f.view.setTool("hand",0,2,true);int count=f.doc.items().size();worldStroke(f,-100,-100,100,100);check(f.doc.items().size()==count,"hand mode stylus input is read-only");
++        f.view.setZoomPercent(1000);check(f.view.zoomPercent()==1000,"infinite supports ten times zoom");
++        f.view.resetOrigin();close(field(f.view,"cx"),0,.001,"reset origin x");close(field(f.view,"cy"),0,.001,"reset origin y");check(f.view.zoomPercent()==1000,"origin retains scale");
++        NoteDocument copy=f.view.snapshot();NoteCanvasView restored=new NoteCanvasView(f.context,copy,"qa",new Host());restored.layout(0,0,800,600);check(restored.zoomPercent()==1000,"ten times zoom survives reopen");f.view.fit();check(f.view.zoomPercent()==100,"fit returns default scale");
++        Fixture paper=new Fixture(2);stroke(paper,300,150,400,200);long original=paper.doc.items().get(0).id;
++        paper.view.duplicatePage();check(paper.doc.pageCount()==3&&paper.doc.currentPage()==1,"duplicate page inserts independent page");check(paper.doc.items().get(0).id!=original,"duplicated items use fresh ids");
++        paper.view.clearPage();check(paper.doc.items().isEmpty()&&paper.doc.pageItems(0).size()==1,"clear affects selected page only");paper.view.undo();check(paper.doc.items().size()==1,"clear page undo restores content");
++        paper.view.deletePage();check(paper.doc.pageCount()==2&&paper.doc.pageItems(0).size()==1,"delete copied page preserves original");
++        paper.view.setZoomPercent(1000);check(paper.view.zoomPercent()==300,"finite page retains 300 percent ceiling");
++    }
++    static void presetsAndDisabledMenus(){
++        ArrayList<NotePenPresets.Preset> presets=NotePenPresets.read(null);check(presets.size()==3,"pen box defaults");
++        String wire=NotePenPresets.write(presets);ArrayList<NotePenPresets.Preset> read=NotePenPresets.read(wire);
++        check(read.size()==3&&read.get(2).width==18,"pen presets roundtrip");check(NotePenPresets.read("").isEmpty(),"intentionally emptied pen box stays empty");
++        check(NotePenPresets.read("pen,ff000000,NaN;pen,ff000000,100;lasso,ff000000,2").isEmpty(),"invalid presets rejected");
++        for(int i=0;i<20;i++)presets.add(new NotePenPresets.Preset("pen",0xff001000+i,2));check(NotePenPresets.read(NotePenPresets.write(presets)).size()==8,"pen box remains bounded");
++        Context context=new Context();View anchor=new View(context);final int[] calls={0};
++        Dialog menu=NoteActionMenu.showActions(context,anchor,"selection",new NoteActionMenu.Action("×","Disabled","No selection",null),new NoteActionMenu.Action("+","Enabled","Action",()->calls[0]++));
++        List<View> rows=new ArrayList<>();walk(menu.content,rows);rows.get(0).performClick();check(calls[0]==0&&menu.shown,"unavailable action neither runs nor dismisses");
++        rows.get(1).performClick();check(calls[0]==1&&!menu.shown,"enabled action works alongside disabled row");
++    }
++
++    static void longEdgePull(Fixture f){
++        time+=400;f.view.onTouchEvent(single(0,1,700,300));f.view.onTouchEvent(single(2,1,650,300));time+=500;
++        f.view.onTouchEvent(single(2,1,100,300));f.view.onTouchEvent(single(1,1,100,300));
++    }
++    static void shapeInteriorSelection()throws Exception{
++        Fixture f=new Fixture("infinite",1);f.doc.add(new NoteDocument.Item(f.doc.newId(),NoteDocument.CIRCLE,0xff333333,2,new double[]{-100,-100,100,100},""));
++        f.view.setTool("lasso",0,2,true);f.view.setLassoFreeform(false);worldStroke(f,-10,-10,10,10);check(f.view.selectionCount()==0,"rectangle lasso does not select empty circle interior");
++        f.doc.clearPage();f.doc.add(new NoteDocument.Item(f.doc.newId(),NoteDocument.STROKE,0xff333333,2,new double[]{-100,-100,100,100},""));
++        worldStroke(f,-90,60,-60,90);check(f.view.selectionCount()==0,"lasso does not select empty diagonal bounding-box corner");
++        worldStroke(f,-10,-10,10,10);check(f.view.selectionCount()==1,"lasso selects actual diagonal path crossing");
++    }
++    static void readOnlyAndLegacy()throws Exception{
++        Fixture f=new Fixture(1);stroke(f,200,150,300,200);int objects=f.doc.items().size();
++        f.view.setHorizontalPages(true);f.view.fit();f.view.setTool("hand",0,2,true);f.view.setReadOnly(true);
++        longEdgePull(f);check(f.doc.pageCount()==1,"read-only edge pull cannot append a page");
++        f.view.setTool("pen",0,2,false);stroke(f,200,150,300,200);check(f.doc.items().size()==objects,"read-only blocks stylus even if tool is pen");
++        time+=400;f.view.onTouchEvent(single(0,4,200,150));f.view.onTouchEvent(single(1,4,300,200));check(f.doc.items().size()==objects,"read-only blocks hardware eraser");
++        f.view.addPage();f.view.insertPage(0);f.view.duplicatePage();f.view.deletePage();f.view.clearPage();f.view.putText("blocked",16,0xff000000);f.view.insertImage("blocked.png",20,20);f.view.undo();f.view.redo();
++        check(f.doc.pageCount()==1&&f.doc.items().size()==objects,"read-only rejects public mutation APIs");
++        f.view.setReadOnly(false);f.view.setTool("hand",0,2,true);f.view.fit();longEdgePull(f);check(f.doc.pageCount()==2,"control gesture really appends in editable hand mode");
++        Fixture legacy=new Fixture("infinite",3);
++        check(NoteEditorPresentation.hasPageNavigation(legacy.doc),"legacy multi-canvas keeps navigation");
++        check(NoteEditorPresentation.pdfScope(legacy.doc).contains("3 张独立画布"),"legacy PDF scope includes all canvases");
++        for(int i=0;i<3;i++){legacy.view.selectPage(i);legacy.view.putText("canvas "+i,16,0xff123456);}
++        for(int i=0;i<3;i++){legacy.view.selectPage(i);check(legacy.doc.items().get(0).text.equals("canvas "+i),"legacy canvas remains reachable");check(NoteEditorPresentation.pagePosition(legacy.doc).equals("画布 "+(i+1)+"/3"),"legacy position label follows selection");}
++        Fixture single=new Fixture("infinite",1);check(!NoteEditorPresentation.hasPageNavigation(single.doc),"new single infinite has location UI");check(NoteEditorPresentation.pagePosition(single.doc).equals("无限草稿"),"single infinite label");
++    }
++
+     public static void main(String[] args)throws Exception {
+-        try {pinchAndRestore();boundaryEditing();selectionAndAppend();drawingIsolation();palmAndModes();menu();System.out.println("PASS NoteViewQaTest "+assertions+" assertions (production Views, Android recording shims; not device rendering)");System.exit(0);}
++        try {shapeInteriorSelection();readOnlyAndLegacy();editOperations();eraserPagesAndInfinite();presetsAndDisabledMenus();pinchAndRestore();boundaryEditing();selectionAndAppend();drawingIsolation();palmAndModes();menu();System.out.println("PASS NoteViewQaTest "+assertions+" assertions (production Views, Android recording shims; not device rendering)");System.exit(0);}
+         catch(Throwable error){error.printStackTrace();System.exit(1);}
+     }
+ }
+diff --git a/tests/note-view-qa/src/cn/qingyue/pdf/Support.java b/tests/note-view-qa/src/cn/qingyue/pdf/Support.java
+index 43e8fa2..2e617da 100644
+--- a/tests/note-view-qa/src/cn/qingyue/pdf/Support.java
++++ b/tests/note-view-qa/src/cn/qingyue/pdf/Support.java
+@@ -2,7 +2,7 @@ package cn.qingyue.pdf;
+ import android.content.*;import android.graphics.*;import android.widget.*;import java.io.*;
+ final class AppColors {static final int CANVAS=0xffeeeeee,PAPER=0xffffffff,SURFACE=-1,INK=0xff111111,BORDER=0xffdddddd,MUTED=0xff777777,ACCENT=0xff008800,ACCENT_DARK=0xff006600,SOFT=0xffddddcc;}
+ final class ZoomBadge {void draw(Canvas c,int w,float d,double z){}}
+-final class NoteStore {static int saves;static void save(Context c,String id,NoteDocument d)throws IOException{saves++;}interface Failure {void call(String m);}static void saveAsync(Context c,String id,NoteDocument d,Failure f){saves++;}static File imagesDirectory(Context c,String id)throws IOException{return new File(".");}}
++final class NoteStore {static int saves;static boolean imageExists(Context c,String id,String name){return true;}static void save(Context c,String id,NoteDocument d)throws IOException{saves++;}interface Failure {void call(String m);}static void saveAsync(Context c,String id,NoteDocument d,Failure f){saves++;}static File imagesDirectory(Context c,String id)throws IOException{return new File(".");}}
+ final class NoteTextLayout {static double height(String s,float size,int ink,double width){return size*2;}static void draw(Canvas c,NoteDocument.Item i){Paint p=new Paint(1);p.setColor(i.color);c.drawText(i.text,(float)i.left(),(float)i.top(),p);}}
+ final class ReaderSourceLink {String toUri(){return "qingyue://source?test";}}
+ final class NoteSourceActions {static String body(ReaderSourceLink s){return "source";}}
+-- 
+2.53.0.windows.3
+

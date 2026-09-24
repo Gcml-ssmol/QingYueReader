@@ -3,6 +3,8 @@ package cn.qingyue.pdf;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -25,11 +27,16 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /** Compact document cards shared by the library's manage, rename and remove flows. */
 public final class DocumentDialogs {
@@ -38,6 +45,26 @@ public final class DocumentDialogs {
     private DocumentDialogs() { }
 
     public interface Rename { void changed(String name); }
+    public interface Organization { void changed(String folder, List<String> tags); }
+    public interface ImportOption { void chosen(boolean keepOriginal); }
+
+    /** A lifecycle-replaceable task card. The worker is owned outside the Activity. */
+    public static final class TaskDialog {
+        private final CardDialog dialog;
+        private final TextView stage, detail;
+        private final ProgressBar progress;
+        private final Button cancel;
+        TaskDialog(CardDialog dialog, TextView stage, TextView detail, ProgressBar progress, Button cancel) {
+            this.dialog=dialog;this.stage=stage;this.detail=detail;this.progress=progress;this.cancel=cancel;
+        }
+        public Dialog dialog(){return dialog;}
+        public void update(String title,String message,int percent){
+            stage.setText(safe(title));detail.setText(safe(message));
+            progress.setIndeterminate(percent<0);if(percent>=0)progress.setProgress(Math.max(0,Math.min(100,percent)));
+        }
+        public void setCancellationEnabled(boolean enabled){if(cancel!=null){cancel.setEnabled(enabled);cancel.setVisibility(enabled?View.VISIBLE:View.GONE);}}
+        public void dismiss(){if(dialog.isShowing())dialog.dismiss();}
+    }
 
     public static Dialog actions(Activity activity, String name, String metadata,
             int page1Based, int total, Runnable read, Runnable rename, Runnable remove) {
@@ -94,8 +121,8 @@ public final class DocumentDialogs {
         continueButton.setGravity(Gravity.CENTER);
         continueButton.setPadding(dp(activity, 12), dp(activity, 9), dp(activity, 12), dp(activity, 9));
         continueButton.setMinimumHeight(dp(activity, 52));
-        continueButton.addView(decoration(activity, "book", AppColors.SURFACE), new LinearLayout.LayoutParams(dp(activity, 28), dp(activity, 30)));
-        TextView continueLabel = text(activity, note?"继续记录":"继续阅读", 16, AppColors.SURFACE);
+        continueButton.addView(decoration(activity, "book", AppColors.ON_ACCENT), new LinearLayout.LayoutParams(dp(activity, 28), dp(activity, 30)));
+        TextView continueLabel = text(activity, note?"继续记录":"继续阅读", 16, AppColors.ON_ACCENT);
         continueLabel.setTypeface(null, 1);
         continueLabel.setPadding(dp(activity, 9), 0, 0, 0);
         continueButton.addView(continueLabel);
@@ -111,6 +138,112 @@ public final class DocumentDialogs {
         LinearLayout removeRow = operation(activity, "trash", removeTitle, removeHint, true);
         makeAction(removeRow, REMOVE_SOFT, removeTitle+"，"+removeHint, () -> dialog.complete(remove));
         body.addView(removeRow, new LinearLayout.LayoutParams(-1, -2));
+        dialog.show();
+        return dialog;
+    }
+
+    /** Full library actions. Removal means moving to the recoverable trash. */
+    public static Dialog libraryActions(Activity activity,String name,String metadata,int page1Based,int total,
+            boolean note,String format,boolean favorite,String folder,List<String> tags,Runnable read,
+            Runnable rename,Runnable organize,Runnable toggleFavorite,Runnable moveToTrash){
+        CardDialog dialog=new CardDialog(activity);LinearLayout body=dialog.body;
+        LinearLayout heading=row(activity);
+        TextView badge=text(activity,note?"笔记":safe(format),14,AppColors.ACCENT_DARK);badge.setTypeface(null,1);badge.setGravity(Gravity.CENTER);
+        GradientDrawable cover=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xffffedda,0xffffd7b6});cover.setCornerRadius(dp(activity,13));badge.setBackground(cover);
+        heading.addView(badge,new LinearLayout.LayoutParams(dp(activity,54),dp(activity,66)));
+        LinearLayout copy=column(activity);copy.setPadding(dp(activity,13),dp(activity,2),dp(activity,4),0);
+        TextView title=text(activity,safe(name),17,AppColors.INK);title.setTypeface(null,1);title.setMaxLines(2);title.setEllipsize(TextUtils.TruncateAt.END);copy.addView(title);
+        TextView meta=text(activity,safe(metadata),12,AppColors.MUTED);LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(-1,-2);mp.topMargin=dp(activity,5);copy.addView(meta,mp);
+        String organization=(folder==null||folder.trim().isEmpty()?"未分类":folder.trim());if(tags!=null&&!tags.isEmpty())organization+=" · "+TextUtils.join(" / ",tags);
+        TextView organized=text(activity,organization,11,AppColors.ACCENT_DARK);LinearLayout.LayoutParams op=new LinearLayout.LayoutParams(-1,-2);op.topMargin=dp(activity,5);copy.addView(organized,op);
+        heading.addView(copy,new LinearLayout.LayoutParams(0,-2,1));addClose(dialog,heading);body.addView(heading);gap(body,18);
+        LinearLayout open=operation(activity,"book",note?"继续记录":"继续阅读",note?"打开可编辑笔记":"从上次位置继续",false);makeAction(open,AppColors.SOFT,note?"继续记录":"继续阅读",()->dialog.complete(read));body.addView(open);gap(body,9);
+        LinearLayout fav=operation(activity,favorite?"check":"sun",favorite?"取消收藏":"加入收藏",favorite?"从收藏筛选中移除":"在收藏中快速找到",false);makeAction(fav,AppColors.BACKGROUND,favorite?"取消收藏":"加入收藏",()->dialog.complete(toggleFavorite));body.addView(fav);gap(body,9);
+        LinearLayout org=operation(activity,"settings","整理分类","设置文件夹与标签",false);makeAction(org,AppColors.BACKGROUND,"设置文件夹与标签",()->dialog.complete(organize));body.addView(org);gap(body,9);
+        LinearLayout renameRow=operation(activity,"rename","重命名","修改资料库显示名称",false);makeAction(renameRow,AppColors.BACKGROUND,"重命名",()->dialog.complete(rename));body.addView(renameRow);gap(body,9);
+        LinearLayout trash=operation(activity,"trash","移入最近删除","可在回收站恢复或彻底删除",true);makeAction(trash,REMOVE_SOFT,"移入最近删除",()->dialog.complete(moveToTrash));body.addView(trash);
+        dialog.show();return dialog;
+    }
+
+    public static Dialog organize(Activity activity,String currentFolder,List<String> currentTags,Organization callback){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"整理文档","settings",AppColors.ACCENT_DARK);gap(dialog.body,12);
+        dialog.body.addView(text(activity,"文件夹",12,AppColors.MUTED));gap(dialog.body,7);
+        EditText folder=input(activity,"例如：高等数学",80);folder.setText(safe(currentFolder));dialog.body.addView(folder);
+        gap(dialog.body,15);dialog.body.addView(text(activity,"标签",12,AppColors.MUTED));gap(dialog.body,7);
+        EditText tags=input(activity,"用逗号分隔，例如：重点, 期末",240);tags.setSingleLine(false);tags.setMaxLines(3);tags.setText(currentTags==null?"":TextUtils.join(", ",currentTags));dialog.body.addView(tags);
+        gap(dialog.body,8);TextView hint=text(activity,"文件夹可留空。标签自动去重，最多 20 个，每个最多 30 个字符。",11,AppColors.MUTED);hint.setLineSpacing(dp(activity,3),1f);dialog.body.addView(hint);gap(dialog.body,22);
+        Runnable save=()->{String value=folder.getText().toString().trim();LinkedHashSet<String> unique=new LinkedHashSet<>();
+            for(String raw:tags.getText().toString().split("[,，\\n]")){String tag=raw.trim();if(tag.isEmpty())continue;if(tag.length()>30){tags.setError("每个标签最多 30 个字符");return;}if(unique.size()<20)unique.add(tag);}
+            dialog.complete(callback==null?null:()->callback.changed(value,new ArrayList<>(unique)));};
+        addButtons(dialog,"保存整理",AppColors.ACCENT,AppColors.ON_ACCENT,save);dialog.show();return dialog;
+    }
+
+    public static Dialog importOptions(Activity activity,String name,boolean convertible,ImportOption callback){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"导入文档","book",AppColors.ACCENT_DARK);gap(dialog.body,12);
+        TextView filename=text(activity,safe(name),15,AppColors.INK);filename.setTypeface(null,1);filename.setMaxLines(2);filename.setEllipsize(TextUtils.TruncateAt.END);dialog.body.addView(filename);gap(dialog.body,10);
+        TextView explanation=text(activity,convertible?"EPUB / Word / TXT 会按正文重排为可批注 PDF。EPUB 按章节顺序阅读，图片仅保留说明文字，暂不还原原字体和 CSS；不支持受 DRM 保护的正文。":"PDF 将复制到晴阅本地资料库。",13,AppColors.MUTED);explanation.setLineSpacing(dp(activity,4),1f);dialog.body.addView(explanation);
+        CheckBox keep=new CheckBox(activity);keep.setText("同时保留原始文件附件");keep.setTextColor(AppColors.INK);keep.setTextSize(13);keep.setChecked(convertible);keep.setEnabled(convertible);keep.setPadding(0,dp(activity,12),0,dp(activity,8));dialog.body.addView(keep);
+        gap(dialog.body,15);addButtons(dialog,"开始导入",AppColors.ACCENT,AppColors.ON_ACCENT,()->dialog.complete(callback==null?null:()->callback.chosen(keep.isChecked())));dialog.show();return dialog;
+    }
+
+    public static TaskDialog task(Activity activity,String title,String message,Runnable cancel){
+        CardDialog dialog=new CardDialog(activity);dialog.setCancelable(false);dialog.setCanceledOnTouchOutside(false);
+        addTitle(dialog,title,"book",AppColors.ACCENT_DARK,false);gap(dialog.body,13);
+        TextView stage=text(activity,message,14,AppColors.INK);stage.setTypeface(null,1);dialog.body.addView(stage);gap(dialog.body,7);
+        TextView detail=text(activity,"准备中…",12,AppColors.MUTED);detail.setLineSpacing(dp(activity,3),1f);dialog.body.addView(detail);gap(dialog.body,14);
+        ProgressBar bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(100);bar.setIndeterminate(true);bar.setProgressTintList(ColorStateList.valueOf(AppColors.ACCENT));bar.setProgressBackgroundTintList(ColorStateList.valueOf(AppColors.SOFT));dialog.body.addView(bar,new LinearLayout.LayoutParams(-1,dp(activity,4)));gap(dialog.body,18);
+        Button stop=null;if(cancel!=null){stop=button(activity,"取消",AppColors.BACKGROUND,REMOVE);final Button cancelButton=stop;stop.setOnClickListener(v->{cancelButton.setEnabled(false);stage.setText("正在取消…");cancel.run();});dialog.body.addView(stop);}dialog.show();return new TaskDialog(dialog,stage,detail,bar,stop);
+    }
+
+    public static Dialog trashActions(Activity activity,String name,long deletedAt,Runnable restore,Runnable permanent){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"最近删除","trash",REMOVE);gap(dialog.body,12);
+        TextView title=text(activity,safe(name),16,AppColors.INK);title.setTypeface(null,1);title.setMaxLines(2);title.setEllipsize(TextUtils.TruncateAt.END);dialog.body.addView(title);gap(dialog.body,8);
+        dialog.body.addView(text(activity,"删除时间："+new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(deletedAt)),12,AppColors.MUTED));gap(dialog.body,18);
+        LinearLayout restoreRow=operation(activity,"undo","恢复到资料库","保留原文件夹、标签和批注",false);makeAction(restoreRow,AppColors.SOFT,"恢复到资料库",()->dialog.complete(restore));dialog.body.addView(restoreRow);gap(dialog.body,10);
+        LinearLayout deleteRow=operation(activity,"trash","彻底删除","删除正文、批注、笔记图片与附件",true);makeAction(deleteRow,REMOVE_SOFT,"彻底删除",()->dialog.complete(permanent));dialog.body.addView(deleteRow);dialog.show();return dialog;
+    }
+
+    public static Dialog confirmPermanent(Activity activity,String name,Runnable confirmed){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"彻底删除？","trash",REMOVE);gap(dialog.body,14);
+        TextView message=text(activity,"“"+safe(name)+"”及其正文、批注、图片和附件将被永久删除。此操作无法撤销。",14,AppColors.INK);message.setLineSpacing(dp(activity,4),1f);dialog.body.addView(message);gap(dialog.body,22);
+        addButtons(dialog,"彻底删除",REMOVE_SOFT,REMOVE,()->dialog.complete(confirmed));dialog.show();return dialog;
+    }
+
+    public static Dialog batchActions(Activity activity,int count,Runnable favorite,Runnable organize,Runnable trash){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"已选择 "+count+" 项","check",AppColors.ACCENT_DARK);gap(dialog.body,15);
+        LinearLayout fav=operation(activity,"sun","加入收藏","批量标记为收藏",false);makeAction(fav,AppColors.BACKGROUND,"批量加入收藏",()->dialog.complete(favorite));dialog.body.addView(fav);gap(dialog.body,9);
+        LinearLayout org=operation(activity,"settings","移动与加标签","统一设置文件夹和标签",false);makeAction(org,AppColors.BACKGROUND,"批量整理",()->dialog.complete(organize));dialog.body.addView(org);gap(dialog.body,9);
+        LinearLayout remove=operation(activity,"trash","移入最近删除","可稍后逐项恢复",true);makeAction(remove,REMOVE_SOFT,"批量移入最近删除",()->dialog.complete(trash));dialog.body.addView(remove);dialog.show();return dialog;
+    }
+
+    public static Dialog tools(Activity activity,Runnable backup,Runnable restore,Runnable trash,Runnable rebuild,
+            Runnable globalSearch,Runnable sync,Runnable learning,Runnable ocr,Runnable appearance,Runnable faultReport,Runnable about){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"设置","settings",AppColors.ACCENT_DARK);gap(dialog.body,14);
+        String[] titles={"导出整库备份","从备份恢复","最近删除","扫描并修复资料库","全库搜索","同步","学习资源","OCR 识别","外观与主题","故障记录","关于晴阅"};
+        String[] hints={"通过系统文件选择器保存 .qyb","严格校验后保留冲突副本","恢复或彻底删除","从本机 PDF 与笔记重建索引","搜索 PDF、笔记与文本","打开本地同步中心","打开学习与复习中心","识别扫描件与图片文字","调整浅色、深色与纸张显示","查看或复制本机诊断信息","查看当前版本号"};
+        String[] icons={"book","undo","trash","settings","search","horizontal","note","image","sun","note","info"};
+        Runnable[] actions={backup,restore,trash,rebuild,globalSearch,sync,learning,ocr,appearance,faultReport,about};
+        for(int i=0;i<titles.length;i++){final Runnable action=actions[i];if(action==null)continue;LinearLayout item=operation(activity,icons[i],titles[i],hints[i],i==2);makeAction(item,i==2?REMOVE_SOFT:AppColors.BACKGROUND,titles[i],()->dialog.complete(action));dialog.body.addView(item);gap(dialog.body,8);}
+        dialog.show();return dialog;
+    }
+
+    public static Dialog about(Activity activity) {
+        String version = "暂时无法读取";
+        try {
+            // Read the installed APK so future releases never display a stale UI version.
+            PackageInfo info = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            if (!TextUtils.isEmpty(info.versionName)) version = info.versionName;
+        } catch (PackageManager.NameNotFoundException ignored) { }
+        CardDialog dialog = new CardDialog(activity);
+        addTitle(dialog, "关于晴阅", "info", AppColors.ACCENT_DARK);
+        gap(dialog.body, 22);
+        TextView versionLabel = text(activity, "版本号：" + version, 18, AppColors.INK);
+        versionLabel.setTextIsSelectable(true);
+        dialog.body.addView(versionLabel, new LinearLayout.LayoutParams(-1, -2));
+        gap(dialog.body, 24);
+        Button close = button(activity, "知道了", AppColors.ACCENT, AppColors.ON_ACCENT);
+        close.setOnClickListener(v -> dialog.dismiss());
+        dialog.body.addView(close, new LinearLayout.LayoutParams(-1, -2));
         dialog.show();
         return dialog;
     }
@@ -165,7 +298,7 @@ public final class DocumentDialogs {
             return false;
         });
         gap(dialog.body, 24);
-        addButtons(dialog, "保存", AppColors.ACCENT, AppColors.SURFACE, save);
+        addButtons(dialog, "保存", AppColors.ACCENT, AppColors.ON_ACCENT, save);
         dialog.show();
         input.requestFocus();
         input.post(() -> {
@@ -227,6 +360,10 @@ public final class DocumentDialogs {
     }
 
     private static void addTitle(CardDialog dialog, String title, String kind, int color) {
+        addTitle(dialog,title,kind,color,true);
+    }
+
+    private static void addTitle(CardDialog dialog, String title, String kind, int color, boolean closable) {
         LinearLayout heading = row(dialog.owner);
         IconButton symbol = decoration(dialog.owner, kind, color);
         symbol.setBackground(shape(dialog.owner, color == REMOVE ? REMOVE_SOFT : AppColors.SOFT, 12));
@@ -235,7 +372,7 @@ public final class DocumentDialogs {
         label.setTypeface(null, 1);
         label.setPadding(dp(dialog.owner, 11), 0, 0, 0);
         heading.addView(label, new LinearLayout.LayoutParams(0, -2, 1));
-        addClose(dialog, heading);
+        if(closable)addClose(dialog, heading);
         dialog.body.addView(heading, new LinearLayout.LayoutParams(-1, -2));
     }
 
@@ -274,6 +411,12 @@ public final class DocumentDialogs {
         button.setPadding(dp(activity, 12), dp(activity, 10), dp(activity, 12), dp(activity, 10));
         button.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ad4a14), shape(activity, background, 14), null));
         return button;
+    }
+
+    private static EditText input(Activity activity,String hint,int maxLength){
+        EditText input=new EditText(activity);input.setSingleLine(true);input.setTextSize(15);input.setTextColor(AppColors.INK);input.setHintTextColor(AppColors.MUTED);input.setHint(hint);
+        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});input.setPadding(dp(activity,14),dp(activity,12),dp(activity,14),dp(activity,12));
+        GradientDrawable background=shape(activity,AppColors.BACKGROUND,14);background.setStroke(dp(activity,1),AppColors.BORDER);input.setBackground(background);return input;
     }
 
     private static void makeAction(LinearLayout view, int color, String label, Runnable action) {
@@ -332,6 +475,8 @@ public final class DocumentDialogs {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(color);
         drawable.setCornerRadius(dp(context, radius));
+        if (!AppColors.isClassic() && radius > 0)
+            drawable.setStroke(dp(context, 1), color == AppColors.ACCENT ? AppColors.ACCENT : AppColors.BORDER);
         return drawable;
     }
     private static void gap(LinearLayout parent, int height) {
@@ -345,6 +490,7 @@ public final class DocumentDialogs {
         private final ScrollView scroll;
         private ViewTreeObserver.OnGlobalLayoutListener listener;
         private int width, height;
+        private boolean completed;
 
         CardDialog(Activity owner) {
             super(owner, resolveTheme(owner));
@@ -380,6 +526,8 @@ public final class DocumentDialogs {
         }
 
         void complete(Runnable action) {
+            if(completed||!isShowing())return;
+            completed=true;
             dismiss();
             if (!owner.isFinishing() && !owner.isDestroyed() && action != null) action.run();
         }

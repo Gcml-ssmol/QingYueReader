@@ -1,0 +1,248 @@
+[
+  {
+    "task": "creation",
+    "file": "app/src/main/java/cn/qingyue/pdf/MainActivity.java",
+    "before": "493e0a6ae79131bffe582fc804ef89ff672e6eae27701f1b86fb2066f90069d4",
+    "after": "cfe090a236d53890e931ad973b92b22be9a73a70802e51038b38126895c0793c"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteDialogs.java",
+    "before": "9edc527c4cf39ed80a15575a93442149d27985d9e789629f8ea0edf5e1f2ce01",
+    "after": "fdb52f37441801257ff0db17c854e2015ec06d08cb368dc5c5d958137e0d922b"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteMotion.java",
+    "before": null,
+    "after": "dc710de3b2315651e1772407f1a948b9c8311bb47f1eee98c830639ff6bd2a05"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java",
+    "before": null,
+    "after": "3e71ce2bfe3b881646710fc8f143ed24708d0609a267fa6e79e73b3c6ad46592"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/res/anim/note_enter.xml",
+    "before": null,
+    "after": "89c6c65645f5ab70c30e67d01bb00211b8d47e0621bd3abdb0f266d956f78bd8"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/res/anim/note_exit.xml",
+    "before": null,
+    "after": "51f5a9c48d7f60d17d80dff62e2525cd4811422f5ce3387b9687dad16bc87077"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/res/anim/note_return_enter.xml",
+    "before": null,
+    "after": "721e5a57fd763e1ee5c604bfd1a3388e93c323308c22978132efdd03eabb3720"
+  },
+  {
+    "task": "creation",
+    "file": "app/src/main/res/anim/note_return_exit.xml",
+    "before": null,
+    "after": "23773b94294a6f87e50286887b8a2f72069bce0413e7398051822a461ac0b515"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-creation/NoteCreationChoicesTest.java",
+    "before": null,
+    "after": "e6c08e98918b42897fca5054625e15e3275998369e789b03fb09f84b1de73102"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-creation/run.ps1",
+    "before": null,
+    "after": "b1662f576c32e2ec07af01e337e0bfcbc2ff3a2af984a27566aa53e62b9539cc"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-creation/stubs/android/content/SharedPreferences.java",
+    "before": null,
+    "after": "0800325ff0a66e6408dca6cba651bf00510fb6463ce29c0c7e77ed441f26204a"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/NoteMotionTest.java",
+    "before": null,
+    "after": "7ef260ae8421b5c32407052e981beed3d0f199d62b2fdef7535948f3b4ff7867"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/run.ps1",
+    "before": null,
+    "after": "aa9bad92b50b8dafca932ff808edb4f7f35618e871db489128a9ec65a2575484"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/app/Activity.java",
+    "before": null,
+    "after": "434a9ae73d23335a19f248f9688ab670e836dbfc6a740341a93e058479e94db9"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/content/ContentResolver.java",
+    "before": null,
+    "after": "e49074c33470492726607bea80b6a9f8c6eb0e21a9a5f2c8cb8e558fba2b4bc1"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/content/Context.java",
+    "before": null,
+    "after": "a49d0640da8ac9d786552a6d661e3a93b5d9fd9c53bc694f1556c68da03dacdc"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/content/res/Resources.java",
+    "before": null,
+    "after": "609041b691c73356134d1ffa6f59797d10ec0a947f31358e012aab21e92c046b"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/provider/Settings.java",
+    "before": null,
+    "after": "aca2f3651a8afeea2bdfa6f38b0c7071e8d12febe35dcc9227f94c8d66b2911c"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/android/view/View.java",
+    "before": null,
+    "after": "947ecdf59f2767fcf48f90f00a9901af9a8af93f69d58f08d57a375db7f42bd0"
+  },
+  {
+    "task": "creation",
+    "file": "tests/note-motion/stubs/cn/qingyue/pdf/NoteDialogs.java",
+    "before": null,
+    "after": "7f55b43051a5383165db9456a7e9a27995fd304435844c78bfbcc195c4f67c46"
+  },
+  {
+    "task": "editor",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "875cf823ef4a1542138e5210684b6f7f09b7d6e606b94337c8b71b13b3c8cc99",
+    "after": "2f8e2ce9a5025382e3c61259fbd8431f5c27cf836e3b74acc29202c76f690f50"
+  },
+  {
+    "task": "editor",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteDocument.java",
+    "before": "f7357d3f09e3831aa6029d85f59c44d473be41ebe10164f00e1b57907fdcb433",
+    "after": "9b948b3153a3e483192547df0e64d9a84daf8583de267538d35b55f4ffe28605"
+  },
+  {
+    "task": "editor",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteStore.java",
+    "before": "84b4fab029213d9f16415dfd751549e1d55d2ab31de8c40ba9948b242851d72d",
+    "after": "27ca201663de4c49b3d6b0cbef8ed4bb46d40aa96592bd490a11ba30f782ce65"
+  },
+  {
+    "task": "editor",
+    "file": "app/src/main/java/cn/qingyue/pdf/ZoomLimits.java",
+    "before": "f887dd35d1b0b51004fd5b1d33434415ceff8e31c5183785382d9715ef6128a1",
+    "after": "3fea371210bb8c999eae505bead28d25dbd6cee02e1cf266b120b1edc4c84a7d"
+  },
+  {
+    "task": "editor",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java",
+    "before": null,
+    "after": "e43d2e74e8563e49a16ce2b58416cfe983aa84e08e8e8efc3bbe2510323baa02"
+  },
+  {
+    "task": "editor",
+    "file": "tests/note-editor/NoteEditorTest.java",
+    "before": null,
+    "after": "f92ecbdea7369753a2c196c4a13ab9ef43b41f73649a10169ef32a97235d251d"
+  },
+  {
+    "task": "editor",
+    "file": "tests/note-editor/NoteStoreImageTest.java",
+    "before": null,
+    "after": "067268b1deaebb19557d9004a9b29e7c3d6e8d6a33b98f2ca684f6ee3966876d"
+  },
+  {
+    "task": "editor",
+    "file": "tests/note-editor/run.ps1",
+    "before": null,
+    "after": "055c8f2a88b9d72d9ceda732472b536726233d5bbafa5bcb765db9408eed1590"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+    "before": "4e4931f0f7baf89fa76093ba84667eaaf00621a90f9e64be9b6e991039e65963",
+    "after": "8637ed9b3ab0b3e14c94ec18cd51127bfe9c22bb4bfdca7740dffdc03cdd905e"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java",
+    "before": "b7b50ca24f86c80fa7cbba11ebb19e940eb889811333226726c60cf3015cf29d",
+    "after": "e6a5d6e687ee63300287a09ab3bf682def227cf7d0c990ab11d51879e534398b"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java",
+    "before": "bec8664161131892ce349a483bac21a249e35f88c17a9a00875ba9fab15a47bc",
+    "after": "5cf32568e916657b8981cd2e0c944b4b8f573dbb38fcc5362c147fbc6820c96d"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/IconButton.java",
+    "before": "aaf0086078ca4c9fbb5d91cfb689ff195c1941e1423089dd3aa0d5fefeb9be4d",
+    "after": "4639c8363d56c32bc40a13d08ffdf14ba5fef0c8e66e40d5b1506f389fee54ae"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePenPresets.java",
+    "before": null,
+    "after": "a41e43b8287dec15276fb2fc46d1b135cf89058cd1fc167374a48592dfa9a5f9"
+  },
+  {
+    "task": "qa",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java",
+    "before": null,
+    "after": "34d84138ae5cd1c09234d8af89f55ee3512f0eb9876e61708e718dba5794a085"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/run.ps1",
+    "before": "eafe0a7e5b12538a99273dc21f5f24234d372ce238b0a7cc181e3b58ee152635",
+    "after": "a42fa0afb351ba16834658e2b5c377f47cbd0e3a78771eca27699244c04bf7d0"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/README.md",
+    "before": "1e2f9a5c76b19499738b5ba0da15cd9e9aef8d2142224fefb0de3c11c41dd79e",
+    "after": "3a5c3b67b350761bc70a22895b5b162616411e397f1a78bdd729b74464c770f4"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/View.java",
+    "before": "c90d3adf03602e6af99639f3cc98aa25339890728cfbcb3e582e8ae7d11b6531",
+    "after": "a44b7f92de1a0971b5e53858787e2852cd5d3b4fbbe2d8ae7995359f587ffc14"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Path.java",
+    "before": "6faf843586d19bdc08bbe94741a4392286afb3bd384cc06861152309ba062676",
+    "after": "ad661d41fc6f610235993180cbda03154b95417e808e59508315f4c1f7b1669b"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/Support.java",
+    "before": "fde3da6af8ed882c98e327c853d5e2fa891b24befaa7e45eac6576ce181dc3d4",
+    "after": "4ae908fa240007b790669f05df8cb0474c2e41130e25fa2c690a0dcde3920c86"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java",
+    "before": "48c8c979bbe217b43dafffdef45b7c74471049679543898c1be06b1299151d17",
+    "after": "7e7e9fc3df0cd098c165e75ce60e37524e37ae8044ddcdda3e8230a250c11cdc"
+  },
+  {
+    "task": "qa",
+    "file": "delivery/1.14.0-editor-reference-qa.md",
+    "before": null,
+    "after": "4059990d5dd5e37a02bba889fe047e182c6e7ae5422b7ba6c3110c645e0ec572"
+  }
+]

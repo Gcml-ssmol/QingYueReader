@@ -1,0 +1,759 @@
+From 5ff6ab10f0d285387d9beab0a0bf61c1a88e6cb7 Mon Sep 17 00:00:00 2001
+From: Codex Note Editor <codex-local@example.invalid>
+Date: Thu, 24 Sep 2026 23:17:09 +0800
+Subject: [PATCH 1/2] Add v3-compatible note editing operations
+
+---
+ .../java/cn/qingyue/pdf/NoteCanvasView.java   | 119 +++++++++++++++---
+ .../java/cn/qingyue/pdf/NoteDocument.java     |  21 ++++
+ .../java/cn/qingyue/pdf/NoteEditorOps.java    |  81 ++++++++++++
+ .../main/java/cn/qingyue/pdf/NoteStore.java   |   2 +
+ .../main/java/cn/qingyue/pdf/ZoomLimits.java  |   5 +
+ tests/note-editor/NoteEditorTest.java         |  53 ++++++++
+ tests/note-editor/NoteStoreImageTest.java     |  28 +++++
+ tests/note-editor/run.ps1                     |  13 ++
+ 8 files changed, 302 insertions(+), 20 deletions(-)
+ create mode 100644 app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
+ create mode 100644 tests/note-editor/NoteEditorTest.java
+ create mode 100644 tests/note-editor/NoteStoreImageTest.java
+ create mode 100644 tests/note-editor/run.ps1
+
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java b/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
+index ef8a1eb..475526c 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
+@@ -10,6 +10,8 @@ import java.util.concurrent.*;
+ 
+ /** A viewport over vector paper, including an unbounded two-dimensional canvas. */
+ public final class NoteCanvasView extends View {
++    public static final int LASSO_HANDWRITING=NoteEditorOps.HANDWRITING,LASSO_GRAPHICS=NoteEditorOps.GRAPHICS,
++            LASSO_TEXT=NoteEditorOps.TEXT,LASSO_IMAGE=NoteEditorOps.IMAGE,LASSO_ALL=NoteEditorOps.ALL;
+     public interface Host {void changed();void error(String message);default void readingScrolled(){} default void pageAdded(){} default void pageChanged(){} default void viewportPageChanged(int page){} default void viewportSettled(){}}
+     private static final ExecutorService imageWorker=Executors.newSingleThreadExecutor();
+     private final NoteDocument document;
+@@ -27,7 +29,7 @@ public final class NoteCanvasView extends View {
+     private double cx,cy,zoom=1,baseZoom=1;
+     private final ZoomBadge zoomBadge=new ZoomBadge();
+     private long selected;
+-    private int active=-1,actionMode; // 1 ink/shape, 2 eraser, 3 pan, 4 image drag, 5 image resize
++    private int active=-1,actionMode; // 1 ink/shape, 2 eraser, 3 pan, 4 image drag, 5 image resize, 6 lasso, 7 group move, 8 group scale
+     private boolean activePen,multi,panStarted;
+     private final TouchNavigation.Guard navigationGuard=new TouchNavigation.Guard();
+     private final TouchNavigation.Pinch pinch;
+@@ -48,23 +50,35 @@ public final class NoteCanvasView extends View {
+     private List<NoteDocument.Item> erasePreview;
+     private boolean eraseFailed;
+     private NoteDocument.Item preview;
++    private final LinkedHashSet<Long> selection=new LinkedHashSet<>();
++    private final ArrayList<double[]> lassoPath=new ArrayList<>();
++    private final LinkedHashMap<Long,NoteDocument.Item> groupOriginal=new LinkedHashMap<>(),groupPreview=new LinkedHashMap<>();
++    private final ArrayList<NoteDocument.Item> clipboard=new ArrayList<>();
++    private boolean lassoFreeform=true,wholeStrokeEraser;
++    private int lassoFilter=LASSO_ALL;
++    private double[] groupBounds;
+ 
+     public NoteCanvasView(Context context,NoteDocument document,String noteId,Host host){super(context);this.document=document;this.noteId=noteId;this.host=host;pageLayout=document.infinite()?null:new NotePageLayout(document.width,document.height,24);twoFinger=new TwoFingerTap(dp(7));pinch=new TouchNavigation.Pinch(getResources().getDisplayMetrics().density);setFocusable(true);setContentDescription("笔记画布，单指拖动画布，双指缩放；选择图片后可拖动与缩放");setLayerType(View.LAYER_TYPE_HARDWARE,null);}
+-    public void setTool(String tool,int color,float widthPt,boolean stylusOnly){finishGesture();this.tool=tool;this.color=color;this.width=Math.max(.2f,Math.min(100,widthPt));this.stylusOnly=stylusOnly;if(!"select".equals(tool)){selected=0;imagePreview=null;}invalidate();}
++    public void setTool(String tool,int color,float widthPt,boolean stylusOnly){finishGesture();this.tool=tool;this.color=color;this.width=Math.max(.2f,Math.min(100,widthPt));this.stylusOnly=stylusOnly;if(!"select".equals(tool)){selected=0;imagePreview=null;}if(!"lasso".equals(tool))selection.clear();invalidate();}
++    public void setLassoFreeform(boolean freeform){finishGesture();lassoFreeform=freeform;invalidate();}
++    public void setLassoFilter(int filter){finishGesture();lassoFilter=filter&LASSO_ALL;selection.clear();invalidate();}
++    public void setWholeStrokeEraser(boolean whole){finishGesture();wholeStrokeEraser=whole;}
++    public int selectionCount(){return selection.size();}
++    public boolean hasClipboard(){return !clipboard.isEmpty();}
+     public void setTwoFingerUndoEnabled(boolean enabled){twoFingerEnabled=enabled;twoFinger.reset();}
+     private boolean continuous(){return pageLayout!=null&&!horizontalPages;}
+     public void setHorizontalPages(boolean horizontal){if(horizontalPages==horizontal)return;finishGesture();syncViewport();if(initialized&&pageLayout!=null)cy+=horizontal?-pageLayout.top(document.currentPage()):pageLayout.top(document.currentPage());horizontalPages=horizontal;baseZoom=fittedScale();constrainViewport();syncViewport();invalidate();}
+     public int visiblePage(){return continuous()&&initialized?pageLayout.nearest(cy,document.pageCount()):document.currentPage();}
+-    public void selectPage(int index){finishGesture();syncViewport();document.selectPage(index);selected=0;if(continuous()&&initialized){cy=pageLayout.top(index)+Math.min(document.height/2,getHeight()/(2*zoom));constrainViewport();syncViewport();}else{initialized=false;onSizeChanged(getWidth(),getHeight(),getWidth(),getHeight());}persistPageChange();}
+-    public void addPage(){finishGesture();syncViewport();try{document.addPage();selected=0;focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
+-    public void insertPage(int index){if(disposed)return;finishGesture();syncViewport();try{document.insertPage(index);selected=0;focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void selectPage(int index){finishGesture();syncViewport();document.selectPage(index);selected=0;selection.clear();if(continuous()&&initialized){cy=pageLayout.top(index)+Math.min(document.height/2,getHeight()/(2*zoom));constrainViewport();syncViewport();}else{initialized=false;onSizeChanged(getWidth(),getHeight(),getWidth(),getHeight());}persistPageChange();}
++    public void addPage(){finishGesture();syncViewport();try{document.addPage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void insertPage(int index){if(disposed)return;finishGesture();syncViewport();try{document.insertPage(index);selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
+     private void focusNewPage(){if(continuous()&&initialized){cy=pageLayout.top(document.currentPage())+Math.min(document.height/2,getHeight()/(2*zoom));constrainViewport();syncViewport();invalidate();}else{initialized=false;onSizeChanged(getWidth(),getHeight(),getWidth(),getHeight());}}
+     public void movePage(int from,int to){finishGesture();syncViewport();int before=document.currentPage();document.movePage(from,to);if(continuous()&&initialized)cy+=(document.currentPage()-before)*pageLayout.stride();persistPageChange();}
+     private void persistPageChange(){if(save())host.pageChanged();host.changed();invalidate();}
+     public float previewDiameter(float widthPt){return (float)(widthPt*zoom);}
+     public boolean canUndo(){return document.canUndo();}
+     public boolean canRedo(){return document.canRedo();}
+-    public boolean hasSelection(){return selected!=0&&document.find(selected)!=null;}
++    public boolean hasSelection(){return selected!=0&&document.find(selected)!=null||!selection.isEmpty();}
+     public NoteDocument.Item selectedText(){NoteDocument.Item item=document.find(selected);return item!=null&&item.type==NoteDocument.TEXT?item:null;}
+     public void putText(String value,float size,int ink){
+         finishGesture();if(value==null||value.trim().isEmpty()){host.error("请输入文字");return;}
+@@ -83,10 +97,40 @@ public final class NoteCanvasView extends View {
+         catch(IllegalArgumentException failure){host.error(failure.getMessage());return 0;}
+     }
+     public int zoomPercent(){return (int)Math.round(zoom/baseZoom*100);}
+-    public void setZoomPercent(int percent){finishGesture();zoom=ZoomLimits.noteScale(baseZoom*Math.max(50,Math.min(300,percent))/100.0,baseZoom);constrainViewport();syncViewport();invalidate();}
+-    public void deleteSelected(){finishGesture();if(hasSelection()){document.remove(selected);selected=0;changed();}}
+-    public void undo(){cancelGesture();if(document.undo()){selected=0;changed();}}
+-    public void redo(){cancelGesture();if(document.redo()){selected=0;changed();}}
++    public void setZoomPercent(int percent){finishGesture();int max=document.infinite()?1000:300;double target=baseZoom*Math.max(50,Math.min(max,percent))/100.0;zoom=document.infinite()?ZoomLimits.noteInfiniteScale(target,baseZoom):ZoomLimits.noteScale(target,baseZoom);constrainViewport();syncViewport();invalidate();}
++    public void deleteSelected(){finishGesture();if(!selection.isEmpty()){deleteSelection();return;}if(hasSelection()){document.remove(selected);selected=0;changed();}}
++    public void copySelection(){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;clipboard.clear();for(NoteDocument.Item item:document.items())if(ids.contains(item.id))clipboard.add(item);}
++    public void cutSelection(){copySelection();deleteSelection();}
++    public void pasteSelection(){
++        finishGesture();if(clipboard.isEmpty())return;
++        for(NoteDocument.Item item:clipboard)if(item.type==NoteDocument.IMAGE&&!NoteStore.imageExists(getContext(),noteId,item.image)){host.error("原图片已丢失，无法粘贴");return;}
++        double l=Double.POSITIVE_INFINITY,t=l,r=Double.NEGATIVE_INFINITY,b=r;
++        for(NoteDocument.Item item:clipboard){l=Math.min(l,item.left());t=Math.min(t,item.top());r=Math.max(r,item.right());b=Math.max(b,item.bottom());}
++        double dx=cx-(l+r)/2,dy=localCenterY()-(t+b)/2;
++        if(!document.infinite()){dx=clamp(dx,-l,document.width-r);dy=clamp(dy,-t,document.height-b);}
++        ArrayList<NoteDocument.Item> next=new ArrayList<>(document.items());LinkedHashSet<Long> pasted=new LinkedHashSet<>();
++        try{for(NoteDocument.Item item:clipboard){NoteDocument.Item moved=NoteEditorOps.translated(item,dx,dy);long id=document.newId();next.add(new NoteDocument.Item(id,moved.type,moved.color,moved.width,moved.points,moved.image,moved.text));pasted.add(id);}document.applyItems(next);selection.clear();selection.addAll(pasted);selected=0;tool="lasso";changed();}
++        catch(IllegalArgumentException error){host.error(error.getMessage());}
++    }
++    public void deleteSelection(){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())if(!ids.contains(item.id))next.add(item);document.applyItems(next);selection.clear();selected=0;changed();}
++    public void recolorSelection(int rgb){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.recolored(item,rgb):item);if(!next.equals(document.items())){document.applyItems(next);changed();}}
++    /** Moves selected objects to the top of the page's drawing order. */
++    public void bringSelectionForward(){reorderSelection(true);}
++    /** Moves selected objects to the bottom of the page's drawing order. */
++    public void sendSelectionBackward(){reorderSelection(false);}
++    private void reorderSelection(boolean top){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> chosen=new ArrayList<>(),other=new ArrayList<>();for(NoteDocument.Item item:document.items())(ids.contains(item.id)?chosen:other).add(item);ArrayList<NoteDocument.Item> next=new ArrayList<>(document.items().size());next.addAll(top?other:chosen);next.addAll(top?chosen:other);if(!next.equals(document.items())){document.applyItems(next);changed();}}
++    public void scaleSelection(float factor){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty()||Float.isNaN(factor)||Float.isInfinite(factor)||factor<=0)return;double[] bounds=NoteEditorOps.bounds(document.items(),ids);if(bounds==null)return;double x=(bounds[0]+bounds[2])/2,y=(bounds[1]+bounds[3])/2;applySelectionScale(ids,x,y,Math.max(.25,Math.min(4,factor)));}
++    private void applySelectionScale(Set<Long> ids,double x,double y,double factor){
++        if(!document.infinite()){double[] box=NoteEditorOps.bounds(document.items(),ids);if(box==null)return;double max=Double.POSITIVE_INFINITY;for(double v:new double[]{box[0],document.width-box[2],box[1],document.height-box[3]})if(v<0)max=Math.min(max,1);if(factor>1){double halfW=Math.max(x-box[0],box[2]-x),halfH=Math.max(y-box[1],box[3]-y);max=Math.min((Math.min(x,document.width-x))/Math.max(.001,halfW),(Math.min(y,document.height-y))/Math.max(.001,halfH));factor=Math.min(factor,max);} }
++        if(factor<=0||Math.abs(factor-1)<.000001)return;ArrayList<NoteDocument.Item> next=new ArrayList<>();try{for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.scaled(item,x,y,factor):item);document.applyItems(next);changed();}catch(IllegalArgumentException error){host.error(error.getMessage());}
++    }
++    private Set<Long> selectedIds(){if(!selection.isEmpty())return new LinkedHashSet<>(selection);if(selected!=0&&document.find(selected)!=null)return Collections.singleton(selected);return Collections.emptySet();}
++    public void duplicatePage(){finishGesture();syncViewport();try{document.duplicatePage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException|IllegalArgumentException error){host.error(error.getMessage());}}
++    public void clearPage(){finishGesture();if(document.items().isEmpty())return;document.clearPage();selected=0;selection.clear();changed();}
++    public void deletePage(){finishGesture();syncViewport();try{document.deletePage();selected=0;selection.clear();focusNewPage();persistPageChange();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void resetOrigin(){finishGesture();if(!document.infinite()){fit();return;}cx=cy=0;syncViewport();invalidate();}
++    public void undo(){cancelGesture();if(document.undo()){selected=0;selection.clear();changed();}}
++    public void redo(){cancelGesture();if(document.redo()){selected=0;selection.clear();changed();}}
+     public NoteDocument snapshot(){syncViewport();return document.copy();}
+     public NoteDocument document(){return document;}
+     public boolean save(){if(disposed)return false;finishGesture();syncViewport();try{NoteStore.save(getContext(),noteId,document);return true;}catch(IOException|RuntimeException e){host.error("笔记保存失败："+e.getMessage());return false;}}
+@@ -113,6 +157,7 @@ public final class NoteCanvasView extends View {
+         }else drawPage(canvas,document.currentPage());
+         renderPage=document.currentPage();
+         NoteDocument.Item selection=imagePreview!=null?imagePreview:document.find(selected);if("select".equals(tool)&&selection!=null&&(selection.type==NoteDocument.IMAGE||selection.type==NoteDocument.TEXT))drawSelection(canvas,selection);
++        if("lasso".equals(tool)){drawGroupSelection(canvas);drawLassoPath(canvas);}
+         if(actionMode==2){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);canvas.drawCircle(sx(lastWorldX),sy(lastWorldY),(float)(width*zoom*.5),paint);}
+         zoomBadge.draw(canvas,getWidth(),getResources().getDisplayMetrics().density,zoom/baseZoom);
+     }
+@@ -124,7 +169,7 @@ public final class NoteCanvasView extends View {
+         drawPaper(canvas);
+         double vl=wx(0),vt=wyGlobal(0)-pageOffset(page),vr=wx(getWidth()),vb=wyGlobal(getHeight())-pageOffset(page);
+         List<NoteDocument.Item> items=page==document.currentPage()&&erasePreview!=null?erasePreview:document.pageItems(page);
+-        for(NoteDocument.Item item:items){NoteDocument.Item shown=page==document.currentPage()&&imagePreview!=null&&item.id==imagePreview.id?imagePreview:item;double extra=shown.width*2+20;if(shown.right()+extra<vl||shown.left()-extra>vr||shown.bottom()+extra<vt||shown.top()-extra>vb)continue;if(shown.type==NoteDocument.TEXT)drawText(canvas,shown);else drawItem(canvas,shown);}
++        for(NoteDocument.Item item:items){NoteDocument.Item shown=page==document.currentPage()?groupPreview.get(item.id):null;if(shown==null)shown=page==document.currentPage()&&imagePreview!=null&&item.id==imagePreview.id?imagePreview:item;double extra=shown.width*2+20;if(shown.right()+extra<vl||shown.left()-extra>vr||shown.bottom()+extra<vt||shown.top()-extra>vb)continue;if(shown.type==NoteDocument.TEXT)drawText(canvas,shown);else drawItem(canvas,shown);}
+         if(page==document.currentPage()&&preview!=null)drawItem(canvas,preview);
+         canvas.restoreToCount(clip);
+     }
+@@ -147,6 +192,8 @@ public final class NoteCanvasView extends View {
+     private void drawText(Canvas canvas,NoteDocument.Item item){int save=canvas.save();canvas.translate(sx(item.left()),sy(item.top()));canvas.scale((float)zoom,(float)zoom);canvas.translate((float)-item.left(),(float)-item.top());NoteTextLayout.draw(canvas,item);canvas.restoreToCount(save);}
+     private void loadImage(String name){loading.add(name);final Context app=getContext().getApplicationContext();imageWorker.execute(()->{Bitmap result=null;try{File file=new File(NoteStore.imagesDirectory(app,noteId),name);BitmapFactory.Options options=new BitmapFactory.Options();options.inJustDecodeBounds=true;BitmapFactory.decodeFile(file.getAbsolutePath(),options);if(options.outWidth>0&&options.outHeight>0){options.inSampleSize=1;while(options.outWidth/options.inSampleSize>2048||options.outHeight/options.inSampleSize>2048)options.inSampleSize*=2;options.inJustDecodeBounds=false;options.inPreferredConfig=Bitmap.Config.ARGB_8888;result=BitmapFactory.decodeFile(file.getAbsolutePath(),options);}}catch(IOException|RuntimeException|OutOfMemoryError ignored){}final Bitmap bitmap=result;post(()->{loading.remove(name);if(disposed){if(bitmap!=null)bitmap.recycle();return;}if(bitmap==null)failedImages.add(name);else bitmaps.put(name,bitmap);invalidate();});});}
+     private void drawSelection(Canvas canvas,NoteDocument.Item item){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);canvas.drawRect(sx(item.left()),sy(item.top()),sx(item.right()),sy(item.bottom()),paint);for(int i=0;i<4;i++){float x=sx(i%2==0?item.left():item.right()),y=sy(i<2?item.top():item.bottom());paint.setStyle(Paint.Style.FILL);paint.setColor(Color.WHITE);canvas.drawCircle(x,y,dp(6),paint);paint.setStyle(Paint.Style.STROKE);paint.setColor(AppColors.ACCENT);canvas.drawCircle(x,y,dp(6),paint);}}
++    private void drawGroupSelection(Canvas canvas){double[] box=groupPreview.isEmpty()?NoteEditorOps.bounds(document.items(),selection):NoteEditorOps.bounds(new ArrayList<>(groupPreview.values()),selection);if(box==null)return;paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);canvas.drawRect(sx(box[0]),sy(box[1]),sx(box[2]),sy(box[3]),paint);paint.setStyle(Paint.Style.FILL);paint.setColor(Color.WHITE);canvas.drawCircle(sx(box[2]),sy(box[3]),dp(7),paint);paint.setStyle(Paint.Style.STROKE);paint.setColor(AppColors.ACCENT);canvas.drawCircle(sx(box[2]),sy(box[3]),dp(7),paint);}
++    private void drawLassoPath(Canvas canvas){if(actionMode!=6||lassoPath.isEmpty())return;paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);Path path=new Path();double[] first=lassoPath.get(0);path.moveTo(sx(first[0]),sy(first[1]));if(lassoFreeform){for(int i=1;i<lassoPath.size();i++){double[] p=lassoPath.get(i);path.lineTo(sx(p[0]),sy(p[1]));}}else{double[] last=lassoPath.get(lassoPath.size()-1);path.addRect(Math.min(sx(first[0]),sx(last[0])),Math.min(sy(first[1]),sy(last[1])),Math.max(sx(first[0]),sx(last[0])),Math.max(sy(first[1]),sy(last[1])),Path.Direction.CW);}canvas.drawPath(path,paint);}
+ 
+     @Override public boolean onTouchEvent(MotionEvent event){
+         if(disposed)return false;
+@@ -175,7 +222,7 @@ public final class NoteCanvasView extends View {
+         if(multi){
+             if(action==MotionEvent.ACTION_MOVE&&event.getPointerCount()==2){
+                 if(pinch.move(event.getPointerId(0),event.getPointerId(1),event.getX(0),event.getY(0),event.getX(1),event.getY(1),twoFinger.pairPending())){
+-                    double anchorX=wx(pinch.oldX),anchorY=wyGlobal(pinch.oldY);zoom=ZoomLimits.noteScale(zoom*pinch.scale,baseZoom);
++                    double anchorX=wx(pinch.oldX),anchorY=wyGlobal(pinch.oldY);zoom=document.infinite()?ZoomLimits.noteInfiniteScale(zoom*pinch.scale,baseZoom):ZoomLimits.noteScale(zoom*pinch.scale,baseZoom);
+                     cx=anchorX-(pinch.x-getWidth()/2.0)/zoom;cy=anchorY-(pinch.y-getHeight()/2.0)/zoom;constrainViewport();updateCenteredPage();notifyScroll();invalidate();
+                 }
+             }else if(action==MotionEvent.ACTION_POINTER_UP)pinch.reset();
+@@ -205,11 +252,21 @@ public final class NoteCanvasView extends View {
+     @Override public boolean performClick(){super.performClick();return true;}
+     private void setPinch(MotionEvent event){if(event.getPointerCount()!=2){pinch.reset();return;}pinch.begin(event.getPointerId(0),event.getPointerId(1),event.getX(0),event.getY(0),event.getX(1),event.getY(1));}
+     private void begin(float x,float y,int eventTool){
+-        boolean editing="select".equals(tool)||(!"hand".equals(tool)&&(!stylusOnly||isPen(eventTool)));
++        boolean editing="select".equals(tool)||"lasso".equals(tool)||(!"hand".equals(tool)&&(!stylusOnly||isPen(eventTool)));
+         gesturePage=continuous()&&editing?pageLayout.hit(wx(x),wyGlobal(y),document.pageCount()):document.currentPage();
+-        if(editing&&gesturePage>=0&&gesturePage!=document.currentPage()){syncViewport();document.selectPage(gesturePage);selected=0;viewportPageDirty=true;host.viewportPageChanged(gesturePage);}
++        if(editing&&gesturePage>=0&&gesturePage!=document.currentPage()){syncViewport();document.selectPage(gesturePage);selected=0;selection.clear();viewportPageDirty=true;host.viewportPageChanged(gesturePage);}
+         renderPage=document.currentPage();
+-        lastX=x;lastY=y;startX=lastWorldX=wx(x);startY=lastWorldY=wy(y);panTravel=0;scrollNotified=false;panStarted=false;vertices.clear();erasePreview=null;eraseFailed=false;preview=null;imageOriginal=null;imagePreview=null;
++        lastX=x;lastY=y;startX=lastWorldX=wx(x);startY=lastWorldY=wy(y);panTravel=0;scrollNotified=false;panStarted=false;vertices.clear();erasePreview=null;eraseFailed=false;preview=null;imageOriginal=null;imagePreview=null;lassoPath.clear();groupOriginal.clear();groupPreview.clear();
++        if("lasso".equals(tool)){
++            if(gesturePage<0||!onPaper(startX,startY)){actionMode=0;return;}
++            groupBounds=NoteEditorOps.bounds(document.items(),selection);
++            if(groupBounds!=null){
++                if(Math.hypot(x-sx(groupBounds[2]),y-sy(groupBounds[3]))<=dp(20))actionMode=8;
++                else if(startX>=groupBounds[0]&&startX<=groupBounds[2]&&startY>=groupBounds[1]&&startY<=groupBounds[3])actionMode=7;
++                if(actionMode==7||actionMode==8){for(NoteDocument.Item item:document.items())if(selection.contains(item.id))groupOriginal.put(item.id,item);return;}
++            }
++            selection.clear();selected=0;actionMode=6;lassoPath.add(new double[]{startX,startY});invalidate();return;
++        }
+         if("select".equals(tool)){NoteDocument.Item chosen=document.find(selected);int handle=chosen==null?-1:handleAt(chosen,x,y);if(handle>=0){actionMode=5;resizeCorner=handle;imageOriginal=chosen;imagePreview=chosen;return;}chosen=imageAt(wx(x),wy(y));selected=chosen==null?0:chosen.id;host.changed();if(chosen!=null){actionMode=4;imageOriginal=chosen;imagePreview=chosen;}else actionMode=3;invalidate();return;}
+         boolean draw=(!stylusOnly||isPen(eventTool))&&!"hand".equals(tool);if(!draw){actionMode=3;return;}if(gesturePage<0||!onPaper(startX,startY)){actionMode=0;return;}if("eraser".equals(tool)||eventTool==MotionEvent.TOOL_TYPE_ERASER){actionMode=2;eraseAt(startX,startY);invalidate();return;}actionMode=1;vertices.add(new double[]{startX,startY});updatePreview(startX,startY);invalidate();}
+     private void moveSamples(MotionEvent event,int index){for(int h=0;h<event.getHistorySize();h++)move(event.getHistoricalX(index,h),event.getHistoricalY(index,h));move(event.getX(index),event.getY(index));}
+@@ -218,12 +275,24 @@ public final class NoteCanvasView extends View {
+             double oldX=cx,oldY=cy;float dx=x-lastX,dy=y-lastY;cx-=dx/zoom;cy-=dy/zoom;constrainViewport();
+             if(!continuous())pageDrag.add(horizontalPages?dx:dy,(float)(-(horizontalPages?cx-oldX:cy-oldY)*zoom));
+             updateCenteredPage();
+-            panTravel+=Math.hypot(dx,dy);if(panTravel>dp(12))notifyScroll();}else if(actionMode==1){if(!document.infinite()){worldX=clamp(worldX,0,document.width);worldY=clamp(worldY,0,document.height);}if(vertices.size()<50000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=.7)vertices.add(new double[]{worldX,worldY});updatePreview(worldX,worldY);}else if(actionMode==2){eraseSweep(lastWorldX,lastWorldY,worldX,worldY);}else if(actionMode==4&&imageOriginal!=null){double w=imageOriginal.right()-imageOriginal.left(),h=imageOriginal.bottom()-imageOriginal.top(),nx=imageOriginal.left()+worldX-startX,ny=imageOriginal.top()+worldY-startY;if(!document.infinite()){nx=clamp(nx,0,Math.max(0,document.width-w));ny=clamp(ny,0,Math.max(0,document.height-h));}imagePreview=imageOriginal.bounds(nx,ny,w,h);}else if(actionMode==5&&imageOriginal!=null){resizeImage(worldX,worldY);}lastX=x;lastY=y;lastWorldX=worldX;lastWorldY=worldY;invalidate();}
++            panTravel+=Math.hypot(dx,dy);if(panTravel>dp(12))notifyScroll();}else if(actionMode==1){if(!document.infinite()){worldX=clamp(worldX,0,document.width);worldY=clamp(worldY,0,document.height);}if(vertices.size()<50000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=.7)vertices.add(new double[]{worldX,worldY});updatePreview(worldX,worldY);}else if(actionMode==2){eraseSweep(lastWorldX,lastWorldY,worldX,worldY);}else if(actionMode==4&&imageOriginal!=null){double w=imageOriginal.right()-imageOriginal.left(),h=imageOriginal.bottom()-imageOriginal.top(),nx=imageOriginal.left()+worldX-startX,ny=imageOriginal.top()+worldY-startY;if(!document.infinite()){nx=clamp(nx,0,Math.max(0,document.width-w));ny=clamp(ny,0,Math.max(0,document.height-h));}imagePreview=imageOriginal.bounds(nx,ny,w,h);}else if(actionMode==5&&imageOriginal!=null){resizeImage(worldX,worldY);}else if(actionMode==6){if(lassoPath.size()<5000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=2)lassoPath.add(new double[]{worldX,worldY});}else if(actionMode==7||actionMode==8){previewGroup(worldX,worldY);}lastX=x;lastY=y;lastWorldX=worldX;lastWorldY=worldY;invalidate();}
+     private void notifyScroll(){scrollNotified=true;}
+     private int pageTurn(float x,float y){float dx=x-gestureStartX,dy=y-gestureStartY;return pageDrag.turn(horizontalPages?dx:dy,horizontalPages?dy:dx,dp(90));}
+     private void updatePreview(double x,double y){int type=NoteDocument.STROKE;switch(tool){case "line":type=NoteDocument.LINE;break;case "circle":type=NoteDocument.CIRCLE;break;case "rectangle":type=NoteDocument.RECTANGLE;break;case "arrow":type=NoteDocument.ARROW;break;default:break;}double[] points;if(type==NoteDocument.STROKE){points=new double[vertices.size()*2];for(int i=0;i<vertices.size();i++){points[i*2]=vertices.get(i)[0];points[i*2+1]=vertices.get(i)[1];}}else{if(type==NoteDocument.CIRCLE){double side=Math.min(Math.abs(x-startX),Math.abs(y-startY));x=startX+Math.copySign(side,x-startX);y=startY+Math.copySign(side,y-startY);}points=new double[]{startX,startY,x,y};}int ink="marker".equals(tool)?InkInput.markerColor(color):"pencil".equals(tool)?(color&0x00ffffff)|0xa0000000:color;preview=new NoteDocument.Item(1,type,ink,width,points,"");}
+     private void eraseAt(double x,double y){eraseSweep(x,y,x,y);}
+-    private void eraseSweep(double ax,double ay,double bx,double by){if(eraseFailed)return;try{List<NoteDocument.Item> source=erasePreview==null?document.items():erasePreview;erasePreview=NoteDocument.eraseSweep(source,ax,ay,bx,by,width/2);}catch(IllegalArgumentException problem){erasePreview=null;eraseFailed=true;host.error("这次橡皮轨迹产生的笔迹过多，未修改笔记");}}
++    private void eraseSweep(double ax,double ay,double bx,double by){if(eraseFailed)return;try{List<NoteDocument.Item> source=erasePreview==null?document.items():erasePreview;erasePreview=wholeStrokeEraser?NoteEditorOps.wholeStrokeErase(source,ax,ay,bx,by,width/2):NoteDocument.eraseSweep(source,ax,ay,bx,by,width/2);}catch(IllegalArgumentException problem){erasePreview=null;eraseFailed=true;host.error("这次橡皮轨迹产生的笔迹过多，未修改笔记");}}
++    private void previewGroup(double x,double y){
++        if(groupBounds==null||groupOriginal.isEmpty())return;
++        double dx=0,dy=0,factor=1;
++        if(actionMode==7){dx=x-startX;dy=y-startY;if(!document.infinite()){dx=clamp(dx,-groupBounds[0],document.width-groupBounds[2]);dy=clamp(dy,-groupBounds[1],document.height-groupBounds[3]);}}
++        else{
++            double ax=groupBounds[0],ay=groupBounds[1];double original=Math.hypot(groupBounds[2]-ax,groupBounds[3]-ay);
++            factor=original<.001?1:clamp(Math.hypot(x-ax,y-ay)/original,.25,4);
++            if(!document.infinite()){factor=Math.min(factor,Math.min((document.width-ax)/Math.max(.001,groupBounds[2]-ax),(document.height-ay)/Math.max(.001,groupBounds[3]-ay)));}
++        }
++        LinkedHashMap<Long,NoteDocument.Item> next=new LinkedHashMap<>();
++        try{for(NoteDocument.Item item:groupOriginal.values())next.put(item.id,actionMode==7?NoteEditorOps.translated(item,dx,dy):NoteEditorOps.scaled(item,groupBounds[0],groupBounds[1],factor));groupPreview.clear();groupPreview.putAll(next);}catch(IllegalArgumentException ignored){}
++    }
+     private void resizeImage(double x,double y){if(imageOriginal.type==NoteDocument.TEXT){
+         double ax=resizeCorner%2==0?imageOriginal.right():imageOriginal.left(),signX=resizeCorner%2==0?-1:1;
+         double w=Math.max(24,(x-ax)*signX),nx=signX<0?ax-w:ax;
+@@ -237,11 +306,21 @@ public final class NoteCanvasView extends View {
+         double ratio=(imageOriginal.right()-imageOriginal.left())/(imageOriginal.bottom()-imageOriginal.top());double ax=resizeCorner%2==0?imageOriginal.right():imageOriginal.left(),ay=resizeCorner<2?imageOriginal.bottom():imageOriginal.top();double signX=resizeCorner%2==0?-1:1,signY=resizeCorner<2?-1:1;double w=Math.max(dp(20)/zoom,Math.max((x-ax)*signX,(y-ay)*signY*ratio)),h=w/ratio;if(!document.infinite()){double maxW=signX<0?ax:document.width-ax,maxH=signY<0?ay:document.height-ay;double s=Math.min(1,Math.min(maxW/w,maxH/h));w*=s;h*=s;}if(w>.1&&h>.1)imagePreview=imageOriginal.bounds(signX<0?ax-w:ax,signY<0?ay-h:ay,w,h);}
+     private int handleAt(NoteDocument.Item item,float x,float y){for(int i=0;i<4;i++)if(Math.hypot(x-sx(i%2==0?item.left():item.right()),y-sy(i<2?item.top():item.bottom()))<=dp(20))return i;return -1;}
+     private NoteDocument.Item imageAt(double x,double y){List<NoteDocument.Item> items=document.items();for(int i=items.size()-1;i>=0;i--){NoteDocument.Item item=items.get(i);if((item.type==NoteDocument.IMAGE||item.type==NoteDocument.TEXT)&&item.near(x,y,0))return item;}return null;}
+-    public void finishGesture(){if(disposed)return;boolean didChange=false;try{if(actionMode==1&&preview!=null){NoteDocument.Item p=preview;document.add(new NoteDocument.Item(document.newId(),p.type,p.color,p.width,p.points,p.image));didChange=true;}else if(actionMode==2&&erasePreview!=null){didChange=document.applyErasure(erasePreview);}else if((actionMode==4||actionMode==5)&&imagePreview!=null&&imageOriginal!=null&&(!Arrays.equals(imagePreview.points,imageOriginal.points)||imagePreview.width!=imageOriginal.width)){document.replace(imagePreview);didChange=true;}}catch(IllegalArgumentException e){host.error(e.getMessage());}clearGesture();if(didChange)changed();else{syncViewport();invalidate();}settleViewport();}
++    public void finishGesture(){if(disposed)return;boolean didChange=false,selectionChanged=false;try{
++        if(actionMode==1&&preview!=null){NoteDocument.Item p=preview;document.add(new NoteDocument.Item(document.newId(),p.type,p.color,p.width,p.points,p.image));didChange=true;}
++        else if(actionMode==2&&erasePreview!=null){didChange=document.applyErasure(erasePreview);}
++        else if((actionMode==4||actionMode==5)&&imagePreview!=null&&imageOriginal!=null&&(!Arrays.equals(imagePreview.points,imageOriginal.points)||imagePreview.width!=imageOriginal.width)){document.replace(imagePreview);didChange=true;}
++        else if(actionMode==6){List<double[]> outline=lassoPath;if(!lassoFreeform&&lassoPath.size()>1)outline=Arrays.asList(lassoPath.get(0),lassoPath.get(lassoPath.size()-1));selection.clear();selection.addAll(NoteEditorOps.select(document.items(),outline,lassoFreeform,lassoFilter));selectionChanged=true;}
++        else if((actionMode==7||actionMode==8)&&!groupPreview.isEmpty()){
++            ArrayList<NoteDocument.Item> next=new ArrayList<>();
++            for(NoteDocument.Item item:document.items()){NoteDocument.Item replacement=groupPreview.get(item.id);if(replacement!=null&&(!Arrays.equals(replacement.points,item.points)||replacement.width!=item.width)){next.add(replacement);didChange=true;}else next.add(item);}
++            if(didChange)document.applyItems(next);
++        }
++    }catch(IllegalArgumentException e){host.error(e.getMessage());didChange=false;}clearGesture();if(didChange)changed();else{syncViewport();if(selectionChanged)host.changed();invalidate();}settleViewport();}
+     private void cancelGesture(){clearGesture();syncViewport();settleViewport();invalidate();}
+-    private void clearGesture(){actionMode=0;active=-1;activePen=false;gesturePage=-1;preview=null;vertices.clear();erasePreview=null;eraseFailed=false;imageOriginal=null;imagePreview=null;}
++    private void clearGesture(){actionMode=0;active=-1;activePen=false;gesturePage=-1;preview=null;vertices.clear();erasePreview=null;eraseFailed=false;imageOriginal=null;imagePreview=null;lassoPath.clear();groupOriginal.clear();groupPreview.clear();groupBounds=null;}
+     private void constrainViewport(){if(document.infinite()){if(!NoteDocument.finite(cx)||!NoteDocument.finite(cy)){cx=0;cy=0;}return;}double halfW=getWidth()/(2*zoom),halfH=getHeight()/(2*zoom);cx=document.width<halfW*2?document.width/2:clamp(cx,halfW,document.width-halfW);double total=continuous()?pageLayout.totalHeight(document.pageCount()):document.height;cy=total<halfH*2?total/2:clamp(cy,halfH,total-halfH);}
+-    private void updateCenteredPage(){if(!continuous()||!initialized||(actionMode!=3&&!multi))return;int page=pageLayout.nearest(cy,document.pageCount());if(page==document.currentPage())return;syncViewport();document.selectPage(page);selected=0;renderPage=page;viewportPageDirty=true;host.viewportPageChanged(page);}
++    private void updateCenteredPage(){if(!continuous()||!initialized||(actionMode!=3&&!multi))return;int page=pageLayout.nearest(cy,document.pageCount());if(page==document.currentPage())return;syncViewport();document.selectPage(page);selected=0;selection.clear();renderPage=page;viewportPageDirty=true;host.viewportPageChanged(page);}
+     private void settleViewport(){if(viewportPageDirty){viewportPageDirty=false;host.viewportSettled();}}
+     private boolean onPaper(double x,double y){return document.infinite()||(x>=0&&y>=0&&x<=document.width&&y<=document.height);}
+     private static boolean isPen(int tool){return tool==MotionEvent.TOOL_TYPE_STYLUS||tool==MotionEvent.TOOL_TYPE_ERASER;}
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteDocument.java b/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
+index c653a7d..49a8b38 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
+@@ -86,6 +86,25 @@ public final class NoteDocument {
+     private void storePage(){Page p=pages.get(currentPage);p.items=items;p.x=centerX;p.y=centerY;p.zoom=zoom;p.saved=viewportSaved;}
+     public void selectPage(int index){if(index<0||index>=pages.size())throw new IndexOutOfBoundsException();if(index==currentPage)return;storePage();currentPage=index;Page p=pages.get(index);items=p.items;centerX=p.x;centerY=p.y;zoom=p.zoom;viewportSaved=p.saved;undo.clear();redo.clear();}
+     public int addPage(){return insertPage(pages.size());}
++    /** Copies the active paper after itself. Image items keep this note's image filename. */
++    public int duplicatePage(){
++        if(pages.size()>=MAX_PAGES)throw new IllegalStateException("页数已达上限");
++        storePage();Page source=pages.get(currentPage);
++        ArrayList<Item> copied=new ArrayList<>(source.items.size());
++        for(Item item:source.items)copied.add(new Item(newId(),item.type,item.color,item.width,item.points,item.image,item.text));
++        int inserted=currentPage+1;
++        pages.add(inserted,new Page(copied,source.x,source.y,source.zoom,source.saved));
++        selectPage(inserted);return inserted;
++    }
++    /** Clearing an active page is one undoable edit. */
++    public void clearPage(){if(!items.isEmpty())commit(new ArrayList<>());}
++    /** Deletes the active page, keeping at least one sheet in the note. */
++    public int deletePage(){
++        if(pages.size()==1)throw new IllegalStateException("至少保留一页纸张");
++        pages.remove(currentPage);currentPage=Math.min(currentPage,pages.size()-1);
++        Page page=pages.get(currentPage);items=page.items;centerX=page.x;centerY=page.y;zoom=page.zoom;viewportSaved=page.saved;
++        undo.clear();redo.clear();return currentPage;
++    }
+     /** Inserts an empty page before index (0..pageCount), selecting the new page. */
+     public int insertPage(int index){if(index<0||index>pages.size())throw new IndexOutOfBoundsException();if(pages.size()>=MAX_PAGES)throw new IllegalStateException("页数已达上限");storePage();pages.add(index,new Page(new ArrayList<>(),width/2,height/2,1,false));if(currentPage>=index)currentPage++;selectPage(index);return currentPage;}
+     public void movePage(int from,int to){if(from<0||to<0||from>=pages.size()||to>=pages.size())throw new IndexOutOfBoundsException();if(from==to)return;storePage();Page active=pages.get(currentPage);Page moved=pages.remove(from);pages.add(to,moved);currentPage=pages.indexOf(active);undo.clear();redo.clear();}
+@@ -93,6 +112,8 @@ public final class NoteDocument {
+     public Item find(long id){for(Item item:items)if(item.id==id)return item;return null;}
+     public void add(Item item){List<Item> next=new ArrayList<>(items);next.add(item);commit(next);}
+     public void replace(Item item){List<Item> next=new ArrayList<>(items);for(int i=0;i<next.size();i++)if(next.get(i).id==item.id){next.set(i,item);commit(next);return;}}
++    /** Applies group transforms, paste, delete or layer order as one history entry. */
++    public void applyItems(List<Item> next){if(next==null)throw new IllegalArgumentException("无效的笔记项目");if(!items.equals(next))commit(new ArrayList<>(next));}
+     public void remove(Set<Long> ids){List<Item> next=new ArrayList<>();for(Item item:items)if(!ids.contains(item.id))next.add(item);if(next.size()!=items.size())commit(next);}
+     public void remove(long id){remove(Collections.singleton(id));}
+     /** Commits one eraser gesture as one history entry. Preview pieces may share their source id. */
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java b/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
+new file mode 100644
+index 0000000..7e2178f
+--- /dev/null
++++ b/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
+@@ -0,0 +1,81 @@
++package cn.qingyue.pdf;
++
++import java.util.*;
++
++/** Page-local, v3-compatible selection and item transforms. */
++final class NoteEditorOps {
++    static final int HANDWRITING=1, GRAPHICS=2, TEXT=4, IMAGE=8, ALL=15;
++    private NoteEditorOps(){}
++
++    static int kind(NoteDocument.Item item){
++        if(item.type==NoteDocument.STROKE)return HANDWRITING;
++        if(item.type==NoteDocument.TEXT)return TEXT;
++        if(item.type==NoteDocument.IMAGE)return IMAGE;
++        return GRAPHICS;
++    }
++    static Set<Long> select(List<NoteDocument.Item> items,List<double[]> path,boolean freeform,int filter){
++        LinkedHashSet<Long> ids=new LinkedHashSet<>();if(path==null||path.size()<(freeform?3:2))return ids;
++        double l=Double.POSITIVE_INFINITY,t=l,r=Double.NEGATIVE_INFINITY,b=r;
++        for(double[] point:path){l=Math.min(l,point[0]);t=Math.min(t,point[1]);r=Math.max(r,point[0]);b=Math.max(b,point[1]);}
++        if(r-l<1||b-t<1)return ids;
++        for(NoteDocument.Item item:items){
++            if((kind(item)&filter)==0||item.right()<l||item.left()>r||item.bottom()<t||item.top()>b)continue;
++            if(!freeform||intersectsPolygon(item,path))ids.add(item.id);
++        }
++        return ids;
++    }
++    private static boolean intersectsPolygon(NoteDocument.Item item,List<double[]> polygon){
++        double[][] corners={{item.left(),item.top()},{item.right(),item.top()},
++                {item.right(),item.bottom()},{item.left(),item.bottom()}};
++        for(double[] corner:corners)if(inside(corner[0],corner[1],polygon))return true;
++        for(double[] p:polygon)if(p[0]>=item.left()&&p[0]<=item.right()&&p[1]>=item.top()&&p[1]<=item.bottom())return true;
++        double[] points=item.points;
++        for(int i=0;i<points.length;i+=2)if(inside(points[i],points[i+1],polygon))return true;
++        for(int i=2;i<points.length;i+=2)for(int j=0;j<polygon.size();j++){
++            double[] a=polygon.get(j),b=polygon.get((j+1)%polygon.size());
++            if(cross(points[i-2],points[i-1],points[i],points[i+1],a[0],a[1],b[0],b[1]))return true;
++        }
++        return false;
++    }
++    private static boolean inside(double x,double y,List<double[]> polygon){
++        boolean result=false;for(int i=0,j=polygon.size()-1;i<polygon.size();j=i++){
++            double[] a=polygon.get(i),b=polygon.get(j);
++            if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])result=!result;
++        }return result;
++    }
++    private static boolean cross(double ax,double ay,double bx,double by,double cx,double cy,double dx,double dy){
++        double a=orientation(ax,ay,bx,by,cx,cy),b=orientation(ax,ay,bx,by,dx,dy);
++        double c=orientation(cx,cy,dx,dy,ax,ay),d=orientation(cx,cy,dx,dy,bx,by);
++        return a*b<=0&&c*d<=0&&Math.max(Math.min(ax,bx),Math.min(cx,dx))<=Math.min(Math.max(ax,bx),Math.max(cx,dx))&&Math.max(Math.min(ay,by),Math.min(cy,dy))<=Math.min(Math.max(ay,by),Math.max(cy,dy));
++    }
++    private static double orientation(double ax,double ay,double bx,double by,double cx,double cy){return (bx-ax)*(cy-ay)-(by-ay)*(cx-ax);}
++    static NoteDocument.Item translated(NoteDocument.Item item,double dx,double dy){
++        double[] points=item.points.clone();for(int i=0;i<points.length;i+=2){points[i]+=dx;points[i+1]+=dy;}
++        return new NoteDocument.Item(item.id,item.type,item.color,item.width,points,item.image,item.text);
++    }
++    static NoteDocument.Item scaled(NoteDocument.Item item,double x,double y,double factor){
++        if(!NoteDocument.finite(factor)||factor<=0)throw new IllegalArgumentException("无效的缩放比例");
++        double[] points=item.points.clone();for(int i=0;i<points.length;i+=2){points[i]=x+(points[i]-x)*factor;points[i+1]=y+(points[i+1]-y)*factor;}
++        float width=item.type==NoteDocument.IMAGE?item.width:(float)Math.max(.2,Math.min(item.type==NoteDocument.TEXT?72:200,item.width*factor));
++        return new NoteDocument.Item(item.id,item.type,item.color,width,points,item.image,item.text);
++    }
++    static NoteDocument.Item recolored(NoteDocument.Item item,int rgb){
++        if(item.type==NoteDocument.IMAGE)return item;
++        int color=(item.color&0xff000000)|(rgb&0x00ffffff);
++        return new NoteDocument.Item(item.id,item.type,color,item.width,item.points,item.image,item.text);
++    }
++    static double[] bounds(List<NoteDocument.Item> items,Set<Long> ids){
++        double l=Double.POSITIVE_INFINITY,t=l,r=Double.NEGATIVE_INFINITY,b=r;
++        for(NoteDocument.Item item:items)if(ids.contains(item.id)){l=Math.min(l,item.left());t=Math.min(t,item.top());r=Math.max(r,item.right());b=Math.max(b,item.bottom());}
++        return l==Double.POSITIVE_INFINITY?null:new double[]{l,t,r,b};
++    }
++    static List<NoteDocument.Item> wholeStrokeErase(List<NoteDocument.Item> source,double ax,double ay,double bx,double by,double radius){
++        ArrayList<NoteDocument.Item> kept=new ArrayList<>(source.size());
++        for(NoteDocument.Item item:source){
++            if(item.type==NoteDocument.IMAGE||item.type==NoteDocument.TEXT){kept.add(item);continue;}
++            List<NoteDocument.Item> cut=NoteDocument.eraseSweep(Collections.singletonList(item),ax,ay,bx,by,radius);
++            if(cut.size()==1&&cut.get(0)==item)kept.add(item);
++        }
++        return kept;
++    }
++}
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteStore.java b/app/src/main/java/cn/qingyue/pdf/NoteStore.java
+index f492631..3764bee 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteStore.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteStore.java
+@@ -20,6 +20,8 @@ public final class NoteStore {
+     public static synchronized boolean exists(Context c,String id){try{File f=file(c,id);return !deleted.contains(key(c,id))&&(pending.containsKey(key(c,id))||f.exists()||new File(f+".bak").exists());}catch(IOException e){return false;}}
+     public static synchronized NoteDocument load(Context c,String id)throws IOException{String k=key(c,id);if(deleted.contains(k))throw new FileNotFoundException("笔记已移除");NoteDocument d=pending.get(k);if(d!=null)return d.copy();try(FileInputStream in=new AtomicFile(file(c,id)).openRead()){return NoteDocument.read(in);}}
+     public static synchronized File imagesDirectory(Context c,String id)throws IOException{if(!exists(c,id))throw new FileNotFoundException("笔记已移除");File f=new File(directory(c,id),"images");if(!f.isDirectory()&&!f.mkdirs())throw new IOException("无法创建图片目录");return f;}
++    /** Clipboard images may be reused only while the original file belongs to this note. */
++    public static synchronized boolean imageExists(Context c,String id,String name){try{return exists(c,id)&&name!=null&&name.matches("[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|webp)")&&new File(new File(directory(c,id),"images"),name).isFile();}catch(IOException error){return false;}}
+     public static synchronized void save(Context c,String id,NoteDocument document)throws IOException{String k=key(c,id);if(deleted.contains(k))return;NoteDocument snapshot=document.copy();pending.put(k,snapshot);write(c,id,k,snapshot);}
+     public static void saveAsync(Context c,String id,NoteDocument document,Failure failure){final Context app=c.getApplicationContext();final NoteDocument snapshot=document.copy();final String k;try{synchronized(NoteStore.class){k=key(app,id);if(deleted.contains(k))return;pending.put(k,snapshot);}}catch(IOException e){if(failure!=null)failure.failed(e.getMessage());return;}
+         worker.execute(()->{try{synchronized(NoteStore.class){if(deleted.contains(k)||pending.get(k)!=snapshot)return;write(app,id,k,snapshot);}}catch(IOException|RuntimeException e){if(failure!=null)failure.failed("笔记保存失败："+e.getMessage());}});
+diff --git a/app/src/main/java/cn/qingyue/pdf/ZoomLimits.java b/app/src/main/java/cn/qingyue/pdf/ZoomLimits.java
+index c666468..4abf1fe 100644
+--- a/app/src/main/java/cn/qingyue/pdf/ZoomLimits.java
++++ b/app/src/main/java/cn/qingyue/pdf/ZoomLimits.java
+@@ -16,4 +16,9 @@ final class ZoomLimits {
+     static double noteScale(double absoluteScale, double base) {
+         return base * clamp(absoluteScale / base);
+     }
++    /** Infinite notes may zoom farther, while the persisted v3 absolute scale stays <=32. */
++    static double noteInfiniteScale(double absoluteScale, double base) {
++        if (Double.isNaN(absoluteScale) || Double.isInfinite(absoluteScale)) return base;
++        return Math.max(.025, Math.min(32, base * Math.max(.5, Math.min(10, absoluteScale / base))));
++    }
+ }
+diff --git a/tests/note-editor/NoteEditorTest.java b/tests/note-editor/NoteEditorTest.java
+new file mode 100644
+index 0000000..357e610
+--- /dev/null
++++ b/tests/note-editor/NoteEditorTest.java
+@@ -0,0 +1,53 @@
++package cn.qingyue.pdf;
++
++import java.io.*;
++import java.util.*;
++
++/** Exercises real v3 model and editor operations, without UI mocks. */
++public final class NoteEditorTest {
++    private static void check(boolean ok,String message){if(!ok)throw new AssertionError(message);}
++    private static NoteDocument.Item ink(NoteDocument d,int color,double x,double y){return new NoteDocument.Item(d.newId(),NoteDocument.STROKE,color,3,new double[]{x,y,x+10,y+10},"");}
++    public static void main(String[] args)throws Exception{
++        NoteDocument doc=NoteDocument.create("grid","A4");
++        NoteDocument.Item marker=ink(doc,0x66336699,30,30);
++        NoteDocument.Item pen=ink(doc,0xff221100,300,300);
++        NoteDocument.Item shape=new NoteDocument.Item(doc.newId(),NoteDocument.RECTANGLE,0xff222222,2,new double[]{45,45,90,90},"");
++        NoteDocument.Item text=new NoteDocument.Item(doc.newId(),NoteDocument.TEXT,0xff333333,18,new double[]{100,100,230,150},"","测试文字");
++        NoteDocument.Item image=new NoteDocument.Item(doc.newId(),NoteDocument.IMAGE,0xffffffff,1,new double[]{240,100,340,180},"sample_1.png");
++        for(NoteDocument.Item item:Arrays.asList(marker,pen,shape,text,image))doc.add(item);
++        List<double[]> box=Arrays.asList(new double[]{20,20},new double[]{350,190});
++        Set<Long> all=NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.ALL);
++        check(all.size()==4&&!all.contains(pen.id),"rectangle lasso must select intersecting items on one page");
++        check(NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.HANDWRITING).equals(Collections.singleton(marker.id)),"handwriting filter must include transparent stroke without guessing brush kind");
++        check(NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.TEXT).equals(Collections.singleton(text.id)),"text filter");
++        check(NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.IMAGE).equals(Collections.singleton(image.id)),"image filter");
++        check(NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.GRAPHICS).equals(Collections.singleton(shape.id)),"graphics filter");
++        List<double[]> polygon=Arrays.asList(new double[]{20,20},new double[]{355,20},new double[]{355,190},new double[]{20,190});
++        check(NoteEditorOps.select(doc.items(),polygon,true,NoteEditorOps.ALL).equals(all),"free lasso must use polygon geometry");
++        NoteDocument.Item recolored=NoteEditorOps.recolored(marker,0xffee5500);
++        check((recolored.color>>>24)==0x66&&(recolored.color&0xffffff)==0xee5500,"recolor must preserve marker transparency");
++        NoteDocument.Item moved=NoteEditorOps.translated(marker,20,30);
++        check(moved.id==marker.id&&moved.points[0]==50&&moved.points[1]==60,"group move must retain id and local coordinates");
++        NoteDocument.Item scaled=NoteEditorOps.scaled(text,100,100,1.5);
++        check(scaled.width==27&&scaled.right()==295,"text frame and font must scale together");
++        ArrayList<NoteDocument.Item> batch=new ArrayList<>(doc.items());batch.set(0,moved);batch.set(3,scaled);
++        doc.applyItems(batch);check(doc.items().get(0).left()==50&&doc.items().get(3).right()==295,"batch transform");
++        check(doc.undo()&&doc.items().get(0).left()==30&&doc.items().get(3).right()==230,"multi-object transform must be one undo");doc.redo();
++        List<NoteDocument.Item> whole=NoteEditorOps.wholeStrokeErase(doc.items(),50,60,60,70,4);
++        check(whole.size()<5&&!whole.contains(moved)&&whole.contains(image),"whole-stroke eraser must remove touched ink and retain image");
++        List<NoteDocument.Item> partial=NoteDocument.eraseSweep(doc.items(),50,60,60,70,4);
++        check(partial.size()>=4,"partial vector eraser remains available");
++        doc.applyItems(whole);check(doc.undo()&&doc.items().size()==5,"whole eraser is one undo");
++        doc.duplicatePage();check(doc.pageCount()==2&&doc.currentPage()==1&&doc.items().size()==5,"page duplicate");
++        check(doc.items().get(4).image.equals(image.image)&&doc.items().get(4).id!=image.id,"duplicate keeps image resource and allocates new id");
++        doc.clearPage();check(doc.items().isEmpty()&&doc.undo()&&doc.items().size()==5,"clear page must be undoable");
++        doc.deletePage();check(doc.pageCount()==1&&doc.items().get(4).id==image.id,"delete returns to original page");
++        try{doc.deletePage();throw new AssertionError("deleted final page");}catch(IllegalStateException expected){}
++        ByteArrayOutputStream bytes=new ByteArrayOutputStream();NoteDocument.write(bytes,doc);
++        DataInputStream header=new DataInputStream(new ByteArrayInputStream(bytes.toByteArray()));check(header.readInt()==0x514e4f54&&header.readInt()==3,"wire version must remain v3");
++        NoteDocument reopened=NoteDocument.read(new ByteArrayInputStream(bytes.toByteArray()));check(reopened.items().size()==5&&reopened.items().get(4).image.equals("sample_1.png"),"reopen preserves image reference");
++        check(ZoomLimits.noteInfiniteScale(10,1)==10&&ZoomLimits.noteInfiniteScale(100,10)==32,"infinite zoom supports 10x but persists <=32");
++        check(ZoomLimits.noteScale(10,1)==3,"finite note zoom limit is unchanged");
++        System.out.println("note-editor: OK");
++    }
++}
+diff --git a/tests/note-editor/NoteStoreImageTest.java b/tests/note-editor/NoteStoreImageTest.java
+new file mode 100644
+index 0000000..b416095
+--- /dev/null
++++ b/tests/note-editor/NoteStoreImageTest.java
+@@ -0,0 +1,28 @@
++package cn.qingyue.pdf;
++
++import android.content.Context;
++import java.io.*;
++import java.nio.file.Files;
++
++/** Real NoteStore with the existing desktop Context/AtomicFile shims. */
++public final class NoteStoreImageTest {
++    private static void check(boolean ok,String message){if(!ok)throw new AssertionError(message);}
++    public static void main(String[] args)throws Exception{
++        Context context=new Context(Files.createTempDirectory("qingyue-editor-store-").toFile());
++        NoteDocument first=NoteStore.create(context,"first","blank","A4");
++        NoteStore.create(context,"second","blank","A4");
++        File image=new File(NoteStore.imagesDirectory(context,"first"),"shared_1.png");
++        try(FileOutputStream out=new FileOutputStream(image)){out.write(new byte[]{1,2,3});}
++        check(NoteStore.imageExists(context,"first","shared_1.png"),"clipboard may reuse an image owned by its note");
++        check(!NoteStore.imageExists(context,"second","shared_1.png"),"clipboard must not borrow another note's image");
++        check(!NoteStore.imageExists(context,"first","../shared_1.png"),"image lookup must reject traversal");
++        first.add(new NoteDocument.Item(first.newId(),NoteDocument.IMAGE,0xffffffff,1,new double[]{20,20,120,90},"shared_1.png"));
++        first.duplicatePage();NoteStore.save(context,"first",first);
++        NoteDocument reopened=NoteStore.load(context,"first");
++        check(reopened.pageCount()==2&&reopened.pageItems(0).get(0).id!=reopened.pageItems(1).get(0).id,"saved duplicate pages keep separate item IDs");
++        check(reopened.pageItems(0).get(0).image.equals(reopened.pageItems(1).get(0).image)&&NoteStore.imageExists(context,"first","shared_1.png"),"duplicated image reference survives save/reopen");
++        for(int page=0;page<reopened.pageCount();page++)check(BasicNoteExportBounds.forItems(reopened,reopened.pageItems(page)).width>0,"export bounds accept duplicated image page");
++        NoteStore.delete(context,"first");check(!NoteStore.imageExists(context,"first","shared_1.png"),"deleted note cannot own clipboard images");
++        System.out.println("note-editor store/image: OK");
++    }
++}
+diff --git a/tests/note-editor/run.ps1 b/tests/note-editor/run.ps1
+new file mode 100644
+index 0000000..03e4e24
+--- /dev/null
++++ b/tests/note-editor/run.ps1
+@@ -0,0 +1,13 @@
++param([Parameter(Mandatory=$true)][string]$BuildDirectory)
++$ErrorActionPreference='Stop'
++$project=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
++$classes=Join-Path $BuildDirectory ('note-editor-'+[Guid]::NewGuid().ToString('N'))
++New-Item -ItemType Directory -Force -Path $classes | Out-Null
++$source=Join-Path $project 'app/src/main/java/cn/qingyue/pdf'
++$files=@((Join-Path $source 'NoteDocument.java'),(Join-Path $source 'NoteEditorOps.java'),(Join-Path $source 'ZoomLimits.java'),(Join-Path $source 'NoteStore.java'),(Join-Path $source 'BasicNoteExportBounds.java'),(Join-Path $project 'tests/note-store/android/content/Context.java'),(Join-Path $project 'tests/note-store/android/util/AtomicFile.java'),(Join-Path $PSScriptRoot 'NoteEditorTest.java'),(Join-Path $PSScriptRoot 'NoteStoreImageTest.java'))
++& javac -encoding UTF-8 --release 8 -d $classes @files
++if($LASTEXITCODE -ne 0){throw 'note-editor compilation failed'}
++& java -cp $classes cn.qingyue.pdf.NoteEditorTest
++if($LASTEXITCODE -ne 0){throw 'note-editor test failed'}
++& java -cp $classes cn.qingyue.pdf.NoteStoreImageTest
++if($LASTEXITCODE -ne 0){throw 'note-editor store test failed'}
+-- 
+2.53.0.windows.3
+
+
+From d5918c0e521261107aa2f76f57893d52f1a0dbc6 Mon Sep 17 00:00:00 2001
+From: Codex Editor <codex-editor@local.invalid>
+Date: Thu, 24 Sep 2026 23:27:24 +0800
+Subject: [PATCH 2/2] Guard read-only notes and select actual ink geometry
+
+---
+ .../java/cn/qingyue/pdf/NoteCanvasView.java   | 48 ++++++++++---------
+ .../java/cn/qingyue/pdf/NoteDocument.java     |  4 +-
+ .../java/cn/qingyue/pdf/NoteEditorOps.java    | 39 ++++++++++-----
+ tests/note-editor/NoteEditorTest.java         | 11 +++++
+ 4 files changed, 66 insertions(+), 36 deletions(-)
+
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java b/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
+index 475526c..ea36baa 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java
+@@ -25,7 +25,7 @@ public final class NoteCanvasView extends View {
+     private String tool="pen";
+     private int color=0xff36302b;
+     private float width=2;
+-    private boolean stylusOnly=true,twoFingerEnabled=true,disposed,initialized;
++    private boolean stylusOnly=true,twoFingerEnabled=true,disposed,initialized,readOnly;
+     private double cx,cy,zoom=1,baseZoom=1;
+     private final ZoomBadge zoomBadge=new ZoomBadge();
+     private long selected;
+@@ -66,29 +66,30 @@ public final class NoteCanvasView extends View {
+     public int selectionCount(){return selection.size();}
+     public boolean hasClipboard(){return !clipboard.isEmpty();}
+     public void setTwoFingerUndoEnabled(boolean enabled){twoFingerEnabled=enabled;twoFinger.reset();}
++    public void setReadOnly(boolean enabled){if(readOnly==enabled)return;cancelGesture();readOnly=enabled;selected=0;selection.clear();invalidate();}
+     private boolean continuous(){return pageLayout!=null&&!horizontalPages;}
+     public void setHorizontalPages(boolean horizontal){if(horizontalPages==horizontal)return;finishGesture();syncViewport();if(initialized&&pageLayout!=null)cy+=horizontal?-pageLayout.top(document.currentPage()):pageLayout.top(document.currentPage());horizontalPages=horizontal;baseZoom=fittedScale();constrainViewport();syncViewport();invalidate();}
+     public int visiblePage(){return continuous()&&initialized?pageLayout.nearest(cy,document.pageCount()):document.currentPage();}
+     public void selectPage(int index){finishGesture();syncViewport();document.selectPage(index);selected=0;selection.clear();if(continuous()&&initialized){cy=pageLayout.top(index)+Math.min(document.height/2,getHeight()/(2*zoom));constrainViewport();syncViewport();}else{initialized=false;onSizeChanged(getWidth(),getHeight(),getWidth(),getHeight());}persistPageChange();}
+-    public void addPage(){finishGesture();syncViewport();try{document.addPage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
+-    public void insertPage(int index){if(disposed)return;finishGesture();syncViewport();try{document.insertPage(index);selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void addPage(){if(readOnly)return;finishGesture();syncViewport();try{document.addPage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void insertPage(int index){if(disposed||readOnly)return;finishGesture();syncViewport();try{document.insertPage(index);selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException error){host.error(error.getMessage());}}
+     private void focusNewPage(){if(continuous()&&initialized){cy=pageLayout.top(document.currentPage())+Math.min(document.height/2,getHeight()/(2*zoom));constrainViewport();syncViewport();invalidate();}else{initialized=false;onSizeChanged(getWidth(),getHeight(),getWidth(),getHeight());}}
+-    public void movePage(int from,int to){finishGesture();syncViewport();int before=document.currentPage();document.movePage(from,to);if(continuous()&&initialized)cy+=(document.currentPage()-before)*pageLayout.stride();persistPageChange();}
++    public void movePage(int from,int to){if(readOnly)return;finishGesture();syncViewport();int before=document.currentPage();document.movePage(from,to);if(continuous()&&initialized)cy+=(document.currentPage()-before)*pageLayout.stride();persistPageChange();}
+     private void persistPageChange(){if(save())host.pageChanged();host.changed();invalidate();}
+     public float previewDiameter(float widthPt){return (float)(widthPt*zoom);}
+-    public boolean canUndo(){return document.canUndo();}
+-    public boolean canRedo(){return document.canRedo();}
++    public boolean canUndo(){return !readOnly&&document.canUndo();}
++    public boolean canRedo(){return !readOnly&&document.canRedo();}
+     public boolean hasSelection(){return selected!=0&&document.find(selected)!=null||!selection.isEmpty();}
+     public NoteDocument.Item selectedText(){NoteDocument.Item item=document.find(selected);return item!=null&&item.type==NoteDocument.TEXT?item:null;}
+     public void putText(String value,float size,int ink){
+-        finishGesture();if(value==null||value.trim().isEmpty()){host.error("请输入文字");return;}
++        if(readOnly)return;finishGesture();if(value==null||value.trim().isEmpty()){host.error("请输入文字");return;}
+         NoteDocument.Item old=selectedText();double w=old==null?Math.min(300,Math.max(120,getWidth()*.55/zoom)):old.right()-old.left();
+         double h=NoteTextLayout.height(value,size,ink,w),x=old==null?cx-w/2:old.left(),y=old==null?localCenterY()-h/2:old.top();
+         if(!document.infinite()){x=clamp(x,0,Math.max(0,document.width-w));y=clamp(y,0,Math.max(0,document.height-h));}
+         try{NoteDocument.Item item=new NoteDocument.Item(old==null?document.newId():old.id,NoteDocument.TEXT,ink,size,new double[]{x,y,x+w,y+h},old==null?"":old.image,value);if(old==null)document.add(item);else document.replace(item);selected=item.id;tool="select";changed();}catch(IllegalArgumentException e){host.error(e.getMessage());}
+     }
+     public long insertSource(ReaderSourceLink source){
+-        finishGesture();if(disposed)return 0;
++        if(readOnly)return 0;finishGesture();if(disposed)return 0;
+         String text=NoteSourceActions.body(source);double w=document.infinite()?360:Math.min(360,document.width-48);
+         double h=NoteTextLayout.height(text,17,0xff36302b,w),x=cx-w/2,y=localCenterY()-h/2;
+         if(!document.infinite()&&h>document.height-48){host.error("摘录超出当前纸张，请改用无限画布笔记");return 0;}
+@@ -98,11 +99,11 @@ public final class NoteCanvasView extends View {
+     }
+     public int zoomPercent(){return (int)Math.round(zoom/baseZoom*100);}
+     public void setZoomPercent(int percent){finishGesture();int max=document.infinite()?1000:300;double target=baseZoom*Math.max(50,Math.min(max,percent))/100.0;zoom=document.infinite()?ZoomLimits.noteInfiniteScale(target,baseZoom):ZoomLimits.noteScale(target,baseZoom);constrainViewport();syncViewport();invalidate();}
+-    public void deleteSelected(){finishGesture();if(!selection.isEmpty()){deleteSelection();return;}if(hasSelection()){document.remove(selected);selected=0;changed();}}
++    public void deleteSelected(){if(readOnly)return;finishGesture();if(!selection.isEmpty()){deleteSelection();return;}if(hasSelection()){document.remove(selected);selected=0;changed();}}
+     public void copySelection(){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;clipboard.clear();for(NoteDocument.Item item:document.items())if(ids.contains(item.id))clipboard.add(item);}
+-    public void cutSelection(){copySelection();deleteSelection();}
++    public void cutSelection(){if(readOnly)return;copySelection();deleteSelection();}
+     public void pasteSelection(){
+-        finishGesture();if(clipboard.isEmpty())return;
++        if(readOnly)return;finishGesture();if(clipboard.isEmpty())return;
+         for(NoteDocument.Item item:clipboard)if(item.type==NoteDocument.IMAGE&&!NoteStore.imageExists(getContext(),noteId,item.image)){host.error("原图片已丢失，无法粘贴");return;}
+         double l=Double.POSITIVE_INFINITY,t=l,r=Double.NEGATIVE_INFINITY,b=r;
+         for(NoteDocument.Item item:clipboard){l=Math.min(l,item.left());t=Math.min(t,item.top());r=Math.max(r,item.right());b=Math.max(b,item.bottom());}
+@@ -112,25 +113,25 @@ public final class NoteCanvasView extends View {
+         try{for(NoteDocument.Item item:clipboard){NoteDocument.Item moved=NoteEditorOps.translated(item,dx,dy);long id=document.newId();next.add(new NoteDocument.Item(id,moved.type,moved.color,moved.width,moved.points,moved.image,moved.text));pasted.add(id);}document.applyItems(next);selection.clear();selection.addAll(pasted);selected=0;tool="lasso";changed();}
+         catch(IllegalArgumentException error){host.error(error.getMessage());}
+     }
+-    public void deleteSelection(){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())if(!ids.contains(item.id))next.add(item);document.applyItems(next);selection.clear();selected=0;changed();}
+-    public void recolorSelection(int rgb){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.recolored(item,rgb):item);if(!next.equals(document.items())){document.applyItems(next);changed();}}
++    public void deleteSelection(){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())if(!ids.contains(item.id))next.add(item);document.applyItems(next);selection.clear();selected=0;changed();}
++    public void recolorSelection(int rgb){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.recolored(item,rgb):item);if(!next.equals(document.items())){document.applyItems(next);changed();}}
+     /** Moves selected objects to the top of the page's drawing order. */
+     public void bringSelectionForward(){reorderSelection(true);}
+     /** Moves selected objects to the bottom of the page's drawing order. */
+     public void sendSelectionBackward(){reorderSelection(false);}
+-    private void reorderSelection(boolean top){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> chosen=new ArrayList<>(),other=new ArrayList<>();for(NoteDocument.Item item:document.items())(ids.contains(item.id)?chosen:other).add(item);ArrayList<NoteDocument.Item> next=new ArrayList<>(document.items().size());next.addAll(top?other:chosen);next.addAll(top?chosen:other);if(!next.equals(document.items())){document.applyItems(next);changed();}}
+-    public void scaleSelection(float factor){finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty()||Float.isNaN(factor)||Float.isInfinite(factor)||factor<=0)return;double[] bounds=NoteEditorOps.bounds(document.items(),ids);if(bounds==null)return;double x=(bounds[0]+bounds[2])/2,y=(bounds[1]+bounds[3])/2;applySelectionScale(ids,x,y,Math.max(.25,Math.min(4,factor)));}
++    private void reorderSelection(boolean top){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> chosen=new ArrayList<>(),other=new ArrayList<>();for(NoteDocument.Item item:document.items())(ids.contains(item.id)?chosen:other).add(item);ArrayList<NoteDocument.Item> next=new ArrayList<>(document.items().size());next.addAll(top?other:chosen);next.addAll(top?chosen:other);if(!next.equals(document.items())){document.applyItems(next);changed();}}
++    public void scaleSelection(float factor){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty()||Float.isNaN(factor)||Float.isInfinite(factor)||factor<=0)return;double[] bounds=NoteEditorOps.bounds(document.items(),ids);if(bounds==null)return;double x=(bounds[0]+bounds[2])/2,y=(bounds[1]+bounds[3])/2;applySelectionScale(ids,x,y,Math.max(.25,Math.min(4,factor)));}
+     private void applySelectionScale(Set<Long> ids,double x,double y,double factor){
+         if(!document.infinite()){double[] box=NoteEditorOps.bounds(document.items(),ids);if(box==null)return;double max=Double.POSITIVE_INFINITY;for(double v:new double[]{box[0],document.width-box[2],box[1],document.height-box[3]})if(v<0)max=Math.min(max,1);if(factor>1){double halfW=Math.max(x-box[0],box[2]-x),halfH=Math.max(y-box[1],box[3]-y);max=Math.min((Math.min(x,document.width-x))/Math.max(.001,halfW),(Math.min(y,document.height-y))/Math.max(.001,halfH));factor=Math.min(factor,max);} }
+         if(factor<=0||Math.abs(factor-1)<.000001)return;ArrayList<NoteDocument.Item> next=new ArrayList<>();try{for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.scaled(item,x,y,factor):item);document.applyItems(next);changed();}catch(IllegalArgumentException error){host.error(error.getMessage());}
+     }
+     private Set<Long> selectedIds(){if(!selection.isEmpty())return new LinkedHashSet<>(selection);if(selected!=0&&document.find(selected)!=null)return Collections.singleton(selected);return Collections.emptySet();}
+-    public void duplicatePage(){finishGesture();syncViewport();try{document.duplicatePage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException|IllegalArgumentException error){host.error(error.getMessage());}}
+-    public void clearPage(){finishGesture();if(document.items().isEmpty())return;document.clearPage();selected=0;selection.clear();changed();}
+-    public void deletePage(){finishGesture();syncViewport();try{document.deletePage();selected=0;selection.clear();focusNewPage();persistPageChange();}catch(IllegalStateException error){host.error(error.getMessage());}}
++    public void duplicatePage(){if(readOnly)return;finishGesture();syncViewport();try{document.duplicatePage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException|IllegalArgumentException error){host.error(error.getMessage());}}
++    public void clearPage(){if(readOnly)return;finishGesture();if(document.items().isEmpty())return;document.clearPage();selected=0;selection.clear();changed();}
++    public void deletePage(){if(readOnly)return;finishGesture();syncViewport();try{document.deletePage();selected=0;selection.clear();focusNewPage();persistPageChange();}catch(IllegalStateException error){host.error(error.getMessage());}}
+     public void resetOrigin(){finishGesture();if(!document.infinite()){fit();return;}cx=cy=0;syncViewport();invalidate();}
+-    public void undo(){cancelGesture();if(document.undo()){selected=0;selection.clear();changed();}}
+-    public void redo(){cancelGesture();if(document.redo()){selected=0;selection.clear();changed();}}
++    public void undo(){if(readOnly)return;cancelGesture();if(document.undo()){selected=0;selection.clear();changed();}}
++    public void redo(){if(readOnly)return;cancelGesture();if(document.redo()){selected=0;selection.clear();changed();}}
+     public NoteDocument snapshot(){syncViewport();return document.copy();}
+     public NoteDocument document(){return document;}
+     public boolean save(){if(disposed)return false;finishGesture();syncViewport();try{NoteStore.save(getContext(),noteId,document);return true;}catch(IOException|RuntimeException e){host.error("笔记保存失败："+e.getMessage());return false;}}
+@@ -147,7 +148,7 @@ public final class NoteCanvasView extends View {
+         constrainViewport();syncViewport();invalidate();
+     }
+     public void fit(){finishGesture();if(getWidth()==0||getHeight()==0){document.viewportSaved=false;initialized=false;return;}baseZoom=fittedScale();zoom=baseZoom;cx=document.infinite()?0:document.width/2;cy=document.infinite()?0:(continuous()?pageLayout.top(document.currentPage())+Math.min(document.height/2,getHeight()/(2*zoom)):document.height/2);constrainViewport();syncViewport();invalidate();}
+-    public boolean insertImage(String name,int pixelWidth,int pixelHeight){finishGesture();if(disposed||getWidth()<=0||getHeight()<=0||pixelWidth<=0||pixelHeight<=0){host.error("画布尚未准备好，请稍后再插入图片");return false;}double w=Math.min(360,Math.max(80,getWidth()*.65/zoom)),h=w*pixelHeight/(double)pixelWidth;if(h>getHeight()*.7/zoom){h=getHeight()*.7/zoom;w=h*pixelWidth/(double)pixelHeight;}if(!document.infinite()){double scale=Math.min(1,Math.min(document.width*.85/w,document.height*.85/h));w*=scale;h*=scale;}double x=cx-w/2,y=localCenterY()-h/2;if(!document.infinite()){x=clamp(x,0,document.width-w);y=clamp(y,0,document.height-h);}try{NoteDocument.Item item=new NoteDocument.Item(document.newId(),NoteDocument.IMAGE,Color.WHITE,1,new double[]{x,y,x+w,y+h},name);document.add(item);selected=item.id;tool="select";changed();return true;}catch(IllegalArgumentException e){host.error(e.getMessage());return false;}}
++    public boolean insertImage(String name,int pixelWidth,int pixelHeight){if(readOnly)return false;finishGesture();if(disposed||getWidth()<=0||getHeight()<=0||pixelWidth<=0||pixelHeight<=0){host.error("画布尚未准备好，请稍后再插入图片");return false;}double w=Math.min(360,Math.max(80,getWidth()*.65/zoom)),h=w*pixelHeight/(double)pixelWidth;if(h>getHeight()*.7/zoom){h=getHeight()*.7/zoom;w=h*pixelWidth/(double)pixelHeight;}if(!document.infinite()){double scale=Math.min(1,Math.min(document.width*.85/w,document.height*.85/h));w*=scale;h*=scale;}double x=cx-w/2,y=localCenterY()-h/2;if(!document.infinite()){x=clamp(x,0,document.width-w);y=clamp(y,0,document.height-h);}try{NoteDocument.Item item=new NoteDocument.Item(document.newId(),NoteDocument.IMAGE,Color.WHITE,1,new double[]{x,y,x+w,y+h},name);document.add(item);selected=item.id;tool="select";changed();return true;}catch(IllegalArgumentException e){host.error(e.getMessage());return false;}}
+ 
+     @Override protected void onDraw(Canvas canvas){super.onDraw(canvas);strokeCache.beginFrame();canvas.drawColor(AppColors.CANVAS);if(!initialized)return;
+         if(continuous()){
+@@ -235,7 +236,7 @@ public final class NoteCanvasView extends View {
+             move(event.getX(i),event.getY(i));
+             int turn=actionMode==3&&!document.infinite()&&!continuous()?pageTurn(event.getX(i),event.getY(i)):0;
+             float dx=event.getX(i)-gestureStartX,dy=event.getY(i)-gestureStartY;
+-            boolean add=!continuous()&&actionMode==3&&pageDrag.canAddPage("hand".equals(tool),activePen,zoom/baseZoom,event.getEventTime()-gestureStartedAt,horizontalPages?dx:dy,horizontalPages?dy:dx,dp(90));
++            boolean add=!readOnly&&!continuous()&&actionMode==3&&pageDrag.canAddPage("hand".equals(tool),activePen,zoom/baseZoom,event.getEventTime()-gestureStartedAt,horizontalPages?dx:dy,horizontalPages?dy:dx,dp(90));
+             boolean scrolled=scrollNotified;finishGesture();
+             int target=document.currentPage()+turn;
+             if(turn!=0&&target>=0&&target<document.pageCount())selectPage(target);
+@@ -252,6 +253,7 @@ public final class NoteCanvasView extends View {
+     @Override public boolean performClick(){super.performClick();return true;}
+     private void setPinch(MotionEvent event){if(event.getPointerCount()!=2){pinch.reset();return;}pinch.begin(event.getPointerId(0),event.getPointerId(1),event.getX(0),event.getY(0),event.getX(1),event.getY(1));}
+     private void begin(float x,float y,int eventTool){
++        if(readOnly){gesturePage=document.currentPage();lastX=x;lastY=y;startX=lastWorldX=wx(x);startY=lastWorldY=wy(y);panTravel=0;scrollNotified=false;panStarted=false;actionMode=3;return;}
+         boolean editing="select".equals(tool)||"lasso".equals(tool)||(!"hand".equals(tool)&&(!stylusOnly||isPen(eventTool)));
+         gesturePage=continuous()&&editing?pageLayout.hit(wx(x),wyGlobal(y),document.pageCount()):document.currentPage();
+         if(editing&&gesturePage>=0&&gesturePage!=document.currentPage()){syncViewport();document.selectPage(gesturePage);selected=0;selection.clear();viewportPageDirty=true;host.viewportPageChanged(gesturePage);}
+@@ -275,7 +277,7 @@ public final class NoteCanvasView extends View {
+             double oldX=cx,oldY=cy;float dx=x-lastX,dy=y-lastY;cx-=dx/zoom;cy-=dy/zoom;constrainViewport();
+             if(!continuous())pageDrag.add(horizontalPages?dx:dy,(float)(-(horizontalPages?cx-oldX:cy-oldY)*zoom));
+             updateCenteredPage();
+-            panTravel+=Math.hypot(dx,dy);if(panTravel>dp(12))notifyScroll();}else if(actionMode==1){if(!document.infinite()){worldX=clamp(worldX,0,document.width);worldY=clamp(worldY,0,document.height);}if(vertices.size()<50000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=.7)vertices.add(new double[]{worldX,worldY});updatePreview(worldX,worldY);}else if(actionMode==2){eraseSweep(lastWorldX,lastWorldY,worldX,worldY);}else if(actionMode==4&&imageOriginal!=null){double w=imageOriginal.right()-imageOriginal.left(),h=imageOriginal.bottom()-imageOriginal.top(),nx=imageOriginal.left()+worldX-startX,ny=imageOriginal.top()+worldY-startY;if(!document.infinite()){nx=clamp(nx,0,Math.max(0,document.width-w));ny=clamp(ny,0,Math.max(0,document.height-h));}imagePreview=imageOriginal.bounds(nx,ny,w,h);}else if(actionMode==5&&imageOriginal!=null){resizeImage(worldX,worldY);}else if(actionMode==6){if(lassoPath.size()<5000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=2)lassoPath.add(new double[]{worldX,worldY});}else if(actionMode==7||actionMode==8){previewGroup(worldX,worldY);}lastX=x;lastY=y;lastWorldX=worldX;lastWorldY=worldY;invalidate();}
++            panTravel+=Math.hypot(dx,dy);if(panTravel>dp(12))notifyScroll();}else if(actionMode==1){if(!document.infinite()){worldX=clamp(worldX,0,document.width);worldY=clamp(worldY,0,document.height);}if(vertices.size()<50000&&Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=.7)vertices.add(new double[]{worldX,worldY});updatePreview(worldX,worldY);}else if(actionMode==2){eraseSweep(lastWorldX,lastWorldY,worldX,worldY);}else if(actionMode==4&&imageOriginal!=null){double w=imageOriginal.right()-imageOriginal.left(),h=imageOriginal.bottom()-imageOriginal.top(),nx=imageOriginal.left()+worldX-startX,ny=imageOriginal.top()+worldY-startY;if(!document.infinite()){nx=clamp(nx,0,Math.max(0,document.width-w));ny=clamp(ny,0,Math.max(0,document.height-h));}imagePreview=imageOriginal.bounds(nx,ny,w,h);}else if(actionMode==5&&imageOriginal!=null){resizeImage(worldX,worldY);}else if(actionMode==6){if(Math.hypot(worldX-lastWorldX,worldY-lastWorldY)*zoom>=2){if(lassoPath.size()>=256){ArrayList<double[]> fewer=new ArrayList<>();for(int p=0;p<lassoPath.size();p+=2)fewer.add(lassoPath.get(p));lassoPath.clear();lassoPath.addAll(fewer);}lassoPath.add(new double[]{worldX,worldY});}}else if(actionMode==7||actionMode==8){previewGroup(worldX,worldY);}lastX=x;lastY=y;lastWorldX=worldX;lastWorldY=worldY;invalidate();}
+     private void notifyScroll(){scrollNotified=true;}
+     private int pageTurn(float x,float y){float dx=x-gestureStartX,dy=y-gestureStartY;return pageDrag.turn(horizontalPages?dx:dy,horizontalPages?dy:dx,dp(90));}
+     private void updatePreview(double x,double y){int type=NoteDocument.STROKE;switch(tool){case "line":type=NoteDocument.LINE;break;case "circle":type=NoteDocument.CIRCLE;break;case "rectangle":type=NoteDocument.RECTANGLE;break;case "arrow":type=NoteDocument.ARROW;break;default:break;}double[] points;if(type==NoteDocument.STROKE){points=new double[vertices.size()*2];for(int i=0;i<vertices.size();i++){points[i*2]=vertices.get(i)[0];points[i*2+1]=vertices.get(i)[1];}}else{if(type==NoteDocument.CIRCLE){double side=Math.min(Math.abs(x-startX),Math.abs(y-startY));x=startX+Math.copySign(side,x-startX);y=startY+Math.copySign(side,y-startY);}points=new double[]{startX,startY,x,y};}int ink="marker".equals(tool)?InkInput.markerColor(color):"pencil".equals(tool)?(color&0x00ffffff)|0xa0000000:color;preview=new NoteDocument.Item(1,type,ink,width,points,"");}
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteDocument.java b/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
+index 49a8b38..0cbe3fe 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteDocument.java
+@@ -177,7 +177,7 @@ public final class NoteDocument {
+         System.arraycopy(first.points,2,joined,last.points.length,first.points.length-2);
+         pieces.set(firstIndex,new Item(first.id,STROKE,first.color,first.width,joined,""));pieces.remove(pieces.size()-1);
+     }
+-    private static List<double[]> erasablePaths(Item item){
++    static List<double[]> erasablePaths(Item item){
+         double[] p=item.points;if(item.type==STROKE||item.type==LINE)return Collections.singletonList(p);
+         if(item.type==ARROW){double[] a=arrowHeads(p,item.width);return Arrays.asList(new double[]{p[0],p[1],p[2],p[3]},
+                 new double[]{p[2],p[3],a[0],a[1]},new double[]{p[2],p[3],a[2],a[3]});}
+@@ -187,7 +187,7 @@ public final class NoteDocument {
+         for(int i=0;i<=segments;i++){double angle=2*Math.PI*i/segments;outline[i*2]=(l+r)/2+(r-l)/2*Math.cos(angle);outline[i*2+1]=(t+b)/2+(b-t)/2*Math.sin(angle);}
+         return Collections.singletonList(outline);
+     }
+-    private static boolean segmentsNear(double ax,double ay,double bx,double by,double cx,double cy,double dx,double dy,double radius){
++    static boolean segmentsNear(double ax,double ay,double bx,double by,double cx,double cy,double dx,double dy,double radius){
+         double ux=bx-ax,uy=by-ay,vx=dx-cx,vy=dy-cy,den=ux*vy-uy*vx;
+         if(Math.abs(den)>1e-12){double wx=cx-ax,wy=cy-ay,s=(wx*vy-wy*vx)/den,t=(wx*uy-wy*ux)/den;if(s>=0&&s<=1&&t>=0&&t<=1)return true;}
+         return segmentDistance(ax,ay,cx,cy,dx,dy)<=radius||segmentDistance(bx,by,cx,cy,dx,dy)<=radius||
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java b/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
+index 7e2178f..d665211 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java
+@@ -18,22 +18,39 @@ final class NoteEditorOps {
+         double l=Double.POSITIVE_INFINITY,t=l,r=Double.NEGATIVE_INFINITY,b=r;
+         for(double[] point:path){l=Math.min(l,point[0]);t=Math.min(t,point[1]);r=Math.max(r,point[0]);b=Math.max(b,point[1]);}
+         if(r-l<1||b-t<1)return ids;
++        List<double[]> polygon=freeform?path:Arrays.asList(
++                new double[]{l,t},new double[]{r,t},new double[]{r,b},new double[]{l,b});
+         for(NoteDocument.Item item:items){
+-            if((kind(item)&filter)==0||item.right()<l||item.left()>r||item.bottom()<t||item.top()>b)continue;
+-            if(!freeform||intersectsPolygon(item,path))ids.add(item.id);
++            double radius=item.type==NoteDocument.IMAGE||item.type==NoteDocument.TEXT?0:item.width/2.0;
++            if((kind(item)&filter)==0||item.right()+radius<l||item.left()-radius>r||item.bottom()+radius<t||item.top()-radius>b)continue;
++            if(intersectsPolygon(item,polygon))ids.add(item.id);
+         }
+         return ids;
+     }
+     private static boolean intersectsPolygon(NoteDocument.Item item,List<double[]> polygon){
+-        double[][] corners={{item.left(),item.top()},{item.right(),item.top()},
+-                {item.right(),item.bottom()},{item.left(),item.bottom()}};
+-        for(double[] corner:corners)if(inside(corner[0],corner[1],polygon))return true;
+-        for(double[] p:polygon)if(p[0]>=item.left()&&p[0]<=item.right()&&p[1]>=item.top()&&p[1]<=item.bottom())return true;
+-        double[] points=item.points;
+-        for(int i=0;i<points.length;i+=2)if(inside(points[i],points[i+1],polygon))return true;
+-        for(int i=2;i<points.length;i+=2)for(int j=0;j<polygon.size();j++){
+-            double[] a=polygon.get(j),b=polygon.get((j+1)%polygon.size());
+-            if(cross(points[i-2],points[i-1],points[i],points[i+1],a[0],a[1],b[0],b[1]))return true;
++        if(item.type==NoteDocument.IMAGE||item.type==NoteDocument.TEXT){
++            double[][] corners={{item.left(),item.top()},{item.right(),item.top()},
++                    {item.right(),item.bottom()},{item.left(),item.bottom()}};
++            for(double[] corner:corners)if(inside(corner[0],corner[1],polygon))return true;
++            for(double[] p:polygon)if(p[0]>=item.left()&&p[0]<=item.right()&&p[1]>=item.top()&&p[1]<=item.bottom())return true;
++            for(int i=0;i<4;i++)for(int j=0;j<polygon.size();j++){
++                double[] a=corners[i],b=corners[(i+1)%4],c=polygon.get(j),d=polygon.get((j+1)%polygon.size());
++                if(cross(a[0],a[1],b[0],b[1],c[0],c[1],d[0],d[1]))return true;
++            }
++            return false;
++        }
++        // Vector shapes are outlines. Their bounding-box interior is empty paper.
++        double radius=item.width/2.0;
++        for(double[] points:NoteDocument.erasablePaths(item)){
++            for(int i=0;i<points.length;i+=2)if(inside(points[i],points[i+1],polygon))return true;
++            if(points.length==2){for(int j=0;j<polygon.size();j++){
++                double[] a=polygon.get(j),b=polygon.get((j+1)%polygon.size());
++                if(NoteDocument.segmentDistance(points[0],points[1],a[0],a[1],b[0],b[1])<=radius)return true;
++            }}
++            for(int i=2;i<points.length;i+=2)for(int j=0;j<polygon.size();j++){
++                double[] a=polygon.get(j),b=polygon.get((j+1)%polygon.size());
++                if(NoteDocument.segmentsNear(points[i-2],points[i-1],points[i],points[i+1],a[0],a[1],b[0],b[1],radius))return true;
++            }
+         }
+         return false;
+     }
+diff --git a/tests/note-editor/NoteEditorTest.java b/tests/note-editor/NoteEditorTest.java
+index 357e610..34e4358 100644
+--- a/tests/note-editor/NoteEditorTest.java
++++ b/tests/note-editor/NoteEditorTest.java
+@@ -24,6 +24,17 @@ public final class NoteEditorTest {
+         check(NoteEditorOps.select(doc.items(),box,false,NoteEditorOps.GRAPHICS).equals(Collections.singleton(shape.id)),"graphics filter");
+         List<double[]> polygon=Arrays.asList(new double[]{20,20},new double[]{355,20},new double[]{355,190},new double[]{20,190});
+         check(NoteEditorOps.select(doc.items(),polygon,true,NoteEditorOps.ALL).equals(all),"free lasso must use polygon geometry");
++        NoteDocument.Item diagonal=new NoteDocument.Item(doc.newId(),NoteDocument.STROKE,0xff000000,2,new double[]{0,100,100,0},"");
++        NoteDocument.Item arrow=new NoteDocument.Item(doc.newId(),NoteDocument.ARROW,0xff000000,2,new double[]{0,100,100,0},"");
++        NoteDocument.Item frame=new NoteDocument.Item(doc.newId(),NoteDocument.RECTANGLE,0xff000000,2,new double[]{0,0,100,100},"");
++        NoteDocument.Item circle=new NoteDocument.Item(doc.newId(),NoteDocument.CIRCLE,0xff000000,2,new double[]{0,0,100,100},"");
++        List<NoteDocument.Item> outlines=Arrays.asList(diagonal,arrow,frame,circle);
++        List<double[]> emptyCorner=Arrays.asList(new double[]{5,5},new double[]{12,5},new double[]{12,12},new double[]{5,12});
++        check(NoteEditorOps.select(outlines,emptyCorner,true,NoteEditorOps.ALL).isEmpty(),"free lasso in vector bounding-box corner must not select distant outlines");
++        check(NoteEditorOps.select(outlines,Arrays.asList(new double[]{5,5},new double[]{12,12}),false,NoteEditorOps.ALL).isEmpty(),"rectangle lasso in vector bounding-box corner must not select distant outlines");
++        check(NoteEditorOps.select(Arrays.asList(frame,circle),Arrays.asList(new double[]{40,40},new double[]{60,60}),false,NoteEditorOps.ALL).isEmpty(),"outline center is empty paper, not a filled shape");
++        check(NoteEditorOps.select(Arrays.asList(diagonal,arrow),Arrays.asList(new double[]{45,45},new double[]{55,55}),false,NoteEditorOps.ALL).size()==2,"rectangle lasso intersects actual diagonal strokes");
++        check(NoteEditorOps.select(Arrays.asList(frame,circle),Arrays.asList(new double[]{45,-5},new double[]{55,5}),false,NoteEditorOps.ALL).size()==2,"rectangle lasso intersects actual shape outlines");
+         NoteDocument.Item recolored=NoteEditorOps.recolored(marker,0xffee5500);
+         check((recolored.color>>>24)==0x66&&(recolored.color&0xffffff)==0xee5500,"recolor must preserve marker transparency");
+         NoteDocument.Item moved=NoteEditorOps.translated(marker,20,30);
+-- 
+2.53.0.windows.3
+

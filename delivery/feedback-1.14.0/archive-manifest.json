@@ -1,0 +1,397 @@
+[
+  {
+    "file": "integration-manifest.json",
+    "sha256": "ca8f343e52972f08ad0c6e25bfc2d39629d6abd240bb1985d7aeb970f3f441e1",
+    "bytes": 9150
+  },
+  {
+    "file": "creation/changed-files.json",
+    "sha256": "30ac4cbf75c121b013e419edb1484ae79427b0bbaba7e3a858983ae1cf004fa0",
+    "bytes": 3664
+  },
+  {
+    "file": "creation/creation-ui-final.bundle",
+    "sha256": "9eeda17cbbdc0436494bdfa30ae3ce87444b53df2c0b454646462f7c815ccda9",
+    "bytes": 51109
+  },
+  {
+    "file": "creation/cross-review.md",
+    "sha256": "160065fabce1e8725274c646135ffd55f1e0824519bb2b7ec5e28c375e5fe857",
+    "bytes": 2817
+  },
+  {
+    "file": "creation/delivery.md",
+    "sha256": "17377ec20f49d5a663c75b658f200f1fe69a6f9ec12e374e6d9e7632a1a5b192",
+    "bytes": 2250
+  },
+  {
+    "file": "creation/research.md",
+    "sha256": "13e9fb08a9742c3e7a6b323a241fdf06d50c4d276e4465fdc8ebc983d6dcd402",
+    "bytes": 4821
+  },
+  {
+    "file": "creation/final-patch/0001-Default-to-infinite-draft-with-tested-creation-and-m.patch",
+    "sha256": "949da94ccd49734a80f5a7fe44ef42b7e0a4f9ee47ea6b815ab7a29656c1871e",
+    "bytes": 32444
+  },
+  {
+    "file": "creation/final-patch/0002-Animate-internal-note-jumps.patch",
+    "sha256": "5fb2f1fc68acb019657f68ef574459219a77f5e83ebf1a4e52878a4fcab63802",
+    "bytes": 3677
+  },
+  {
+    "file": "creation/final-patch/0003-Disable-activity-transitions-when-system-animations-.patch",
+    "sha256": "b32cc1743eb116d72d5f90a46bb116d7e7d0e6a6073330b76a75bc18b93efe3b",
+    "bytes": 2803
+  },
+  {
+    "file": "editor/changed-files.json",
+    "sha256": "b24305286f0bbde768e824ef0890edee2cf9db43a1eac43b8b3eb4ad83cf4be5",
+    "bytes": 1644
+  },
+  {
+    "file": "editor/delivery.md",
+    "sha256": "016720a832d6aeefed2a6cfc1a487076dc7e617e4ae39bfd7c2bb0224af658ae",
+    "bytes": 3403
+  },
+  {
+    "file": "editor/design.md",
+    "sha256": "33a8a357a63d265b4cce7e035791b3781a29b001330ef87885f25598f186fece",
+    "bytes": 2869
+  },
+  {
+    "file": "editor/editor.bundle",
+    "sha256": "1d048e040c8212ea460126b3dbc0e8a33fb028a5f4bd193e88d705f2edd1b214",
+    "bytes": 29353
+  },
+  {
+    "file": "editor/editor.patch",
+    "sha256": "3bbfcfb7d88a019b8b653f5b85ff440057c46cfa896131853f5b3f3623a65b7f",
+    "bytes": 92391
+  },
+  {
+    "file": "qa/0001-feat-add-local-draft-editor-operations-and-verify-pr.patch",
+    "sha256": "980eccf844cc4c3531343e51a7a88364aceb30590c6e4655ea25fc5abb0edf7d",
+    "bytes": 102814
+  },
+  {
+    "file": "qa/changed-files.json",
+    "sha256": "9968aaed0c9e639398fa59351775a73f87e1e37c08ef2a0e753dfd7942191a90",
+    "bytes": 2921
+  },
+  {
+    "file": "qa/delivery.md",
+    "sha256": "970269ac6c09deec5e4cb1c428210c07ff423ce897484f5a0a8fc896b8b46e03",
+    "bytes": 4405
+  },
+  {
+    "file": "qa/editor-ui.bundle",
+    "sha256": "8350d71bbcde6148391640a559ef5b3de944bb224780264074474bf6a334273e",
+    "bytes": 50525
+  },
+  {
+    "file": "qa/inspect_apk.py",
+    "sha256": "5e149b8021f43d62405e36e80c9f5fc3072d513828e5156996385125b1749032",
+    "bytes": 5226
+  },
+  {
+    "file": "qa/inspect_dex.py",
+    "sha256": "932e646a62da1f0a20bab60331ab8504e1fb8b088882af7245a06a5f1076853a",
+    "bytes": 1996
+  },
+  {
+    "file": "qa/inspect_layouts.py",
+    "sha256": "754bee7767926a164693f0cfab88934500fb4bacdbbde37f1dbd7bc99ffb629b",
+    "bytes": 1410
+  },
+  {
+    "file": "qa/research.md",
+    "sha256": "4059990d5dd5e37a02bba889fe047e182c6e7ae5422b7ba6c3110c645e0ec572",
+    "bytes": 13038
+  },
+  {
+    "file": "qa/reference/activity_note_detail.xmltree.txt",
+    "sha256": "db1f7648806f19574f57dbfda4235b1ea79f571e17bad578da2b11f24034c0d0",
+    "bytes": 4013
+  },
+  {
+    "file": "qa/reference/detail_menu_preview_setting.xmltree.txt",
+    "sha256": "1de0bed4689f64abc03ecf1d60c9cb50c9fda09678823ab7e5b574f792c0d357",
+    "bytes": 10558
+  },
+  {
+    "file": "qa/reference/detail_outline_menu_op.xmltree.txt",
+    "sha256": "71c5a385540c0cfeb9b106f3e8b0e588d9e0ec463a32be263c1164f6c03ab218",
+    "bytes": 16354
+  },
+  {
+    "file": "qa/reference/detail_outline_pop_menu.xmltree.txt",
+    "sha256": "1d42187cd726325656504b6ec2050d06f82b43658d5e8e27b384cc4625f71d77",
+    "bytes": 24840
+  },
+  {
+    "file": "qa/reference/dex-feature-strings.tsv",
+    "sha256": "3571759802bf534150f82873663afee7dd8a7d042a55b1b781d1874449328870",
+    "bytes": 3898
+  },
+  {
+    "file": "qa/reference/dex-owned-classes.tsv",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "file": "qa/reference/dex-owned-methods.tsv",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "file": "qa/reference/dex-summary.json",
+    "sha256": "ab3da9094a91d2b9f90921b1386d1f254204a0fb8e4ff189401337419bdc3628",
+    "bytes": 6436
+  },
+  {
+    "file": "qa/reference/edit_tool_bar_v2.xmltree.txt",
+    "sha256": "410512d3eb6b0e4fd2fe4e9cdc794d53b19dac3e94037e070ec98fc10005635c",
+    "bytes": 20430
+  },
+  {
+    "file": "qa/reference/eraser_pen_pop.xmltree.txt",
+    "sha256": "1ff60636cc758241e5eeaac9bcdbbe63d326ddc9265a7dd04699115045d72a5b",
+    "bytes": 27987
+  },
+  {
+    "file": "qa/reference/feature-strings.tsv",
+    "sha256": "451a2796b8f1c0792c0e5710d56746447a14e3cbd3f89cf9f380c415e3237f03",
+    "bytes": 35241
+  },
+  {
+    "file": "qa/reference/fragment_nb_note_detail.xmltree.txt",
+    "sha256": "9422d38297053fecb3bbd1ef3de9eb5e3c5e6a8b020606fa9863d75826cd23d7",
+    "bytes": 7476
+  },
+  {
+    "file": "qa/reference/fragment_note_detail.xmltree.txt",
+    "sha256": "09a05cf4e3b81f5418101eadd2f27888b0c1b0e316e8b09dc24d2e07c7fe6b23",
+    "bytes": 15651
+  },
+  {
+    "file": "qa/reference/include_change_template.xmltree.txt",
+    "sha256": "56e4fdf970ba7aa887687c7afadeec9b6f1a08ffb281565b3d9f76f7f96a8839",
+    "bytes": 5461
+  },
+  {
+    "file": "qa/reference/include_detail_more_menu.xmltree.txt",
+    "sha256": "f3d6cc3e6dfb4242d42cbcc8cf2ac1f6d9a99bce96a70a81ac9cf5921ae9c3e7",
+    "bytes": 64100
+  },
+  {
+    "file": "qa/reference/include_pen_box.xmltree.txt",
+    "sha256": "ec11bd8fbc10e8012f8d2f3ac5880ef95ccaa4f8b1304365758c4bb3b605cc79",
+    "bytes": 11782
+  },
+  {
+    "file": "qa/reference/include_record_simple_tool_bar.xmltree.txt",
+    "sha256": "8b9e1f102096a689c0a1ea6bcae784ddb16bf97523ecf7f4251c1ded78acc52d",
+    "bytes": 11344
+  },
+  {
+    "file": "qa/reference/include_record_tool_bar.xmltree.txt",
+    "sha256": "0bb5b0387f83ff0b161587ed25f9edf35aedf264c7fc9f400b369173bdc38d9c",
+    "bytes": 16926
+  },
+  {
+    "file": "qa/reference/include_set_page_direction.xmltree.txt",
+    "sha256": "88b431ca18e0af0849b7cf86e069985f6535d5d34cf311716d51b3fc4d01a21e",
+    "bytes": 21422
+  },
+  {
+    "file": "qa/reference/include_set_paper_template.xmltree.txt",
+    "sha256": "871fae54dfbf5173134bfe30ee0309f61f3bf8f7471db688286bc98291206064",
+    "bytes": 3480
+  },
+  {
+    "file": "qa/reference/ink_pen_pop.xmltree.txt",
+    "sha256": "fccae762c3019cc5488d2e165956961cde6c0d16a646f02a52ebf2dbb992f025",
+    "bytes": 21993
+  },
+  {
+    "file": "qa/reference/lasso_hint_pop.xmltree.txt",
+    "sha256": "a93d5f942e48be4d400500a93cae3f33b633e7e77dff2d952333adeb330cf0ef",
+    "bytes": 16831
+  },
+  {
+    "file": "qa/reference/lasso_type_pop.xmltree.txt",
+    "sha256": "f806a7d4d8001bab498026211d099748374c6de6d75d63331f398e70fa8c109f",
+    "bytes": 30951
+  },
+  {
+    "file": "qa/reference/layout_note_detail_search.xmltree.txt",
+    "sha256": "b305074df20a1e957871c366558c4998d628422933fbfde8ffae295f3cf4ab4e",
+    "bytes": 30419
+  },
+  {
+    "file": "qa/reference/layout_relate_notes.xmltree.txt",
+    "sha256": "b01f0b7a1dd756de9dc42da771f174f61ddd8850cc8d298e073d0d4ec53ce125",
+    "bytes": 7007
+  },
+  {
+    "file": "qa/reference/layout_tab_page.xmltree.txt",
+    "sha256": "f8d10eec1bc3cd9aa8840fbf5c4ce4b7f0095e08e7a22ce15bbbfbfaebbfd355",
+    "bytes": 1897
+  },
+  {
+    "file": "qa/reference/layout-controls.txt",
+    "sha256": "60a3d696516011dcd314d5c150d9800fa725dd5be6ebecf5a92986ac296b8fe2",
+    "bytes": 29471
+  },
+  {
+    "file": "qa/reference/nb_draw_panel.xmltree.txt",
+    "sha256": "d3d0329dd9d093bde3603165c94aa59bbfabe1c710d5a1d82321328df149cddc",
+    "bytes": 905
+  },
+  {
+    "file": "qa/reference/pencil_pop_pad.xmltree.txt",
+    "sha256": "a19a724afe81c0953e4e5794b867dbd2bd2385ef10a822ed7e388f3c9289fbc7",
+    "bytes": 10019
+  },
+  {
+    "file": "qa/reference/phone_lasso_type_pop.xmltree.txt",
+    "sha256": "c031e887c54d98577b12d450955a5e87b25f4f30635196ee80fb3f20af2b7258",
+    "bytes": 31141
+  },
+  {
+    "file": "qa/reference/phone_note_menu_bottom_sheet_dialog.xmltree.txt",
+    "sha256": "32f5d01896aa2116266e26ddf0e3e0493e6eb8b0e9b32bcad7e11f40e5ee7318",
+    "bytes": 15349
+  },
+  {
+    "file": "qa/reference/phone_popupwin_detail_more.xmltree.txt",
+    "sha256": "50fcf6e4a2fe8eb451046a0b17a1efa3296a8ae1f3ccb6cc7c8bd463db52bc49",
+    "bytes": 55465
+  },
+  {
+    "file": "qa/reference/phone_sound_record_more_menu.xmltree.txt",
+    "sha256": "a9ecfb30a41021d5a165e2cd81e6ae74a811f93215558dc08ed356ffe8fdbde0",
+    "bytes": 19674
+  },
+  {
+    "file": "qa/reference/pop_create_note_layout.xmltree.txt",
+    "sha256": "0fd5e62fd918cab08ee5a3ed44f6556668970e981b37149eb00833767434a2f2",
+    "bytes": 34214
+  },
+  {
+    "file": "qa/reference/pop_eraser.xmltree.txt",
+    "sha256": "2b4352079cd1a4073c9ce396e81390d205627f4f10a428a70240468dec951575",
+    "bytes": 18261
+  },
+  {
+    "file": "qa/reference/pop_graph_tool.xmltree.txt",
+    "sha256": "e47ccaf8d52ccbeadf61ac6f3db36fcc5eb719f750a60203a5b09f1599f85813",
+    "bytes": 19569
+  },
+  {
+    "file": "qa/reference/pop_lasso.xmltree.txt",
+    "sha256": "1ecdb3effcbbf8db023f1354a7feacbe57ce88039cfdb4395dabf4d738539403",
+    "bytes": 26551
+  },
+  {
+    "file": "qa/reference/pop_tool_pen.xmltree.txt",
+    "sha256": "fecbcea30c3f41e6f332d1295f961be55847896f82d6bc718361ab1329c341ed",
+    "bytes": 21033
+  },
+  {
+    "file": "qa/reference/popup_add_blank_page.xmltree.txt",
+    "sha256": "4da9e414abcb2c2417651515be239328a151809d2319b43536e28eb960e39f43",
+    "bytes": 10507
+  },
+  {
+    "file": "qa/reference/popup_drag_text_menu.xmltree.txt",
+    "sha256": "fe07f367a5544f7583eda47863cea07e199299090532ee8f136a3e5e5cd68a22",
+    "bytes": 10694
+  },
+  {
+    "file": "qa/reference/popup_pen_box_batch_edit.xmltree.txt",
+    "sha256": "b2a013b5a8e25791b3e6d367de511c11339c276f71717f577f9fc2f0dd02770b",
+    "bytes": 6745
+  },
+  {
+    "file": "qa/reference/popupwin_change_template.xmltree.txt",
+    "sha256": "65ae3d744d96a5fce685ccaaaee6a8d4ef0314e086317dca2bca002184d791a8",
+    "bytes": 8346
+  },
+  {
+    "file": "qa/reference/popupwin_detail_export_note.xmltree.txt",
+    "sha256": "da071b9ee5cabde4af2a51eb9a555c46542c0d39a288a698fac874f93308f889",
+    "bytes": 24823
+  },
+  {
+    "file": "qa/reference/popupwin_detail_exportpdf.xmltree.txt",
+    "sha256": "36da8b72545f1059ff6cad956df5dde4c53602f983fd6f9e4e1ecf1bf43985c1",
+    "bytes": 11634
+  },
+  {
+    "file": "qa/reference/popupwin_detail_image_crop.xmltree.txt",
+    "sha256": "de81a3070b5ebc17337b92fafda420134db9291ac8c5b0c17a113d542bffd607",
+    "bytes": 9692
+  },
+  {
+    "file": "qa/reference/popupwin_detail_image_editor.xmltree.txt",
+    "sha256": "2e788fe4a88e12eec8b94c12b2775ba10a0f53a59a846adbe2b193c52b1b78f3",
+    "bytes": 1578
+  },
+  {
+    "file": "qa/reference/popupwin_detail_menu.xmltree.txt",
+    "sha256": "7fa3e09ace537382201db45fabdf4e7f7dd8776d79e843ebfb31d9998101a4c3",
+    "bytes": 55355
+  },
+  {
+    "file": "qa/reference/property_view_addtext.xmltree.txt",
+    "sha256": "67eb4686edaf4101ffa57bcfd0ff8d22597f8dc12e7cbb8fa1fa03aa138850ac",
+    "bytes": 8034
+  },
+  {
+    "file": "qa/reference/property_view_eraser.xmltree.txt",
+    "sha256": "d158d851e673b14b5e0d99e2052888b4522246980a81d54fbbb3d451090d68b0",
+    "bytes": 6565
+  },
+  {
+    "file": "qa/reference/property_view_graph.xmltree.txt",
+    "sha256": "e7aa8131d6851c82f88490f688da77d41faef34ebbb5a30119ac119b5620524e",
+    "bytes": 5320
+  },
+  {
+    "file": "qa/reference/property_view_laser_pointer_pen.xmltree.txt",
+    "sha256": "11b564a98b337ce25a324077fe15a33622665b78c95c898052dc3a7664944968",
+    "bytes": 7432
+  },
+  {
+    "file": "qa/reference/resource-map.json",
+    "sha256": "60273887c537eeaae864d8da8060c45639c5095f5fae277e6ed2b83b32a030b3",
+    "bytes": 10510504
+  },
+  {
+    "file": "qa/reference/standard_graph_pop.xmltree.txt",
+    "sha256": "329e2d154aafa98c45015159ede6f222f8293ab35a1d6aa19e138e25c32aeb76",
+    "bytes": 21410
+  },
+  {
+    "file": "qa/reference/toast_scale.xmltree.txt",
+    "sha256": "653ba9fe9bc8c895af832190f3b31a21cbd6b484e60db400bef5624e5314414c",
+    "bytes": 2729
+  },
+  {
+    "file": "qa/reference/view_note_side_bar.xmltree.txt",
+    "sha256": "afd0b0ea50315abbc981b7894d80035c2115f795599b69bb35c2c139b3629854",
+    "bytes": 31595
+  },
+  {
+    "file": "qa/reference/view_sidebar_search.xmltree.txt",
+    "sha256": "8cafa64de9268b0cf419c30c2d0942eb50b7bb39fd6bcb222d6a653bb2971288",
+    "bytes": 22997
+  },
+  {
+    "file": "qa/reference/zip-entries.txt",
+    "sha256": "0741ec65b37c7e307cdafb05777ce2a3dff195b7962e71f8291ac0b1d3e263b7",
+    "bytes": 406594
+  }
+]

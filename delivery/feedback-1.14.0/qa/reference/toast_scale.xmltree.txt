@@ -1,0 +1,30 @@
+N: android=http://schemas.android.com/apk/res/android (line=2)
+  N: app=http://schemas.android.com/apk/res-auto (line=2)
+    E: LinearLayout (line=2)
+      A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-2
+      A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+        E: LinearLayout (line=7)
+          A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f0915c9 [id/scale_container]
+          A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-2
+          A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+          A: http://schemas.android.com/apk/res/android:layout_marginTop(0x010100f8)=@0x7f070a27 [dimen/hw_dp60]
+            E: LinearLayout (line=13)
+              A: http://schemas.android.com/apk/res/android:orientation(0x010100c4)=0
+              A: http://schemas.android.com/apk/res/android:background(0x010100d4)=@0x7f081010 [drawable/shape_scale_toast_bg]
+              A: http://schemas.android.com/apk/res/android:paddingLeft(0x010100d6)=@0x7f07028d [dimen/dp21]
+              A: http://schemas.android.com/apk/res/android:paddingTop(0x010100d7)=@0x7f0704ac [dimen/dp7]
+              A: http://schemas.android.com/apk/res/android:paddingRight(0x010100d8)=@0x7f07028d [dimen/dp21]
+              A: http://schemas.android.com/apk/res/android:paddingBottom(0x010100d9)=@0x7f0704ac [dimen/dp7]
+              A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-2
+              A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+                E: CheckBox (line=23)
+                  A: http://schemas.android.com/apk/res/android:textSize(0x01010095)=@0x7f07024a [dimen/dp15]
+                  A: http://schemas.android.com/apk/res/android:textColor(0x01010098)=#ffffffff
+                  A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f0915ca [id/scale_lock_button]
+                  A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-2
+                  A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+                  A: http://schemas.android.com/apk/res/android:checked(0x01010106)=false
+                  A: http://schemas.android.com/apk/res/android:button(0x01010107)=@0x7f060436 [color/transparent]
+                  A: http://schemas.android.com/apk/res/android:text(0x0101014f)="100%" (Raw: "100%")
+                  A: http://schemas.android.com/apk/res/android:drawableLeft(0x0101016f)=@0x7f080ef6 [drawable/selector_scale_toast_lock]
+                  A: http://schemas.android.com/apk/res/android:drawablePadding(0x01010171)=@0x7f07024a [dimen/dp15]

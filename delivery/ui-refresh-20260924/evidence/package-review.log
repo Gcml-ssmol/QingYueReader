@@ -1,0 +1,91 @@
+New source files: 29
+{
+  "files": 69,
+  "delivery": "C:\\Users\\xsh12\\Documents\\ChatGPT\\笔记app\\delivery\\ui-refresh-20260924",
+  "stage": "--base"
+}
+Initialized empty Git repository in C:/Users/xsh12/Documents/ChatGPT/笔记app/work/ui-refresh-20260924/review-repository/.git/
+[codex/ui-reference-refresh (root-commit) 9e82cd7] Capture exact UI task baseline from existing working files
+ 40 files changed, 8637 insertions(+)
+ create mode 100644 QingYueIOS/README.md
+ create mode 100644 QingYueIOS/ios/App/App/Info.plist
+ create mode 100644 QingYueIOS/ios/App/App/public/app.mjs
+ create mode 100644 QingYueIOS/ios/App/App/public/bundle-integrity.json
+ create mode 100644 QingYueIOS/ios/App/App/public/index.html
+ create mode 100644 QingYueIOS/ios/App/App/public/native-bridge.js
+ create mode 100644 QingYueIOS/ios/App/App/public/native-start.mjs
+ create mode 100644 QingYueIOS/scripts/configure-ios.mjs
+ create mode 100644 QingYueIOS/scripts/prepare-web.mjs
+ create mode 100644 QingYueIOS/source-web/SOURCE.json
+ create mode 100644 QingYueIOS/source-web/app.mjs
+ create mode 100644 QingYueIOS/source-web/index.html
+ create mode 100644 QingYueIOS/source-web/sw.js
+ create mode 100644 QingYueIOS/src/native-start.mjs
+ create mode 100644 QingYueIOS/tests/native-ui.cjs
+ create mode 100644 QingYueIOS/tests/project.test.mjs
+ create mode 100644 QingYueIOS/www/app.mjs
+ create mode 100644 QingYueIOS/www/bundle-integrity.json
+ create mode 100644 QingYueIOS/www/index.html
+ create mode 100644 QingYueIOS/www/native-bridge.js
+ create mode 100644 QingYueIOS/www/native-start.mjs
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/AppColors.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/AppearanceActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/DocumentDialogs.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/GlobalSearchActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/IconButton.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/LibrarySidebar.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/MainActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/NoteActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/OcrActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/ReaderDialogs.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/ThemedActivity.java
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/WarmBackdrop.java
+ create mode 100644 QingYuePDF/app/src/main/res/values-v27/styles.xml
+ create mode 100644 QingYuePDF/app/src/main/res/values/dark-styles.xml
+ create mode 100644 QingYuePDF/app/src/main/res/values/styles.xml
+ create mode 100644 QingYueWeb/dist/app.mjs
+ create mode 100644 QingYueWeb/dist/index.html
+ create mode 100644 QingYueWeb/dist/sw.js
+{
+  "files": 69,
+  "delivery": "C:\\Users\\xsh12\\Documents\\ChatGPT\\笔记app\\delivery\\ui-refresh-20260924",
+  "stage": "--final"
+}
+[codex/ui-reference-refresh bcdfdc1] Restyle QingYue across Android Web and iOS with reversible classic appearance
+ 69 files changed, 2348 insertions(+), 208 deletions(-)
+ create mode 100644 QingYueIOS/ios/App/App/public/appearance.css
+ create mode 100644 QingYueIOS/ios/App/App/public/appearance.mjs
+ create mode 100644 QingYueIOS/ios/App/App/public/assets/library-scene.svg
+ create mode 100644 QingYueIOS/ios/App/App/public/ui-icons.mjs
+ create mode 100644 QingYueIOS/source-web/appearance.css
+ create mode 100644 QingYueIOS/source-web/appearance.mjs
+ create mode 100644 QingYueIOS/source-web/assets/library-scene.svg
+ create mode 100644 QingYueIOS/source-web/offline.mjs
+ create mode 100644 QingYueIOS/source-web/ui-icons.mjs
+ create mode 100644 QingYueIOS/tests/appearance.cjs
+ create mode 100644 QingYueIOS/www/appearance.css
+ create mode 100644 QingYueIOS/www/appearance.mjs
+ create mode 100644 QingYueIOS/www/assets/library-scene.svg
+ create mode 100644 QingYueIOS/www/ui-icons.mjs
+ create mode 100644 QingYuePDF/app/src/main/java/cn/qingyue/pdf/ReadingArtView.java
+ create mode 100644 QingYuePDF/app/src/main/res/drawable/cream_dialog_background.xml
+ create mode 100644 QingYuePDF/app/src/main/res/drawable/cream_dialog_background_dark.xml
+ create mode 100644 QingYuePDF/tests/appearance/AppearancePreferencesTest.java
+ create mode 100644 QingYuePDF/tests/appearance/run.ps1
+ create mode 100644 QingYuePDF/tests/appearance/stubs/android/content/Context.java
+ create mode 100644 QingYuePDF/tests/appearance/stubs/android/content/SharedPreferences.java
+ create mode 100644 QingYuePDF/tests/appearance/stubs/android/content/res/Configuration.java
+ create mode 100644 QingYuePDF/tests/appearance/stubs/android/content/res/Resources.java
+ create mode 100644 QingYueWeb/dist/appearance.css
+ create mode 100644 QingYueWeb/dist/appearance.mjs
+ create mode 100644 QingYueWeb/dist/assets/library-scene.svg
+ create mode 100644 QingYueWeb/dist/ui-icons.mjs
+ create mode 100644 QingYueWeb/tests/appearance.cjs
+ create mode 100644 QingYueWeb/tests/appearance.test.mjs
+The bundle contains this ref:
+bcdfdc17b2bb2b94bbebb113c65e5fddc022f182 HEAD
+The bundle records a complete history.
+The bundle uses this hash algorithm: sha1
+C:/Users/xsh12/Documents/ChatGPT/笔记app/delivery/ui-refresh-20260924/ui-refresh-review.bundle is okay
+PASS isolated review commit bcdfdc17b2bb2b94bbebb113c65e5fddc022f182; 69 changed source files; bundle and reverse patch verified.

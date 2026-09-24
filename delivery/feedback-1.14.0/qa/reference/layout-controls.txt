@@ -1,0 +1,1233 @@
+### activity_note_detail.xmltree.txt
+id/split_fragment
+id/ll_tips_permission
+string/request_auto_backup_important_reminder = 重要提醒"
+string/request_auto_backup_permission = 需获取您的文件存储权限，用于笔记本地自动备份！取消授权有笔记丢失风险，请谨慎操作。"
+
+### detail_menu_preview_setting.xmltree.txt
+id/ll_preview_setting
+id/rl_aerial_View
+string/setting_aerial_View = 鸟瞰图"
+id/iv_aerial_View
+id/rl_side_bar
+id/tv_sidebar
+string/setting_side_bar = 侧边栏"
+id/iv_side_bar
+id/vip_lock_sidebar
+id/tv_sidebar
+id/ll_side_bar_setting
+string/setting_side_bar_set = 侧边栏设置"
+id/rg_side_bar_setting
+id/title_line
+id/rbLeft
+string/setting_side_bar_left = 左边"
+id/rbRight
+string/setting_side_bar_right = 右边"
+
+### detail_outline_menu_op.xmltree.txt
+id/outline_menu_horn_top
+id/outline_menu_container
+id/outline_menu_horn_top
+id/ll_create_peer_outline
+string/create_peer_outline = 创建同级大纲"
+id/ll_create_child_outline
+string/create_child_outline = 创建子级大纲"
+id/view_open_child_outline
+id/ll_open_child_outline
+id/iv_open_child_outline
+id/tv_open_child_outline
+string/open_child_outline = 展开子级大纲"
+id/ll_update_outline
+string/update_outline = 修改大纲"
+id/ll_delete_outline
+string/delete_outline = 删除大纲"
+id/outline_menu_horn_bottom
+id/outline_menu_container
+
+### detail_outline_pop_menu.xmltree.txt
+id/outline_menu_horn_top
+id/outline_menu_container
+id/outline_menu_horn_top
+id/bookmark_edt_container
+id/et_bookmark_name
+id/btn_clear_name
+id/outline_container
+id/outline_tv
+string/page_2_outline1 = 添加至大纲"
+id/vip_lock_read
+id/copy_container
+id/copy_page_tv
+string/copy = 复制"
+id/new_page_container
+id/new_page_tv
+string/insert_new_page = 插入空白页"
+id/create_link_container
+id/create_link_tv
+string/create_link = 创建链接"
+id/vip_lock_link
+id/share_container
+id/iv_share_and_export
+id/tv_share_and_export
+string/share_and_export = 导出/分享"
+id/delete_container
+id/delete_icon
+id/delete_page_tv
+string/delete_page = 删除本页"
+id/outline_menu_horn_bottom
+id/outline_menu_container
+
+### edit_tool_bar_v2.xmltree.txt
+id/ll_undo_redo
+id/btn_undo
+id/btn_redo
+id/divider1
+id/ll_undo_redo
+id/divider2
+id/fl_property
+id/hs_tools_container
+id/ll_undo_redo
+id/fl_property
+id/tools_recycler_view
+id/fl_property
+id/pen_property
+id/beauty_pen_property
+id/eraser_property
+id/markpen_property
+id/ballpointpen_property
+id/pencil_property
+id/addText_property
+id/pic_view
+id/sticker_view
+id/graph_view
+id/graph_color_view
+id/laser_pointer_view
+id/handWrite_property
+id/adhesive_tape_view
+id/tool_view_translucent
+
+### eraser_pen_pop.xmltree.txt
+id/root_view
+id/content_layout
+id/select_layout
+id/leftBt
+string/eraser_type_px = 像素擦除"
+id/rightBt
+string/dialog_eraser_model_title = 整笔擦除"
+id/view0
+id/select_layout
+id/layout_size
+id/view0
+id/eraserSize
+string/eraser_size = 橡皮擦大小"
+id/eraserSizeSeekBar
+id/eraserSizeValueTv
+id/view4
+id/layout_size
+id/ll_model
+id/view4
+id/tv_model
+string/eraser_mark_pen = 仅擦除荧光笔"
+id/only_markpen_switch
+id/view1
+id/ll_model
+id/ll_only_tape
+id/view1
+id/tv_only_tape
+string/eraser_tape_only_pen = 仅擦除胶带"
+id/only_tape_switch
+id/view2
+id/ll_only_tape
+id/quickly_ll
+id/view2
+string/quickly_eraser = 压感橡皮擦"
+id/iv_quickly_eraser_switch
+id/pressure_ll
+id/quickly_ll
+string/pressure_sensitivity = 压力灵敏度"
+id/pressBar
+id/pressValueTv
+id/penHeight
+id/line1
+id/add_to_pen_box
+id/pressure_ll
+id/remove_from_pen_box
+id/pressure_ll
+id/notchIv
+
+### fragment_nb_note_detail.xmltree.txt
+id/nb_fragment_container
+id/nbControlPanel
+id/include_record_simple_container
+layout/include_record_simple_tool_bar
+id/include_record_play_container
+layout/include_record_tool_bar
+id/fl_move
+id/location_last
+id/location_refresh
+id/location_next
+id/scale_lock_layout
+layout/toast_scale
+
+### fragment_note_detail.xmltree.txt
+id/view_forin
+id/view_top
+id/tab_layout
+id/line_note_detail
+id/content_container
+id/fl_page
+id/turn_page_containt
+id/more_layout
+id/page_recycler_view
+id/foot_view
+layout/layout_more_foot_view
+id/tv_trans
+id/et_debug_inkpen
+id/include_record_simple_container
+layout/include_record_simple_tool_bar
+id/include_record_play_container
+layout/include_record_tool_bar
+id/include_set_paper_template
+layout/include_set_paper_template
+id/scale_lock_layout
+layout/toast_scale
+id/tv_page_index
+id/controls_split_screen
+id/locate_to_bottom_icon
+id/tool_view
+
+### include_change_template.xmltree.txt
+id/menu_change_template_container
+id/btn_preview_menu_back
+string/replace_the_paper_template = 更换模板"
+id/tv_replace_cover_template
+string/replace_cover_template = 更换封面模板"
+id/tv_replace_paper_template
+string/replace_paper_template = 更换纸张模板"
+
+### include_detail_more_menu.xmltree.txt
+id/menu_more_container
+id/detail_more_menu
+id/detail_more_menu_container
+id/menu_common
+id/detail_title_more
+string/detail_title_more = 更多"
+id/detail_note_name
+id/btn_edit_note_name
+id/detail_more_page_tv
+string/page_index = 第 %d 页"
+id/tv_delete_page
+string/detail_delete_page = 删除本页"
+id/tv_clear_page
+string/detail_clear_page = 清空本页"
+id/ll_skip_page
+string/jump_to = 跳转至"
+id/detail_more_pagejump_edt
+string/page = 页"
+id/detail_more_changebg_rl
+id/detail_more_changebg_tv
+string/replace_the_paper_template = 更换模板"
+id/ll_outline_link
+id/ll_outline
+id/tv_outline
+string/page_2_outline1 = 添加至大纲"
+id/vip_lock_read
+id/ll_merge_doc
+id/tv_merge_doc
+string/title_merge_doc = 合并文档"
+id/vip_lock_merge_doc
+id/ll_link
+id/tv_create_link
+string/create_link = 创建链接"
+id/vip_lock_link
+id/detail_more_group_export
+string/export = 导出"
+id/ll_export
+id/detail_export_image
+id/more_menu_export_image_text
+string/detail_export_image = 导出图片并分享"
+id/more_menu_export_image_arrow
+id/detail_more_exportpdf_rl
+id/more_menu_export_file_text
+string/share_and_export = 导出/分享"
+id/more_menu_export_file_arrow
+id/detail_more_group_setting
+string/setting = 设置"
+id/ll_setting
+id/screen_direction_container
+string/screen_direction = 屏幕显示方向"
+id/text_screen_direction_content
+string/vertical_screen = 纵向"
+id/page_direction_container
+id/page_direction_title
+string/label_multi_layout = 多页浏览"
+id/text_page_direction_content
+string/vertical_page_continuous = 上下连续翻页"
+id/page_direction_title
+id/preview_container
+string/setting_preview = 页面预览"
+id/tv_preview
+string/setting_aerial_View = 鸟瞰图"
+id/detail_more_setting_rl
+id/detail_more_setting_tv
+string/detail_menu_more_setting = 更多设置"
+id/detail_more_group_lab
+string/detail_menu_group_lab = 实验室"
+id/detail_labs_group
+id/detail_labs_item
+string/detail_menu_lab_name = 实验室功能"
+id/detail_outline
+string/pdf_outlinepdf = Pdf大纲"
+id/detail_search
+string/pdf_searchpdf = Pdf搜索"
+id/menu_page_direction
+layout/include_set_page_direction
+id/menu_preview
+layout/include_set_preview
+id/menu_labs
+layout/include_set_lab_fun
+id/menu_template
+layout/include_change_template
+id/menu_screen_direction
+layout/include_screen_direction
+
+### include_pen_box.xmltree.txt
+id/pen_box_total_container
+id/pen_box_close_container
+id/btn_pen_box_float
+id/pen_box_open_container
+id/pen_box_open_shadow
+id/pen_box_open_content_container
+id/btn_ver_drag_pen_box
+id/btn_hor_drag_pen_box
+id/list_pen_box
+id/btn_ver_multiple_choice
+id/btn_hor_multiple_choice
+id/btn_ver_close_pen_box
+id/btn_hor_close_pen_box
+id/btn_pen_box_switch_column
+id/pen_box_open_shadow
+
+### include_record_simple_tool_bar.xmltree.txt
+id/record_total_time_box
+id/record_total_time_container
+id/record_total_time_group
+id/record_total_time_layout
+id/btn_show_record_detail
+id/btn_record_play_pause
+id/btn_record_stop
+id/text_record_total_time
+id/record_split_line2
+id/btn_start_asr
+id/btn_show_asr_text_pop
+
+### include_record_tool_bar.xmltree.txt
+id/include_root_layout
+id/record_tool_root
+id/record_tool_layout
+id/btn_hidden_record_detail
+id/record_split_line1
+id/btn_hidden_record_detail
+id/btn_record_play_pause
+id/record_split_line1
+id/btn_record_stop
+id/btn_record_play_speed
+id/btn_record_play_pause
+id/record_play_progress
+id/tv_record_play_duration
+id/btn_record_play_speed
+id/tv_record_play_duration
+id/record_split_line2
+id/record_split_line2
+id/btn_start_asr
+id/btn_start_asr
+id/btn_show_asr_text_pop
+id/btn_show_asr_text_pop
+id/btn_show_record_pop
+id/btn_show_record_pop
+id/layout_asr_text_bottom
+layout/layout_asr_text_bottom
+
+### include_set_page_direction.xmltree.txt
+id/menu_set_page_direction_container
+id/btn_menu_back
+string/label_multi_layout = 多页浏览"
+string/page_direction = 翻页方向"
+id/horizontal_page_container
+string/horizontal_page = 左右翻页"
+id/img_horizontal_page
+id/vertical_page_container
+id/text_vertical_page
+string/vertical_page = 上下翻页"
+id/img_vertical_page
+id/vertical_page_continuous_container
+id/text_vertical_page_continuous
+string/vertical_page_continuous = 上下连续翻页"
+id/img_vertical_page_continuous
+id/vip_lock_page
+id/text_vertical_page_continuous
+id/multi_page_group
+string/title_multi_display = 多页展示"
+id/multi_page_bt_1
+string/item_single_page = 单页"
+id/multi_page_bt_2
+string/item_two_page = 双页"
+id/multi_page_bt_4
+string/item_four_page = 四页"
+
+### include_set_paper_template.xmltree.txt
+id/text_paper_width
+id/text_paper_height
+id/btn_update_paper
+
+### ink_pen_pop.xmltree.txt
+id/root_view
+id/content_layout
+id/penType0
+id/penType1
+id/penType1
+id/penType0
+id/penType0
+id/textType0
+string/ballpoint_pen = 圆珠笔"
+id/penType0
+id/penType0
+id/penType0
+id/textType1
+string/fountain_pen = 钢笔"
+id/penType1
+id/penType1
+id/textType0
+id/line1
+id/textType0
+id/layout_thickness
+id/line1
+id/penThickness
+string/line_thickness = 线条粗细"
+id/thicknessSeekBar
+id/thicknessValueTv
+id/line2
+id/layout_thickness
+id/rl_recently_color
+id/line2
+id/colorTv
+string/text_color_recently_used = 最近使用"
+id/color_change
+id/colorTv
+id/recvRecentlyUsed
+id/color_change
+id/line3
+id/rl_recently_color
+id/add_to_pen_box_ballpoint_pen
+id/line3
+id/layout_press
+id/line3
+id/penHeight
+string/pen_pressure_adjustment = 压力灵敏度"
+id/penPressBar
+id/pressValueTv
+id/add_to_pen_box_ink_pen
+id/layout_press
+id/penGroup
+id/custom_color_layout
+layout/layout_custome_color
+id/notchIv
+
+### lasso_hint_pop.xmltree.txt
+id/root_view
+id/content_layout
+id/bulb_iv
+id/divider_line
+id/lasso_tv
+id/bulb_iv
+id/bulb_iv
+id/lasso_tv
+string/lasso_hint_text = 使用 [套索] 圈中1个或多个对象，您可以进行自由移动、缩放拉伸旋转、复制粘贴、更改颜色、创建链接、转换文本等操作…。提示: 点击 {圆点} 处可编辑大小"
+id/divider_line
+id/layout_funtion
+id/lasso_tv
+id/contentLl
+string/note_detail_popup_window_screenshot = 截图"
+string/note_detail_popup_window_clip = 剪切"
+string/note_detail_popup_window_copy = 复制"
+string/note_detail_popup_window_del = 删除"
+string/create_link = 创建链接"
+string/note_detail_popup_window_ocr = 文字识别"
+id/topHornIv
+id/demo_iv
+id/layout_funtion
+id/i_know_tv
+string/i_know = 我知道了"
+id/demo_iv
+id/notchIv
+
+### lasso_type_pop.xmltree.txt
+id/root_view
+id/content_layout
+string/lasso_style = 套索样式"
+id/rb_custom
+id/rb_rectangle
+string/lasso_select_the_target = 选中对象"
+id/cb_write
+string/lasso_handwriting = 手写"
+id/cb_mark
+string/lasso_highlighter_pen = 荧光笔"
+id/cb_graph
+string/lasso_graphics = 图形"
+id/cb_adhesive_tape
+string/adhesive_tape_title = 记忆胶带"
+id/cb_pic
+string/lasso_picture = 图片"
+id/cb_text
+string/lasso_text_box = 文本框"
+id/notchIv
+
+### layout_note_detail_search.xmltree.txt
+id/iv_close
+id/iv_close
+id/rl_header
+string/search = 搜索"
+id/iv_close
+id/et_search
+id/et_search
+id/line_header
+id/rl_header
+id/et_search
+string/please_enter_keyword = 请输入关键字"
+id/rl_header
+id/iv_note_detail_search_clear
+id/et_search
+id/et_search
+id/et_search
+id/et_search
+id/et_search
+id/rg_search_type
+id/et_search
+id/search_type_print
+string/search_type_text = 文本"
+id/search_type_hand_write
+id/et_search
+string/search_type_hand_write = 手写"
+id/search_type_bookmark
+id/et_search
+string/bookmark = 书签"
+id/search_type_catalog
+id/et_search
+string/search_type_catalog = 大纲"
+id/search_history_container
+id/rg_search_type
+id/textView13
+string/search_history = 搜索历史"
+id/search_history_clear
+id/search_history_tag_list
+id/textView13
+id/ll_tv_result_container
+id/rg_search_type
+id/tv_search_result
+id/tv_no_results_found
+id/fr_result_container
+id/ll_tv_result_container
+id/rl_search_result
+id/ds_search_result
+id/ll_search_loading
+id/rg_search_type
+string/note_detail_searching = 正在搜索关键词..."
+id/progressBar
+id/tv_dialog_content
+
+### layout_relate_notes.xmltree.txt
+id/view
+id/iv_bar_left
+id/tv_bar_right
+string/complete = 完成"
+id/tv_bar_title
+string/add_notes = 新建笔记"
+id/tv_count_of_selected
+id/rl_notes_list
+
+### layout_tab_page.xmltree.txt
+id/fl_page
+id/tab_layout
+id/view_pager
+
+### nb_draw_panel.xmltree.txt
+id/nb_content_layer
+id/nb_temp_layer
+
+### pencil_pop_pad.xmltree.txt
+id/root_view
+id/content_layout
+id/penHeight
+string/press_to_adjust = 按压调节"
+id/container_pencil_tilt_angle
+id/pressValueTv
+id/container_pencil_tilt_angle
+id/penPressBar
+id/container_pencil_tilt_angle
+id/penHeight
+id/pressValueTv
+id/container_pencil_tilt_angle
+id/add_to_pen_box
+id/penPressBar
+string/pencil_tilt_angle = 铅笔倾斜角"
+id/iv_pencil_tilt_angle
+id/txt_pencil_tilt_angle_hint
+string/pencil_tilt_angle_open_hint = 开启/关闭铅笔倾斜手写笔画变粗"
+id/add_to_pen_box
+id/container_pencil_tilt_angle
+id/notchIv
+
+### phone_lasso_type_pop.xmltree.txt
+id/root_view
+id/content_layout
+string/lasso_style = 套索样式"
+id/rb_custom
+id/rb_rectangle
+string/lasso_select_the_target = 选中对象"
+id/cb_write
+string/lasso_handwriting = 手写"
+id/cb_mark
+string/lasso_highlighter_pen = 荧光笔"
+id/cb_graph
+string/lasso_graphics = 图形"
+id/cb_adhesive_tape
+string/adhesive_tape_title = 记忆胶带"
+id/cb_pic
+string/lasso_picture = 图片"
+id/cb_text
+string/lasso_text_box = 文本框"
+id/notchIv
+
+### phone_note_menu_bottom_sheet_dialog.xmltree.txt
+id/constraintLayout
+id/confirm_tv
+string/sure = 确定"
+id/confirm_tv
+id/note_list_more_edit_container
+id/note_name
+id/btn_clear_name
+id/note_name
+id/copy_tv
+string/copy_notes = 复制"
+id/cl_document_encryption
+id/tv_document_encryption
+string/setting_password = 加密"
+id/iv_read_encryption_lock
+id/tv_document_encryption
+id/export_pdf_tv
+string/menu_export_pdf = 导出/分享"
+id/to_folder_tv
+string/move_to_folder = 移动"
+id/to_dustbin_tv
+string/move_to_trash = 移到垃圾箱"
+
+### phone_popupwin_detail_more.xmltree.txt
+id/menu_common
+id/fl_note_bg
+id/phone_more_note_iv
+id/phone_more_page_tv
+string/page_index = 第 %d 页"
+id/phone_more_delete_page_tv
+string/delete_page = 删除本页"
+id/phone_more_clear_page_tv
+string/clear_page = 清空页面"
+id/ll_outline
+id/tv_outline
+string/page_2_outline1 = 添加至大纲"
+id/vip_lock_read
+id/ll_merge_doc
+id/tv_merge_doc
+string/title_merge_doc = 合并文档"
+id/vip_lock_merge_doc
+id/ll_link
+id/tv_create_link
+string/create_link = 创建链接"
+id/vip_lock_link
+string/jump_to = 跳转至"
+id/phone_more_pagejump_edt
+string/page = 页"
+id/page_direction_container
+string/label_multi_layout = 多页浏览"
+id/text_page_direction_content
+string/vertical_page_continuous = 上下连续翻页"
+id/preview_container
+string/setting_preview = 页面预览"
+id/tv_preview
+string/vertical_page_continuous = 上下连续翻页"
+id/phone_more_exportpng_rl
+string/detail_export_image = 导出图片并分享"
+id/detail_outline
+string/pdf_outlinepdf = Pdf大纲"
+id/detail_search
+string/pdf_searchpdf = Pdf搜索"
+id/detail_export_image
+string/detail_export_image = 导出图片并分享"
+id/phone_more_exportpdf_rl
+string/share_and_export = 导出/分享"
+id/phone_more_changebg_rl
+id/phone_more_changebg_tv
+string/replace_the_paper_template = 更换模板"
+id/detail_more_setting_rl
+id/phone_more_setting_tv
+string/setting = 设置"
+id/detail_labs_item
+id/view_lab
+string/detail_menu_lab_name = 实验室功能"
+id/view_lab
+id/view_lab
+id/menu_page_direction
+layout/include_set_page_direction
+id/menu_preview
+layout/include_set_preview
+id/menu_labs
+layout/include_set_lab_fun
+
+### phone_sound_record_more_menu.xmltree.txt
+id/rl_asr_container
+id/dialog_header
+string/more = 更多"
+id/record_list_edt_container
+id/dialog_header
+id/record_name
+id/btn_clear_record_name
+id/export_sound_local
+id/record_list_edt_container
+string/sound_save_local = 录音保存至本地"
+id/export_asr_trans
+id/export_sound_local
+string/asr_trans = 录音转文本"
+id/export_asr_check
+id/export_asr_trans
+string/asr_check_text = 查看录音文本"
+id/export_sound_share
+id/export_asr_check
+string/share = 分享"
+id/export_sound_delete
+id/export_sound_share
+string/delete = 删除"
+
+### popupwin_change_template.xmltree.txt
+id/iv_change_template_back
+string/replace_the_paper_template = 更换模板"
+id/tv_replace_cover_template
+string/replace_cover_template = 更换封面模板"
+id/tv_replace_paper_template
+string/replace_paper_template = 更换纸张模板"
+
+### popupwin_detail_exportpdf.xmltree.txt
+id/cancel_pdfexport_textview
+string/cancel = 取消"
+id/do_pdfexport_textview
+string/sure = 确定"
+id/edit_notename_container
+id/textView3
+id/textView3
+id/edit_notename
+id/delete_note_text
+id/delete_note_text
+id/edit_notename
+id/edit_notename
+string/contains_paper_background = 包含纸张背景"
+id/pdf_checkbox
+
+### popupwin_detail_export_note.xmltree.txt
+id/cancel_tv
+string/cancel = 取消"
+id/confirm_tv
+string/export = 导出"
+id/view15
+string/file_name = 文件名"
+id/export_note_name_pad_edt
+id/tv_select
+id/view15
+id/delete_note_pad_text
+id/export_note_name_pad_edt
+id/export_note_name_pad_edt
+id/tv_select
+string/options = 选项"
+id/export_note_name_pad_edt
+id/cl_export_type
+id/tv_select
+string/export_format = 导出格式"
+id/export_guid_line
+id/tv_export_type
+id/export_guid_line
+id/tv_export_type
+id/relativeLayout
+id/cl_export_type
+string/contains_paper_background = 包含纸张背景"
+id/export_note_pad_switch
+id/ll_pad_note_type_select_container
+id/tv_pad_export_type_title
+string/select_format = 选择格式"
+id/cl_pad_export_pdf
+id/tv_select
+id/iv_pad_pdf_check
+id/cl_pad_export_png
+id/tv_select
+id/iv_pad_png_check
+
+### popupwin_detail_image_crop.xmltree.txt
+id/privacy_dialog_parent
+id/crop_close_tv
+string/cancel = 取消"
+id/crop_save_tv
+string/sure = 确定"
+id/phone_crop_radioGroup
+id/crop_rect_rb
+string/rectangular_crop = 规矩裁剪"
+id/crop_path_rb
+string/free_crop = 自由裁剪"
+id/crop_image
+
+### popupwin_detail_image_editor.xmltree.txt
+id/tv_crop
+string/crop = 裁剪"
+
+### popupwin_detail_menu.xmltree.txt
+id/menu_common
+id/detail_title_more
+string/detail_title_more = 更多"
+id/detail_note_name
+id/btn_edit_note_name
+id/detail_more_page_tv
+string/page_index = 第 %d 页"
+id/tv_delete_page
+string/detail_delete_page = 删除本页"
+id/tv_clear_page
+string/detail_clear_page = 清空本页"
+string/jump_to = 跳转至"
+id/detail_more_pagejump_edt
+string/page = 页"
+id/detail_more_changebg_rl
+id/detail_more_changebg_tv
+string/replace_the_paper_template = 更换模板"
+id/ll_outline
+id/tv_outline
+string/page_2_outline1 = 添加至大纲"
+id/vip_lock_read
+id/ll_merge_doc
+id/tv_merge_doc
+string/title_merge_doc = 合并文档"
+id/vip_lock_merge_doc
+id/ll_link
+id/tv_create_link
+string/create_link = 创建链接"
+id/vip_lock_link
+id/detail_more_group_export
+string/export = 导出"
+id/detail_export_image
+string/detail_export_image = 导出图片并分享"
+id/detail_more_exportpdf_rl
+string/share_and_export = 导出/分享"
+id/detail_more_group_setting
+string/setting = 设置"
+id/page_direction_container
+id/page_direction_label
+string/label_multi_layout = 多页浏览"
+id/preview_container
+string/setting_preview = 页面预览"
+id/tv_preview
+string/vertical_page_continuous = 上下连续翻页"
+id/detail_more_setting_rl
+id/detail_more_setting_tv
+string/detail_menu_more_setting = 更多设置"
+id/detail_more_group_lab
+string/detail_menu_group_lab = 实验室"
+id/detail_labs_item
+string/detail_menu_lab_name = 实验室功能"
+id/detail_outline
+string/pdf_outlinepdf = Pdf大纲"
+id/detail_search
+string/pdf_searchpdf = Pdf搜索"
+id/menu_page_direction
+layout/include_set_page_direction
+id/menu_preview
+layout/include_set_preview
+id/menu_labs
+layout/include_set_lab_fun
+id/menu_template
+layout/include_change_template
+
+### popup_add_blank_page.xmltree.txt
+id/root_view
+string/add_page_location = 添加页面位置"
+id/rb_before_page
+string/before_page = 此页前"
+id/rb_after_page
+string/after_page = 此页后"
+id/rb_last_page
+string/end_page = 末尾页"
+string/add_paper_template = 添加纸张模板"
+id/recycle_view
+id/ll_more_template
+id/tv_more_template
+string/more_add_paper_template = 更多纸张模板"
+id/notchIv
+
+### popup_drag_text_menu.xmltree.txt
+id/ai_btn
+id/ai_line
+id/copy_btn
+string/copy = 复制"
+id/edit_btn
+string/edit = 编辑"
+layout/popup_drag_fun
+id/delete_btn
+string/delete = 删除"
+
+### popup_pen_box_batch_edit.xmltree.txt
+id/txt_title
+string/brush_batch_edit = 笔刷批量编辑"
+id/container_select_all
+id/container_delete
+id/txt_title
+id/img_select_all
+string/select_all = 全选"
+id/container_delete
+id/container_select_all
+id/txt_title
+string/delete = 删除"
+
+### pop_create_note_layout.xmltree.txt
+id/contentView
+id/cancel_tv
+id/confirm_tv
+id/view15
+id/confirm_tv
+id/top_ll
+id/cover_ll01
+string/cover = 封面"
+id/cover_view
+id/cover_iv
+id/paper_ll01
+string/paper = 纸张"
+id/paper_view
+id/paper_iv
+id/cover_sl
+id/name_color_tv
+id/cover_color_recycler
+id/name_color_tv
+id/tv1
+id/cover_color_recycler
+id/cover_nature_recycler
+id/tv1
+id/tv2
+id/cover_nature_recycler
+id/cover_art_recycler
+id/tv2
+id/paper_ll
+id/textView18
+id/add_note_radioGroup_phone
+id/textView18
+id/rb_choose_white
+id/rb_choose_beige
+id/rb_choose_grey
+id/rb_choose_spring_festival
+id/view16
+id/add_note_radioGroup_phone
+id/textView19
+id/view16
+id/view17
+id/textView19
+id/add_note_page_list_phone
+id/view17
+
+### pop_eraser.xmltree.txt
+id/tv_title
+string/pen_btn_fun_eraser = 橡皮擦"
+id/btn_eraser_px
+string/eraser_type_px = 像素擦除"
+id/btn_eraser_stroke
+string/setting_stroke_clear = 整笔擦除"
+id/container_erase_size
+id/txt_size_title
+id/seek_bar_size
+id/txt_size_value
+id/seek_bar_size
+id/txt_size_value
+id/container_only_erase_mark_pen
+layout/pop_item_pen_switch
+id/container_only_erase_tape_pen
+layout/pop_item_pen_switch
+id/container_quickly_eraser
+id/container_quickly_eraser_switch
+id/txt_quickly_eraser_title
+string/line_drawing = 直线绘制"
+id/switch_quickly_eraser
+id/container_quickly_eraser_pressure
+id/txt_pressure_title
+string/press_to_adjust = 按压调节"
+id/seek_bar_pressure
+id/txt_pressure_value
+id/seek_bar_pressure
+id/txt_pressure_value
+
+### pop_graph_tool.xmltree.txt
+id/content_layout
+id/select_layout
+id/leftBt
+string/one_stroke_shape = 一笔成型"
+id/rightBt
+id/rightBt
+string/standard_graph = 标准图形"
+id/leftBt
+id/img_left_indicate
+id/leftBt
+id/leftBt
+id/leftBt
+id/img_right_indicate
+id/rightBt
+id/rightBt
+id/rightBt
+id/view_space
+id/select_layout
+id/ll_graph_view
+id/view_space
+id/layout_line_size
+id/ll_graph_view
+id/penGraph
+string/line_thickness = 线条粗细"
+id/graphSeekBar
+id/graphValueTv
+id/graphSeekBar
+id/graphValueTv
+id/rl_recently_color
+id/layout_line_size
+id/colorTv
+string/text_color_recently_used = 最近使用"
+id/color_change
+id/colorTv
+id/recvRecentlyUsed
+id/color_change
+id/container_file_color
+id/rl_recently_color
+id/fill_color_tv
+string/fill_color = 填充颜色"
+id/iv_fill_color_switch
+
+### pop_lasso.xmltree.txt
+string/pen_btn_fun_lasso = 套索"
+id/rb_custom
+id/rb_rectangle
+string/lasso_select_the_target = 选中对象"
+id/cb_write
+string/lasso_handwriting = 手写"
+id/cb_mark
+string/lasso_highlighter_pen = 荧光笔"
+id/cb_graph
+string/lasso_graphics = 图形"
+id/cb_adhesive_tape
+string/adhesive_tape_title = 记忆胶带"
+id/cb_pic
+string/lasso_picture = 图片"
+id/cb_text
+string/lasso_text_box = 文本框"
+
+### pop_tool_pen.xmltree.txt
+id/root_view
+id/content_layout
+id/select_layout
+id/leftBt
+string/preset = 预设"
+id/rightBt
+string/custom = 自定义"
+id/container_common_pen
+id/penThickness
+string/line_thickness = 线条粗细"
+id/size_seekbar
+id/size_tv
+id/divider_ink_pen
+id/container_ink_pen
+id/penHeight
+string/press_to_adjust = 按压调节"
+id/penPressBar
+id/text_press_value
+id/divider_mark_pen
+id/container_mark_pen
+string/line_drawing = 直线绘制"
+id/iv_draw_line
+id/divider_mark_layer
+id/container_mark_layer
+string/draw_text_bottom = 置底显示"
+id/iv_draw_text_bottom
+id/colorPickerView
+id/customColorPicker
+id/remove_from_pen_box
+id/notchIv
+
+### property_view_addtext.xmltree.txt
+id/btn_color1
+id/btn_color2
+id/btn_color1
+id/btn_color3
+id/btn_color2
+id/btn_color3
+id/textSizeContainer
+id/textSizeLl
+id/textSizeLl
+id/btn_text_color_small
+
+### property_view_eraser.xmltree.txt
+id/ll_size1
+id/btn_size1
+id/img_size1
+id/ll_size2
+id/btn_size2
+id/img_size2
+id/ll_size3
+id/btn_size3
+id/img_size3
+
+### property_view_graph.xmltree.txt
+id/iv_graph0
+id/iv_graph1
+id/iv_graph2
+id/iv_graph3
+id/iv_graph4
+id/iv_graph5
+id/iv_graph6
+
+### property_view_laser_pointer_pen.xmltree.txt
+id/btn_color1
+id/btn_color2
+id/btn_color3
+id/btn_color4
+id/btn_laser_pointer_color
+id/rl_pen_shape1
+id/btn_shape_selected1
+id/btn_line
+id/rl_pen_shape2
+id/btn_shape_selected2
+id/btn_point
+
+### standard_graph_pop.xmltree.txt
+id/root_view
+id/content_layout
+id/select_layout
+id/leftBt
+string/one_stroke_shape = 一笔成型"
+id/rightBt
+string/standard_graph = 标准图形"
+id/line10
+id/select_layout
+id/selectShapeTv
+string/select_shape = 选择形状"
+id/line10
+id/ll_graph_view
+id/selectShapeTv
+id/line3
+id/ll_graph_view
+id/layout_line_size
+id/line3
+id/penGraph
+string/line_thickness = 线条粗细"
+id/graphSeekBar
+id/graphValueTv
+id/line2
+id/layout_line_size
+id/rl_recently_color
+id/line2
+id/colorTv
+string/text_color_recently_used = 最近使用"
+id/color_change
+id/colorTv
+id/recvRecentlyUsed
+id/color_change
+id/container_file_color
+id/rl_recently_color
+id/line4
+id/fill_color_tv
+string/fill_color = 填充颜色"
+id/iv_fill_color_switch
+id/custom_color_layout
+layout/layout_custome_color
+id/notchIv
+
+### toast_scale.xmltree.txt
+id/scale_container
+id/scale_lock_button
+
+### view_note_side_bar.xmltree.txt
+id/cl_sidebar_root
+id/shadowlayout
+id/ll_sidebar
+id/ll_sidebar_header
+id/btn_back
+id/ll_selector_all_container
+id/iv_select_all
+id/tv_pad_choose_all
+string/select_all = 全选"
+id/tv_sidebar_title
+string/thumbnail = 缩略图"
+id/tv_edit
+string/edit = 编辑"
+id/ll_sidebar_fun_tab
+id/iv_side_bar_thumbnail
+id/iv_side_bar_switch
+id/iv_side_bar_bookmark
+id/iv_side_bar_outline
+id/iv_side_bar_search
+id/ll_edit_menu
+id/iv_side_bar_insert
+id/iv_side_bar_copy
+id/iv_side_bar_export
+id/iv_merge_doc
+id/iv_side_bar_delete
+id/fr_thumbnail
+id/rv_thumbnail
+id/ds_thumbnail
+id/ll_thumbnail_drag_hint
+id/line
+string/sidebar_thumbnail_drag_hint = 长按缩略图拖动调整页序"
+id/tv_i_know
+string/i_know = 我知道了"
+id/fr_bookmark
+id/rv_bookmark
+id/ds_bookmark
+id/ll_bookmark_empty_container
+id/tv_bookmark_empty
+string/bookmark_list_empty_tips = 您没有为本文档添加过书签…"
+id/cl_sidebar_search_container
+layout/view_sidebar_search
+id/fl_outline
+id/fr_sidebar_drag
+id/shadowlayout
+id/iv_sidebar_drag
+
+### view_sidebar_search.xmltree.txt
+id/et_search
+string/please_enter_keyword = 请输入关键字"
+id/iv_note_detail_search_clear
+id/et_search
+id/et_search
+id/et_search
+id/rg_search_type
+id/et_search
+id/search_type_print
+string/search_type_text = 文本"
+id/search_type_hand_write
+string/search_type_hand_write = 手写"
+id/search_type_bookmark
+string/bookmark = 书签"
+id/search_type_catalog
+string/search_type_catalog = 大纲"
+id/search_history_container
+id/rg_search_type
+id/textView13
+string/search_history = 搜索历史"
+id/search_history_clear
+id/search_history_tag_list
+id/textView13
+id/ll_tv_result_container
+id/rg_search_type
+id/tv_search_result
+id/tv_no_results_found
+id/fr_result_container
+id/ll_tv_result_container
+id/rl_search_result
+id/ds_search_result
+id/ll_search_loading
+id/rg_search_type
+string/note_detail_searching = 正在搜索关键词..."
+id/progressBar
+id/tv_dialog_content

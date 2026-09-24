@@ -1,0 +1,10 @@
+node_modules/
+test-results/
+*.log
+.DS_Store
+ios/App/build/
+ios/App/DerivedData/
+**/xcuserdata/
+*.ipa
+*.p12
+*.mobileprovision

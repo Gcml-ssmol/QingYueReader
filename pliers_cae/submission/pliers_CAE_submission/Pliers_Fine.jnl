@@ -1,0 +1,252 @@
+# -*- coding: mbcs -*-
+from mesh import *
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from job import *
+from sketch import *
+from visualization import *
+mdb.models['Model-1'].setValues(description=
+    'Reference-size idealized long nose pliers; elastic Cr-V proxy; not a reverse-engineered product.')
+mdb.models['Model-1'].Material(name='CrV_Elastic_Proxy')
+mdb.models['Model-1'].materials['CrV_Elastic_Proxy'].Elastic(table=((210000.0, 
+    0.3), ))
+mdb.models['Model-1'].Material(name='Steel_Workpiece')
+mdb.models['Model-1'].materials['Steel_Workpiece'].Elastic(table=((210000.0, 
+    0.3), ))
+mdb.models['Model-1'].HomogeneousSolidSection(material='CrV_Elastic_Proxy', 
+    name='ToolSteel')
+mdb.models['Model-1'].HomogeneousSolidSection(material='Steel_Workpiece', name=
+    'BlockSteel')
+mdb.models['Model-1'].ConstrainedSketch(name='LeverOutline', sheetSize=450.0)
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-5, 73), point2=(
+    -8, 73))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-8, 73), point2=(
+    -17, 30))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-17, 30), point2=(
+    -18, 15))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-18, 15), point2=(
+    -14, 8))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-14, 8), point2=(
+    -13, -5))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-13, -5), point2=(
+    -5, -15))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-5, -15), point2=(
+    7, -22))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(7, -22), point2=(
+    15, -55))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(15, -55), point2=(
+    21, -95))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(21, -95), point2=(
+    23, -127))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(23, -127), point2=(
+    35, -127))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(35, -127), point2=(
+    34, -95))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(34, -95), point2=(
+    28, -55))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(28, -55), point2=(
+    20, -22))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(20, -22), point2=(
+    14, -10))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(14, -10), point2=(
+    14, 5))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(14, 5), point2=(8, 
+    15))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(8, 15), point2=(-5, 
+    23))
+mdb.models['Model-1'].sketches['LeverOutline'].Line(point1=(-5, 23), point2=(
+    -5, 73))
+mdb.models['Model-1'].sketches['LeverOutline'].CircleByCenterPerimeter(center=(
+    0.0, 0.0), point1=(3.0, 0.0))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Lever', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Lever'].BaseSolidExtrude(depth=9.5, sketch=
+    mdb.models['Model-1'].sketches['LeverOutline'])
+mdb.models['Model-1'].parts['Lever'].DatumPlaneByPrincipalPlane(offset=9.5, 
+    principalPlane=XYPLANE)
+mdb.models['Model-1'].parts['Lever'].DatumAxisByPrincipalAxis(principalAxis=
+    YAXIS)
+mdb.models['Model-1'].ConstrainedSketch(name='HalfLapCut', sheetSize=450.0, 
+    transform=mdb.models['Model-1'].parts['Lever'].MakeSketchTransform(
+    sketchPlane=mdb.models['Model-1'].parts['Lever'].datums[2], 
+    sketchPlaneSide=SIDE1, 
+    sketchUpEdge=mdb.models['Model-1'].parts['Lever'].datums[3], 
+    sketchOrientation=RIGHT, origin=(0.0, 0.0, 9.5)))
+mdb.models['Model-1'].sketches['HalfLapCut'].rectangle(point1=(-60.0, -24.0), 
+    point2=(60.0, 24.0))
+mdb.models['Model-1'].parts['Lever'].CutExtrude(depth=4.75, 
+    flipExtrudeDirection=OFF, sketch=
+    mdb.models['Model-1'].sketches['HalfLapCut'], sketchOrientation=RIGHT, 
+    sketchPlane=mdb.models['Model-1'].parts['Lever'].datums[2], 
+    sketchPlaneSide=SIDE1, sketchUpEdge=
+    mdb.models['Model-1'].parts['Lever'].datums[3])
+mdb.models['Model-1'].parts['Lever'].SectionAssignment(region=Region(
+    cells=mdb.models['Model-1'].parts['Lever'].cells.getSequenceFromMask(mask=(
+    '[#1 ]', ), )), sectionName='ToolSteel')
+mdb.models['Model-1'].parts['Lever'].Surface(name='Jaw', side1Faces=
+    mdb.models['Model-1'].parts['Lever'].faces.getSequenceFromMask(mask=(
+    '[#400000 ]', ), ))
+mdb.models['Model-1'].parts['Lever'].Surface(name='Grip', side1Faces=
+    mdb.models['Model-1'].parts['Lever'].faces.getSequenceFromMask(mask=(
+    '[#8000 ]', ), ))
+mdb.models['Model-1'].parts['Lever'].Surface(name='PinBore', side1Faces=
+    mdb.models['Model-1'].parts['Lever'].faces.getSequenceFromMask(mask=(
+    '[#800000 ]', ), ))
+mdb.models['Model-1'].parts['Lever'].Set(cells=
+    mdb.models['Model-1'].parts['Lever'].cells, name='ALL')
+mdb.models['Model-1'].ConstrainedSketch(name='BlockOutline', sheetSize=100.0)
+mdb.models['Model-1'].sketches['BlockOutline'].rectangle(point1=(-5.0, 58.0), 
+    point2=(5.0, 68.0))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Workpiece', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Workpiece'].BaseSolidExtrude(depth=9.5, sketch=
+    mdb.models['Model-1'].sketches['BlockOutline'])
+mdb.models['Model-1'].parts['Workpiece'].SectionAssignment(region=Region(
+    cells=mdb.models['Model-1'].parts['Workpiece'].cells.getSequenceFromMask(
+    mask=('[#1 ]', ), )), sectionName='BlockSteel')
+mdb.models['Model-1'].parts['Workpiece'].Surface(name='Left', side1Faces=
+    mdb.models['Model-1'].parts['Workpiece'].faces.getSequenceFromMask(mask=(
+    '[#1 ]', ), ))
+mdb.models['Model-1'].parts['Workpiece'].Surface(name='Right', side1Faces=
+    mdb.models['Model-1'].parts['Workpiece'].faces.getSequenceFromMask(mask=(
+    '[#4 ]', ), ))
+mdb.models['Model-1'].parts['Workpiece'].DatumPlaneByPrincipalPlane(offset=0.0, 
+    principalPlane=YZPLANE)
+mdb.models['Model-1'].parts['Workpiece'].PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].parts['Workpiece'].cells, datumPlane=
+    mdb.models['Model-1'].parts['Workpiece'].datums[5])
+mdb.models['Model-1'].parts['Workpiece'].DatumPlaneByPrincipalPlane(offset=4.75
+    , principalPlane=XYPLANE)
+mdb.models['Model-1'].parts['Workpiece'].PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].parts['Workpiece'].cells, datumPlane=
+    mdb.models['Model-1'].parts['Workpiece'].datums[7])
+mdb.models['Model-1'].parts['Workpiece'].Set(faces=
+    mdb.models['Model-1'].parts['Workpiece'].faces.getSequenceFromMask(mask=(
+    '[#300 ]', ), ), name='MID_X')
+mdb.models['Model-1'].parts['Workpiece'].Set(faces=
+    mdb.models['Model-1'].parts['Workpiece'].faces.getSequenceFromMask(mask=(
+    '[#3 ]', ), ), name='MID_Z')
+mdb.models['Model-1'].parts['Workpiece'].Set(faces=
+    mdb.models['Model-1'].parts['Workpiece'].faces.getSequenceFromMask(mask=(
+    '[#22084 ]', ), ), name='BOTTOM')
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='LEFT_JAW', 
+    part=mdb.models['Model-1'].parts['Lever'])
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='RIGHT_JAW', 
+    part=mdb.models['Model-1'].parts['Lever'])
+mdb.models['Model-1'].rootAssembly.rotate(angle=180.0, axisDirection=(0.0, 1.0, 
+    0.0), axisPoint=(0.0, 0.0, 0.0), instanceList=('RIGHT_JAW', ))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('RIGHT_JAW', ), 
+    vector=(0.0, 0.0, 9.5))
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='BLOCK', part=
+    mdb.models['Model-1'].parts['Workpiece'])
+mdb.models['Model-1'].rootAssembly.ReferencePoint(point=(0.0, 0.0, 2.375))
+mdb.models['Model-1'].rootAssembly.Set(name='PIN_LEFT_JAW', referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[8], ))
+mdb.models['Model-1'].Coupling(controlPoint=
+    mdb.models['Model-1'].rootAssembly.sets['PIN_LEFT_JAW'], couplingType=
+    KINEMATIC, influenceRadius=WHOLE_SURFACE, localCsys=None, name=
+    'PinCoupling_LEFT_JAW', surface=
+    mdb.models['Model-1'].rootAssembly.instances['LEFT_JAW'].surfaces['PinBore']
+    , u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
+mdb.models['Model-1'].DisplacementBC(createStepName='Initial', name=
+    'PinBC_LEFT_JAW', region=
+    mdb.models['Model-1'].rootAssembly.sets['PIN_LEFT_JAW'], u1=0.0, u2=0.0, 
+    u3=0.0, ur1=0.0, ur2=0.0, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.ReferencePoint(point=(0.0, 0.0, 7.125))
+mdb.models['Model-1'].rootAssembly.Set(name='PIN_RIGHT_JAW', referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[10], ))
+mdb.models['Model-1'].Coupling(controlPoint=
+    mdb.models['Model-1'].rootAssembly.sets['PIN_RIGHT_JAW'], couplingType=
+    KINEMATIC, influenceRadius=WHOLE_SURFACE, localCsys=None, name=
+    'PinCoupling_RIGHT_JAW', surface=
+    mdb.models['Model-1'].rootAssembly.instances['RIGHT_JAW'].surfaces['PinBore']
+    , u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
+mdb.models['Model-1'].DisplacementBC(createStepName='Initial', name=
+    'PinBC_RIGHT_JAW', region=
+    mdb.models['Model-1'].rootAssembly.sets['PIN_RIGHT_JAW'], u1=0.0, u2=0.0, 
+    u3=0.0, ur1=0.0, ur2=0.0, ur3=UNSET)
+mdb.models['Model-1'].DisplacementBC(createStepName='Initial', name='BlockX', 
+    region=mdb.models['Model-1'].rootAssembly.instances['BLOCK'].sets['MID_X'], 
+    u1=0.0)
+mdb.models['Model-1'].DisplacementBC(createStepName='Initial', name='BlockZ', 
+    region=mdb.models['Model-1'].rootAssembly.instances['BLOCK'].sets['MID_Z'], 
+    u3=0.0)
+mdb.models['Model-1'].DisplacementBC(createStepName='Initial', name='BlockY', 
+    region=mdb.models['Model-1'].rootAssembly.instances['BLOCK'].sets['BOTTOM']
+    , u2=0.0)
+mdb.models['Model-1'].ContactProperty('FrictionlessHard')
+mdb.models['Model-1'].interactionProperties['FrictionlessHard'].NormalBehavior(
+    allowSeparation=ON, constraintEnforcementMethod=DEFAULT, 
+    pressureOverclosure=HARD)
+mdb.models['Model-1'].SurfaceToSurfaceContactStd(adjustMethod=NONE, 
+    createStepName='Initial', interactionProperty='FrictionlessHard', master=
+    mdb.models['Model-1'].rootAssembly.instances['BLOCK'].surfaces['Left'], 
+    name='Contact_LEFT_JAW', slave=
+    mdb.models['Model-1'].rootAssembly.instances['LEFT_JAW'].surfaces['Jaw'], 
+    sliding=FINITE, thickness=ON)
+mdb.models['Model-1'].SurfaceToSurfaceContactStd(adjustMethod=NONE, 
+    createStepName='Initial', interactionProperty='FrictionlessHard', master=
+    mdb.models['Model-1'].rootAssembly.instances['BLOCK'].surfaces['Right'], 
+    name='Contact_RIGHT_JAW', slave=
+    mdb.models['Model-1'].rootAssembly.instances['RIGHT_JAW'].surfaces['Jaw'], 
+    sliding=FINITE, thickness=ON)
+mdb.models['Model-1'].StaticStep(initialInc=0.1, maxInc=0.25, maxNumInc=200, 
+    minInc=1e-07, name='Grip_100N', nlgeom=ON, previous='Initial')
+mdb.models['Model-1'].fieldOutputRequests['F-Output-1'].setValues(frequency=
+    LAST_INCREMENT, variables=('S', 'U', 'RF', 'CF', 'CSTRESS', 'CDISP', 
+    'CFORCE'))
+mdb.models['Model-1'].HistoryOutputRequest(createStepName='Grip_100N', name=
+    'Energy', region=MODEL, variables=('ALLSE', 'ALLSD', 'ALLWK'))
+mdb.models['Model-1'].SurfaceTraction(createStepName='Grip_100N', 
+    directionVector=((0.0, 0.0, 0.0), (-1.0, 0.0, 0.0)), distributionType=
+    UNIFORM, follower=OFF, magnitude=0.328786867133908, name=
+    'GripLoad_LEFT_JAW', region=
+    mdb.models['Model-1'].rootAssembly.instances['LEFT_JAW'].surfaces['Grip'], 
+    resultant=ON, traction=GENERAL)
+mdb.models['Model-1'].SurfaceTraction(createStepName='Grip_100N', 
+    directionVector=((0.0, 0.0, 0.0), (1.0, 0.0, 0.0)), distributionType=
+    UNIFORM, follower=OFF, magnitude=0.328786867133908, name=
+    'GripLoad_RIGHT_JAW', region=
+    mdb.models['Model-1'].rootAssembly.instances['RIGHT_JAW'].surfaces['Grip'], 
+    resultant=ON, traction=GENERAL)
+mdb.models['Model-1'].parts['Lever'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=2.0)
+mdb.models['Model-1'].parts['Lever'].seedEdgeBySize(constraint=FINER, 
+    deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['Lever'].edges.getSequenceFromMask(mask=(
+    '[#0 #c8 #1e ]', ), ), minSizeFactor=0.1, size=0.9)
+mdb.models['Model-1'].parts['Lever'].setMeshControls(elemShape=TET, regions=
+    mdb.models['Model-1'].parts['Lever'].cells, technique=FREE)
+mdb.models['Model-1'].parts['Lever'].setElementType(elemTypes=(ElemType(
+    elemCode=C3D10, elemLibrary=STANDARD), ), regions=(
+    mdb.models['Model-1'].parts['Lever'].cells, ))
+mdb.models['Model-1'].parts['Lever'].generateMesh()
+mdb.models['Model-1'].parts['Workpiece'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=0.9)
+mdb.models['Model-1'].parts['Workpiece'].setMeshControls(elemShape=TET, 
+    regions=mdb.models['Model-1'].parts['Workpiece'].cells, technique=FREE)
+mdb.models['Model-1'].parts['Workpiece'].setElementType(elemTypes=(ElemType(
+    elemCode=C3D10, elemLibrary=STANDARD), ), regions=(
+    mdb.models['Model-1'].parts['Workpiece'].cells, ))
+mdb.models['Model-1'].parts['Workpiece'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(description='Quasistatic pliers contact, per-handle force 20 to 100 N', 
+    memory=80, memoryUnits=PERCENTAGE, model='Model-1', name='Pliers_Fine', 
+    numCpus=2, numDomains=2)
+# Save by xsh12 on 2026_09_24-22.20.45; build 6.14-2 2014_08_22-22.00.46 134497
+from step import *
+from job import *
+mdb.models['Model-1'].HistoryOutputRequest(createStepName='Grip_100N', 
+    interactions=('Contact_LEFT_JAW', ), name='ContactTotals_LEFT_JAW', region=
+    MODEL, variables=('CFN1', 'CFN2', 'CFN3', 'CMN1', 'CMN2', 'CMN3', 'CAREA'))
+mdb.models['Model-1'].HistoryOutputRequest(createStepName='Grip_100N', 
+    interactions=('Contact_RIGHT_JAW', ), name='ContactTotals_RIGHT_JAW', 
+    region=MODEL, variables=('CFN1', 'CFN2', 'CFN3', 'CMN1', 'CMN2', 'CMN3', 
+    'CAREA'))
+# Save by xsh12 on 2026_09_24-22.25.19; build 6.14-2 2014_08_22-22.00.46 134497

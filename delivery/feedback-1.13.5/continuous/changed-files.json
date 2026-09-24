@@ -1,0 +1,22 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "3fcd680a6d7ac655b0f79004c115043ad59f770dcd932f520d4a541af596f1cb",
+    "after": "875cf823ef4a1542138e5210684b6f7f09b7d6e606b94337c8b71b13b3c8cc99"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageLayout.java",
+    "before": null,
+    "after": "cbcb2c2bac8166d4fc4127ff01ab81103c57e13432b03b1fff08b6834a1290e5"
+  },
+  {
+    "file": "tests/note-continuous/NoteContinuousTest.java",
+    "before": null,
+    "after": "7bba4595fd25c5d5b4de63c4c6893d343f14d108067ca5d7a74a4594e1890008"
+  },
+  {
+    "file": "tests/note-continuous/run.ps1",
+    "before": null,
+    "after": "e321408cf2e3647773ca91509749821c29f57b81a5e40356c8619fc5bd7087ee"
+  }
+]

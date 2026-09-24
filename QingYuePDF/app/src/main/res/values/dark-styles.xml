@@ -28,4 +28,29 @@
         <item name="android:windowElevation">12dp</item>
         <item name="android:backgroundDimAmount">0.35</item>
     </style>
+    <style name="CreamDarkAppTheme" parent="DarkAppTheme">
+        <item name="android:colorAccent">#F2A16B</item>
+        <item name="android:colorControlActivated">#F2A16B</item>
+        <item name="android:colorControlNormal">#C9B5A4</item>
+        <item name="android:colorControlHighlight">#33F2A16B</item>
+        <item name="android:textColorPrimary">#F8EEE4</item>
+        <item name="android:textColorSecondary">#C9B5A4</item>
+        <item name="android:colorBackground">#29231F</item>
+        <item name="android:colorBackgroundFloating">#332B25</item>
+        <item name="android:windowBackground">#29231F</item>
+        <item name="android:statusBarColor">#29231F</item>
+        <item name="android:navigationBarColor">#29231F</item>
+        <item name="android:alertDialogTheme">@style/CreamDarkAppDialogTheme</item>
+    </style>
+    <style name="CreamDarkAppDialogTheme" parent="DarkAppDialogTheme">
+        <item name="android:colorAccent">#F2A16B</item>
+        <item name="android:colorControlActivated">#F2A16B</item>
+        <item name="android:colorControlNormal">#C9B5A4</item>
+        <item name="android:colorControlHighlight">#33F2A16B</item>
+        <item name="android:textColorPrimary">#F8EEE4</item>
+        <item name="android:textColorSecondary">#C9B5A4</item>
+        <item name="android:colorBackground">#332B25</item>
+        <item name="android:colorBackgroundFloating">#332B25</item>
+        <item name="android:windowBackground">@drawable/cream_dialog_background_dark</item>
+    </style>
 </resources>

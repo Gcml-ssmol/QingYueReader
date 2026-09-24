@@ -1,0 +1,102 @@
+[
+  {
+    "file": "README.md",
+    "before": "cfd5b0ce3246732ef46a5c3feb025579da4a40439b25e25ae46e6e57898c2e31",
+    "after": "241efc766499a62dde43877febb32ed1e91f9170cfb2b766f7752d58846aa04d"
+  },
+  {
+    "file": "app/build.gradle",
+    "before": "913be085d90d3405f40dc52309b19c7202934eac4df42af817fa7e9327353d47",
+    "after": "4b41b741b5c129f55ed7e0e46307367931141f0ee75005439a0538d6cbd0dc3e"
+  },
+  {
+    "file": "app/src/main/AndroidManifest.xml",
+    "before": "91509f044bad8a1c0d620c3704164cf17c29e1e3454b1f6022cbc560c924b956",
+    "after": "5b94b8d8bc8d9928021d32849ead77a7b90804d6fd5d0479cbde38d9fd3e503f"
+  },
+  {
+    "file": "build-apk.ps1",
+    "before": "64fa970d84a524386102a9158f77a24419a570eedb7f456ac3a1ea53f77af9b6",
+    "after": "47c22fb6af5a7f243b1aca974f7b90f7b875940409038258fd8db9f864a85cb0"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/BackupManager.java",
+    "before": "de917e051d38193f5489214628420cf1075fc563628d7a689c4bdaa56dba567b",
+    "after": "83ca6dcbd2834566be0942b275bdfea4c9a156339c9dd2e92df99eaaac7f87ca"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/DocumentEditLease.java",
+    "before": null,
+    "after": "2b9d938c2fff97da6aeb7c1751e1671f58e496ca01e2ab632ff8f39c96e52a87"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/LibraryStore.java",
+    "before": "09eb5826af21cdd9f9dbc5ff07363cb885be3e58bcacaa6d60c3c498546f8a14",
+    "after": "f73768216ba1df7caf7666d3f77ff9c7e6807dae19ac8c9ba11e1ef697254d96"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteDocument.java",
+    "before": "11a9f0acac81c95f952e9f24f15e3316895f186208bde75002133f323b0020c6",
+    "after": "f7357d3f09e3831aa6029d85f59c44d473be41ebe10164f00e1b57907fdcb433"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/OcrSidecar.java",
+    "before": "15dea31f13f6feeeb7e0bb164082057b56e1a4a086e13185339699dab6002256",
+    "after": "16b327a62891b133e44395a3a72fb29442f041183314423fcdd66442c3b85615"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfBlankPageEditor.java",
+    "before": null,
+    "after": "8b999aeb6969614522e17653d6683afbe0b20874f825627af5bfbb278d266d1e"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfPageInsertion.java",
+    "before": null,
+    "after": "99b55d62c7eedb56e649e48e932ae0a70b61c87581f154c8dc6a9818685c7fe4"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/QingYueApplication.java",
+    "before": "cad777dc61052910ed0f9d0c4957f6f7182acbd5b5f0965605638cf8babfe4c9",
+    "after": "d9dedc8f570d47e14e6dc80104f1c5a651cad12641de58a353a8413fe90ceb47"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ReaderDocument.java",
+    "before": "4db844dfcc1a098d8835ac146ab230c4864a1a0a00ff60a46f737f8cc8726072",
+    "after": "2aaa54eed0a9fc006b87601defa8d4149bf9d21f8addd286f7fd542c8ee236ac"
+  },
+  {
+    "file": "tests/ocr-sidecar-v2/OcrSidecarV2Test.java",
+    "before": "cf17456fa23d3ededcd876b88c3b98415e2d26dd405177027092ccaa4c2dfb2c",
+    "after": "6573d6fd9e09f65d0ad5a14c2f2a9dfa70115536bb86e8d396fd674845e87bde"
+  },
+  {
+    "file": "tests/pdf-page-insertion/android/content/Context.java",
+    "before": null,
+    "after": "37bb557b5088d74e2fccb91c2959accad2808f0fa424daa2fd1aa759f3e31900"
+  },
+  {
+    "file": "tests/pdf-page-insertion/PdfPageInsertionTest.java",
+    "before": null,
+    "after": "a6cd4d8374c8e01d136e205a31a0f4232c10d27d5ed48eaec63d1abbc346c13d"
+  },
+  {
+    "file": "tests/pdf-page-insertion/run.ps1",
+    "before": null,
+    "after": "345b21dd1e86f495024755c4ec7389f279a1022ecc7852cd1a6df960d607398d"
+  },
+  {
+    "file": "tests/crash-diagnostics/src/cn/qingyue/pdf/PdfPageInsertion.java",
+    "before": null,
+    "after": "bc3d49ba378bb17812aec5cc44e501c7113d1227d333c68b404970dae5271862"
+  },
+  {
+    "file": "tests/crash-diagnostics/src/cn/qingyue/pdf/CrashDiagnosticsTest.java",
+    "before": "1bf68d82b704eea2826928fffb6e383120acc2391d39410ac6ba657fd2885320",
+    "after": "f391e48274b99655436ced5c26c315a6921ace473c4056d5cc9cfa6affc6c1a2"
+  },
+  {
+    "file": "tests/crash-diagnostics/src/android/app/Application.java",
+    "before": "2b311e39f334123e02e9599b5492b739c020e492d5678a0b41f58e90b79a7a91",
+    "after": "7a1cd07d5e94ccba994a5ca2338aa900fe653bde6aefb3da75fe8dee8df255d0"
+  }
+]

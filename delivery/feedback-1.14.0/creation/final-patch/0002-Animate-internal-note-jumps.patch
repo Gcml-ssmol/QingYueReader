@@ -1,0 +1,25 @@
+From b3badfcfb16c946fd52598366b1d1f72f60255a8 Mon Sep 17 00:00:00 2001
+From: QingYue Creation Task <creation-task@local>
+Date: Thu, 24 Sep 2026 23:21:01 +0800
+Subject: [PATCH 2/3] Animate internal note jumps
+
+---
+ app/src/main/java/cn/qingyue/pdf/MainActivity.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app/src/main/java/cn/qingyue/pdf/MainActivity.java b/app/src/main/java/cn/qingyue/pdf/MainActivity.java
+index 43efc89..37e69b5 100644
+--- a/app/src/main/java/cn/qingyue/pdf/MainActivity.java
++++ b/app/src/main/java/cn/qingyue/pdf/MainActivity.java
+@@ -558,7 +558,7 @@ public class MainActivity extends ThemedActivity {
+     }
+     private String safeMessage(Throwable failure){String message=failure==null?null:failure.getMessage();return message==null||message.trim().isEmpty()?"操作未完成，请检查本机存储后重试。":message;}
+ 
+-    private boolean handleInternalJump(Intent intent){if(intent==null||!intent.hasExtra("docId"))return false;String id=intent.getStringExtra("docId");int page=(int)Math.max(0,Math.min(Integer.MAX_VALUE,longExtra(intent,"page",0)));long notePageId=longExtra(intent,"notePageId",0);LibraryItem target=null;for(LibraryItem item:docs)if(item.id.equals(id)){target=item;break;}setIntent(new Intent(this,MainActivity.class));if(target==null||target.isTrashed()){toast(target==null?"来源文档已不存在":"来源文档位于最近删除，请先恢复");return true;}if(target.isNote()){target.opened=System.currentTimeMillis();if(!save())return true;lastOpenedNoteId=target.id;Intent note=new Intent(this,NoteActivity.class).putExtra("id",target.id).putExtra("name",target.name).putExtra("page",Math.max(0,page));if(notePageId>0)note.putExtra("notePageId",notePageId);startActivity(note);}else{target.page=Math.max(0,Math.min(page,target.pages-1));open(target);if(pdfView!=null)pdfView.jumpTo(target.page);}return true;}
++    private boolean handleInternalJump(Intent intent){if(intent==null||!intent.hasExtra("docId"))return false;String id=intent.getStringExtra("docId");int page=(int)Math.max(0,Math.min(Integer.MAX_VALUE,longExtra(intent,"page",0)));long notePageId=longExtra(intent,"notePageId",0);LibraryItem target=null;for(LibraryItem item:docs)if(item.id.equals(id)){target=item;break;}setIntent(new Intent(this,MainActivity.class));if(target==null||target.isTrashed()){toast(target==null?"来源文档已不存在":"来源文档位于最近删除，请先恢复");return true;}if(target.isNote()){target.opened=System.currentTimeMillis();if(!save())return true;lastOpenedNoteId=target.id;Intent note=new Intent(this,NoteActivity.class).putExtra("id",target.id).putExtra("name",target.name).putExtra("page",Math.max(0,page));if(notePageId>0)note.putExtra("notePageId",notePageId);startActivity(note);NoteMotion.applyActivityTransition(this,true);}else{target.page=Math.max(0,Math.min(page,target.pages-1));open(target);if(pdfView!=null)pdfView.jumpTo(target.page);}return true;}
+     private long longExtra(Intent intent,String key,long fallback){if(intent==null||intent.getExtras()==null)return fallback;Object value=intent.getExtras().get(key);if(value instanceof Number)return ((Number)value).longValue();if(value instanceof String)try{return Long.parseLong(((String)value).trim());}catch(NumberFormatException ignored){}return fallback;}
+     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(!initialized||inserting!=null&&!inserting.finished)return;load();showLibrary();if(!handleInternalJump(intent)&&!openSourceIntent(intent))handleIncomingIntent(intent);}
+     private boolean openSourceIntent(Intent intent){
+-- 
+2.53.0.windows.3
+

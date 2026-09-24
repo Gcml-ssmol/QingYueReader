@@ -1,0 +1,236 @@
+[
+  {
+    "task": "continuous",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "3fcd680a6d7ac655b0f79004c115043ad59f770dcd932f520d4a541af596f1cb",
+    "after": "875cf823ef4a1542138e5210684b6f7f09b7d6e606b94337c8b71b13b3c8cc99"
+  },
+  {
+    "task": "continuous",
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageLayout.java",
+    "before": null,
+    "after": "cbcb2c2bac8166d4fc4127ff01ab81103c57e13432b03b1fff08b6834a1290e5"
+  },
+  {
+    "task": "continuous",
+    "file": "tests/note-continuous/NoteContinuousTest.java",
+    "before": null,
+    "after": "7bba4595fd25c5d5b4de63c4c6893d343f14d108067ca5d7a74a4594e1890008"
+  },
+  {
+    "task": "continuous",
+    "file": "tests/note-continuous/run.ps1",
+    "before": null,
+    "after": "e321408cf2e3647773ca91509749821c29f57b81a5e40356c8619fc5bd7087ee"
+  },
+  {
+    "task": "ui",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+    "before": "e561f9014d0c18d3de05d8c3e7a712d0750315b989575c30554313862b4ae662",
+    "after": "4e4931f0f7baf89fa76093ba84667eaaf00621a90f9e64be9b6e991039e65963"
+  },
+  {
+    "task": "ui",
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java",
+    "before": "384378dbeee53e663b0d6005e72f4ac93e12f80ea405519e9ab838fd881ac469",
+    "after": "bec8664161131892ce349a483bac21a249e35f88c17a9a00875ba9fab15a47bc"
+  },
+  {
+    "task": "ui",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java",
+    "before": null,
+    "after": "b7b50ca24f86c80fa7cbba11ebb19e940eb889811333226726c60cf3015cf29d"
+  },
+  {
+    "task": "ui",
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionPlacement.java",
+    "before": null,
+    "after": "efa617660c8cb064c875fda972e1ca376d775e4b066889349686e0622ffe586a"
+  },
+  {
+    "task": "ui",
+    "file": "tests/note-action-menu/NoteActionPlacementTest.java",
+    "before": null,
+    "after": "84e96e6931a37780709228f8b724af92a30db26a80d745a3173f6d4a13bb9445"
+  },
+  {
+    "task": "ui",
+    "file": "tests/note-action-menu/run.ps1",
+    "before": null,
+    "after": "fdc8960f2fd048a22b8778269a1987770fa4b7ca2c13e009ab5af628f0fa4edc"
+  },
+  {
+    "task": "qa",
+    "file": "delivery/1.13.5-reference-qa.md",
+    "before": null,
+    "after": "5f61d442cdcd0989bb1afbcbe551154967301de1cd7ac3e7290cbae331a5e967"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/README.md",
+    "before": null,
+    "after": "1e2f9a5c76b19499738b5ba0da15cd9e9aef8d2142224fefb0de3c11c41dd79e"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/run.ps1",
+    "before": null,
+    "after": "eafe0a7e5b12538a99273dc21f5f24234d372ce238b0a7cc181e3b58ee152635"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/app/Dialog.java",
+    "before": null,
+    "after": "bbe6678dfdfdc7b98c97a7f7a4456a393775b3c44dc3e2f2f5b9bad1cee2cc7a"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/content/Context.java",
+    "before": null,
+    "after": "2935bb193990904e7459480dc0a5fe9bdb4e93efd5b454aab47cbde518859173"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/content/res/Resources.java",
+    "before": null,
+    "after": "2edaa8b4cf7205e94600922738dd155dce3007f9c5a1b46ccea34c182a64310f"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Bitmap.java",
+    "before": null,
+    "after": "85cbe8e70410ea8b2f8d8df43bedc2f86cc7cc2e92dc7a6269f16978b17114ad"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/BitmapFactory.java",
+    "before": null,
+    "after": "f21480ae0d206b29a4f634d5ad7d992f7be66d091620c196f7f58259a0d74f78"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Canvas.java",
+    "before": null,
+    "after": "7d7af7bf615818c5f3ba8eb61dac6a146fd932710cd1d0db4ef3fcbeca6d6f65"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Color.java",
+    "before": null,
+    "after": "57afa7fbacbb788ca1b7dddd596116355d9c4eefd2bcae81ebe66130a8e9e7fc"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Paint.java",
+    "before": null,
+    "after": "518bb89a1ea839bc80d77dd530a9138f86686d1598e01dba699e34e2129266d2"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Path.java",
+    "before": null,
+    "after": "6faf843586d19bdc08bbe94741a4392286afb3bd384cc06861152309ba062676"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/Rect.java",
+    "before": null,
+    "after": "badccc0f97c245a7db47bf034ad04e06f0ccfee922697cdabb7be3af93a7963c"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/graphics/RectF.java",
+    "before": null,
+    "after": "10e72d160ae8643c3bb99fc9e8d67bfaaa4ffbc926cca3620b925407eb49f774"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/R.java",
+    "before": null,
+    "after": "94c3beb0bd86bdb4d4035853bfb5a59046305ff3ce0c1e6bc697a5a5fba45851"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/util/DisplayMetrics.java",
+    "before": null,
+    "after": "8c99aafbdd1854557a5f28c5a5761af908ab72e027215ef7a18209256eba34fd"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/util/LruCache.java",
+    "before": null,
+    "after": "e300518daeeb89c3ae5e9202641f07dbf09f2237d936675e996bd65dca3613ab"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/Gravity.java",
+    "before": null,
+    "after": "186570f96d6ca65b427ddcccb9a90df68317d21983792e1410136ae3ae81ea03"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/MotionEvent.java",
+    "before": null,
+    "after": "5a00d46654c632ed83756f8f7c9e4fd37bcc2ab2946b55d25f7759d7c634f478"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/View.java",
+    "before": null,
+    "after": "c90d3adf03602e6af99639f3cc98aa25339890728cfbcb3e582e8ae7d11b6531"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/ViewGroup.java",
+    "before": null,
+    "after": "fa605375127b80c3f950adbff249816c051e6f8ba33052247743fbf25c7dbd94"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/ViewParent.java",
+    "before": null,
+    "after": "98159a8185561229729e721a0111f8779e4239829ff390bdcb6e4bdcf6951b1b"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/Window.java",
+    "before": null,
+    "after": "2f0e7cc114dfc2a21ece67394cdb98f42595085076ca66dd512f54810f9063ac"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/view/WindowManager.java",
+    "before": null,
+    "after": "02fba66bf3709060857c7467f4abd6ddf60b27c4f260f10f4c3b056fbc5ca14d"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/widget/LinearLayout.java",
+    "before": null,
+    "after": "3ff3527844dc618bc8972bd1920d0d9a90652b74f99bbf9a7b0e4bc5e4be3ec6"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/widget/ScrollView.java",
+    "before": null,
+    "after": "eac75c591fdd4a7b19b128d0533a686751c234a5ad9ff6a3ba0c62237fe3d06c"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/android/widget/TextView.java",
+    "before": null,
+    "after": "a7cf20bb844f6c79138a0d45d1cd3d8e3f1b04917e478ed8a1188e14bc1ea16f"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java",
+    "before": null,
+    "after": "48c8c979bbe217b43dafffdef45b7c74471049679543898c1be06b1299151d17"
+  },
+  {
+    "task": "qa",
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/Support.java",
+    "before": null,
+    "after": "fde3da6af8ed882c98e327c853d5e2fa891b24befaa7e45eac6576ce181dc3d4"
+  }
+]

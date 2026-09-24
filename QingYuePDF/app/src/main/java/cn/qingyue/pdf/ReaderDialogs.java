@@ -41,6 +41,8 @@ public final class ReaderDialogs {
 
     public interface SettingsChanged { void changed(boolean horizontal, boolean twoFinger); }
     public interface PageSelection { void selected(int zeroBased); }
+    public interface AdvancedToolSelection { void selected(int tool); }
+    public interface BookmarkSaved { void save(String label); }
 
     public static Dialog menu(Activity owner, boolean horizontal, Runnable settings,
             Runnable fit, Runnable clear, Runnable help) {
@@ -143,13 +145,73 @@ public final class ReaderDialogs {
         page.addView(label, new LinearLayout.LayoutParams(0, -2, 1));
         dialog.body.addView(page, new LinearLayout.LayoutParams(-1, -2));
         gap(dialog.body, 17);
-        TextView note = text(owner, "清空后可点击工具栏的撤销按钮恢复。其他页面的批注保持不变。", 13, AppColors.MUTED);
+        TextView note = text(owner, "清空后可立即撤销；即使离开页面，也可恢复最近一次清空前的内容。其他页面不受影响。", 13, AppColors.MUTED);
         note.setLineSpacing(dp(owner, 4), 1f);
         dialog.body.addView(note);
         gap(dialog.body, 24);
         buttons(dialog, "清空批注", WARNING_SOFT, WARNING, () -> dialog.complete(confirmed));
         dialog.show();
         return dialog;
+    }
+
+    /** Expanded menu used by ReaderActions integrations; the legacy overload stays source compatible. */
+    public static Dialog menu(Activity owner,boolean horizontal,Runnable settings,Runnable fit,
+            Runnable navigate,Runnable advanced,Runnable export,boolean canRestore,Runnable restore,
+            Runnable clear,Runnable help){
+        return menu(owner,horizontal,settings,fit,null,navigate,advanced,null,null,export,canRestore,restore,clear,help);
+    }
+
+    public static Dialog menu(Activity owner,boolean horizontal,Runnable settings,Runnable fit,
+            Runnable navigate,Runnable advanced,Runnable selectText,Runnable source,Runnable export,
+            boolean canRestore,Runnable restore,Runnable clear,Runnable help){
+        return menu(owner,horizontal,settings,fit,null,navigate,advanced,selectText,source,export,canRestore,restore,clear,help);
+    }
+
+    public static Dialog menu(Activity owner,boolean horizontal,Runnable settings,Runnable fit,Runnable zoom,
+            Runnable navigate,Runnable advanced,Runnable selectText,Runnable source,Runnable export,
+            boolean canRestore,Runnable restore,Runnable clear,Runnable help){
+        return menu(owner,horizontal,settings,fit,zoom,navigate,advanced,selectText,source,null,export,canRestore,restore,clear,help);
+    }
+
+    public static Dialog menu(Activity owner,boolean horizontal,Runnable settings,Runnable fit,Runnable zoom,
+            Runnable navigate,Runnable advanced,Runnable selectText,Runnable source,Runnable recognize,Runnable export,
+            boolean canRestore,Runnable restore,Runnable clear,Runnable help){
+        CardDialog dialog=new CardDialog(owner);title(dialog,"阅读工具","导航、批注整理与可靠导出","settings",false,true);gap(dialog.body,16);
+        action(dialog,"book","目录、缩略图与书签","浏览原文目录、页缩略图、手动书签和批注",false,navigate);gap(dialog.body,8);
+        action(dialog,"pen","批注增强工具","圆珠笔、铅笔、局部橡皮、套索与规则图形",false,advanced);gap(dialog.body,8);
+        if(selectText!=null){action(dialog,"select","选择 PDF 文字","拖动文字后复制、标亮或摘录到笔记",false,selectText);gap(dialog.body,8);}
+        if(recognize!=null){action(dialog,"text","识别扫描文字（OCR）","离线识别中英文，导出可搜索 PDF 副本",false,recognize);gap(dialog.body,8);}
+        if(source!=null){action(dialog,"note","摘录到笔记","保存当前页或选中文字，从笔记返回原页",false,source);gap(dialog.body,8);}
+        action(dialog,"note","导出与分享","保留文字层的带批注 PDF，或导出当前页 PNG",false,export);gap(dialog.body,8);
+        action(dialog,"settings","阅读设置",horizontal?"左右翻页 · 手势与阅读偏好":"上下滚动 · 手势与阅读偏好",false,settings);gap(dialog.body,8);
+        if(zoom!=null){action(dialog,"fit","缩放比例","50%—300%，可输入数值或拖动滑条",false,zoom);gap(dialog.body,8);}
+        action(dialog,"fit",horizontal?"恢复整页显示":"恢复适合宽度","重置页面缩放与位置",false,fit);gap(dialog.body,8);
+        action(dialog,"info","操作说明","翻页、搜索、文字选择与批注提示",false,help);
+        if(canRestore){gap(dialog.body,14);action(dialog,"undo","恢复最近清空","合并清空前内容与清空后新增笔迹",false,restore);}gap(dialog.body,14);
+        action(dialog,"eraser","清空本页批注","保留最近一次清空恢复快照",true,clear);dialog.show();return dialog;
+    }
+
+    public static Dialog textSelection(Activity owner,String quote,Runnable copy,Runnable highlight,Runnable source){
+        CardDialog dialog=new CardDialog(owner);title(dialog,"已选择文字","复制、标亮，或带页码摘录到笔记","select",false,true);gap(dialog.body,16);
+        TextView preview=text(owner,safe(quote),14,AppColors.INK);preview.setMaxLines(5);preview.setLineSpacing(dp(owner,3),1f);preview.setPadding(dp(owner,13),dp(owner,12),dp(owner,13),dp(owner,12));preview.setBackground(shape(owner,AppColors.BACKGROUND,13));dialog.body.addView(preview,new LinearLayout.LayoutParams(-1,-2));gap(dialog.body,14);
+        action(dialog,"note","复制文字","复制到系统剪贴板",false,copy);gap(dialog.body,8);
+        action(dialog,"marker","文字高亮","保存为可定位的文字层高亮，与手绘荧光笔分开",false,highlight);gap(dialog.body,8);
+        action(dialog,"book","摘录到笔记","保留文档、页码与原文，可从笔记返回此处",false,source);dialog.show();return dialog;
+    }
+
+    public static Dialog bookmark(Activity owner,int page1Based,String initial,BookmarkSaved callback){
+        CardDialog dialog=new CardDialog(owner);title(dialog,"添加书签","第 "+Math.max(1,page1Based)+" 页","book",false,true);gap(dialog.body,16);
+        EditText input=new EditText(owner);input.setSingleLine(true);input.setText(safe(initial));input.setSelectAllOnFocus(true);input.setHint("例如：第三章重点");input.setTextSize(15);input.setTextColor(AppColors.INK);input.setHintTextColor(AppColors.MUTED);GradientDrawable field=shape(owner,AppColors.BACKGROUND,12);field.setStroke(dp(owner,1),AppColors.BORDER);input.setBackground(field);input.setPadding(dp(owner,12),0,dp(owner,12),0);dialog.body.addView(input,new LinearLayout.LayoutParams(-1,dp(owner,50)));gap(dialog.body,18);
+        buttons(dialog,"保存书签",AppColors.ACCENT,AppColors.ON_ACCENT,()->{String value=input.getText().toString().trim();if(value.length()==0){input.setError("请输入书签名称");return;}dialog.complete(callback==null?null:()->callback.save(value.length()>240?value.substring(0,240):value));});dialog.show();return dialog;
+    }
+
+    public static Dialog advancedTools(Activity owner,boolean hasSelection,AdvancedToolSelection callback,Runnable copy,Runnable delete){
+        CardDialog dialog=new CardDialog(owner);title(dialog,"批注增强工具","多种文具、局部擦除、套索与规则图形","pen",false,true);gap(dialog.body,16);
+        int[] tools={PdfReaderView.TOOL_BALLPOINT,PdfReaderView.TOOL_PENCIL,PdfReaderView.TOOL_LOCAL_ERASER,PdfReaderView.TOOL_LASSO,PdfReaderView.TOOL_LINE,PdfReaderView.TOOL_RECTANGLE,PdfReaderView.TOOL_ELLIPSE,PdfReaderView.TOOL_ARROW};
+        String[] icons={"ballpoint","pencil","eraser","select","line","rectangle","circle","arrow"},names={"圆珠笔","铅笔","局部橡皮","套索选择","直线","矩形","椭圆","箭头"},details={"固定线宽，不随笔压变化","柔和透明笔迹，支持笔压","只擦除笔迹经过的局部，不删除整笔","圈选后再次拖动即可移动","拖动起点与终点绘制","拖动两角绘制","拖动外接框绘制","拖动绘制带箭头直线"};
+        for(int i=0;i<tools.length;i++){final int tool=tools[i];action(dialog,icons[i],names[i],details[i],false,()->{if(callback!=null)callback.selected(tool);});if(i+1<tools.length)gap(dialog.body,8);}
+        if(hasSelection){gap(dialog.body,16);section(dialog.body,"当前套索选择","移动由页面拖动完成");gap(dialog.body,8);action(dialog,"plus","复制所选笔迹","复制后轻微偏移，仍可继续移动",false,copy);gap(dialog.body,8);action(dialog,"trash","删除所选笔迹","可使用撤销恢复",true,delete);}
+        dialog.show();return dialog;
     }
 
     public static Dialog jump(Activity owner, int current1Based, int total, PageSelection callback) {
@@ -215,7 +277,7 @@ public final class ReaderDialogs {
             return false;
         });
         gap(dialog.body, 24);
-        buttons(dialog, "前往", AppColors.ACCENT, AppColors.SURFACE, go);
+        buttons(dialog, "前往", AppColors.ACCENT, AppColors.ON_ACCENT, go);
         dialog.show();
         input.requestFocus();
         input.post(() -> {
@@ -361,7 +423,7 @@ public final class ReaderDialogs {
     }
 
     private static void choice(LinearLayout view, boolean selected, String description) {
-        GradientDrawable background = shape(view.getContext(), selected ? 0xffffedde : AppColors.BACKGROUND, 15);
+        GradientDrawable background = shape(view.getContext(), selected ? (AppColors.isClassic() ? 0xffffedde : AppColors.SOFT) : AppColors.BACKGROUND, 15);
         background.setStroke(dp(view.getContext(), 1), selected ? AppColors.ACCENT : AppColors.BORDER);
         view.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ad4a14), background, null));
         view.setSelected(selected);
@@ -412,7 +474,7 @@ public final class ReaderDialogs {
     }
 
     private static void singleButton(CardDialog dialog, String title, Runnable action) {
-        Button button = button(dialog.owner, title, AppColors.ACCENT, AppColors.SURFACE);
+        Button button = button(dialog.owner, title, AppColors.ACCENT, AppColors.ON_ACCENT);
         button.setOnClickListener(v -> action.run());
         dialog.body.addView(button, new LinearLayout.LayoutParams(-1, -2));
     }
@@ -468,6 +530,8 @@ public final class ReaderDialogs {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(color);
         drawable.setCornerRadius(dp(context, radius));
+        if (!AppColors.isClassic() && radius > 0)
+            drawable.setStroke(dp(context, 1), color == AppColors.ACCENT ? AppColors.ACCENT : AppColors.BORDER);
         return drawable;
     }
     private static RippleDrawable ripple(Context context, int color, int radius) {
@@ -483,6 +547,7 @@ public final class ReaderDialogs {
         final LinearLayout body;
         private ViewTreeObserver.OnGlobalLayoutListener listener;
         private int width, height;
+        private boolean completed;
 
         CardDialog(Activity owner) {
             super(owner, resolveTheme(owner));
@@ -520,6 +585,8 @@ public final class ReaderDialogs {
         }
 
         void complete(Runnable action) {
+            if(completed||!isShowing())return;
+            completed=true;
             dismiss();
             if (!owner.isFinishing() && !owner.isDestroyed() && action != null) action.run();
         }

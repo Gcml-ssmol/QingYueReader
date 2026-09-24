@@ -1,0 +1,42 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "875cf823ef4a1542138e5210684b6f7f09b7d6e606b94337c8b71b13b3c8cc99",
+    "after": "2f8e2ce9a5025382e3c61259fbd8431f5c27cf836e3b74acc29202c76f690f50"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteDocument.java",
+    "before": "f7357d3f09e3831aa6029d85f59c44d473be41ebe10164f00e1b57907fdcb433",
+    "after": "9b948b3153a3e483192547df0e64d9a84daf8583de267538d35b55f4ffe28605"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteStore.java",
+    "before": "84b4fab029213d9f16415dfd751549e1d55d2ab31de8c40ba9948b242851d72d",
+    "after": "27ca201663de4c49b3d6b0cbef8ed4bb46d40aa96592bd490a11ba30f782ce65"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/ZoomLimits.java",
+    "before": "f887dd35d1b0b51004fd5b1d33434415ceff8e31c5183785382d9715ef6128a1",
+    "after": "3fea371210bb8c999eae505bead28d25dbd6cee02e1cf266b120b1edc4c84a7d"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteEditorOps.java",
+    "before": null,
+    "after": "e43d2e74e8563e49a16ce2b58416cfe983aa84e08e8e8efc3bbe2510323baa02"
+  },
+  {
+    "file": "tests/note-editor/NoteEditorTest.java",
+    "before": null,
+    "after": "f92ecbdea7369753a2c196c4a13ab9ef43b41f73649a10169ef32a97235d251d"
+  },
+  {
+    "file": "tests/note-editor/NoteStoreImageTest.java",
+    "before": null,
+    "after": "067268b1deaebb19557d9004a9b29e7c3d6e8d6a33b98f2ca684f6ee3966876d"
+  },
+  {
+    "file": "tests/note-editor/run.ps1",
+    "before": null,
+    "after": "055c8f2a88b9d72d9ceda732472b536726233d5bbafa5bcb765db9408eed1590"
+  }
+]

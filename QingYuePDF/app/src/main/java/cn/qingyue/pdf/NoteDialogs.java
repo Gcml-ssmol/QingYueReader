@@ -35,7 +35,7 @@ public final class NoteDialogs {
 
     public static Dialog create(Activity owner, Created callback) {
         Card card = new Card(owner);
-        header(card, "新建笔记", "一张纸，装下新的想法", "note");
+        header(card, "新建笔记", "从无限草稿开始，也可选分页纸张", "note");
         gap(card.body, 18);
         EditText name = new EditText(owner);
         name.setSingleLine(true);
@@ -52,7 +52,18 @@ public final class NoteDialogs {
         gap(card.body, 22);
         card.body.addView(label(owner, "纸张底纹", 13, AppColors.MUTED));
         gap(card.body, 10);
-        final String[] chosen = {"blank", "A4"};
+        NoteCreationChoices choices = new NoteCreationChoices(owner.getSharedPreferences("note_creation", Context.MODE_PRIVATE));
+        LinearLayout modes = row(owner);
+        TextView draft = label(owner, "∞ 无限草稿\n自由延伸的画布", 14, AppColors.INK);
+        TextView paged = label(owner, "▤ 分页笔记\n连续的固定纸张", 14, AppColors.INK);
+        draft.setGravity(Gravity.CENTER); paged.setGravity(Gravity.CENTER);
+        draft.setPadding(dp(owner, 8), dp(owner, 11), dp(owner, 8), dp(owner, 11));
+        paged.setPadding(dp(owner, 8), dp(owner, 11), dp(owner, 8), dp(owner, 11));
+        modes.addView(draft, new LinearLayout.LayoutParams(0, -2, 1));
+        LinearLayout.LayoutParams pagedSize = new LinearLayout.LayoutParams(0, -2, 1); pagedSize.leftMargin = dp(owner, 8); modes.addView(paged, pagedSize);
+        selected(draft, "infinite".equals(choices.size)); selected(paged, !"infinite".equals(choices.size));
+        card.body.addView(modes, new LinearLayout.LayoutParams(-1, -2));
+        gap(card.body, 16);
         String[] templates = {"blank", "ruled", "grid"};
         String[] titles = {"全空", "横线", "网格"};
         LinearLayout templateRow = row(owner);
@@ -73,25 +84,26 @@ public final class NoteDialogs {
             if (i > 0) params.leftMargin = dp(owner, 8);
             templateRow.addView(choice, params);
             choice.setOnClickListener(v -> {
-                chosen[0] = value;
+                choices.template(value);
                 for (int k = 0; k < templateCards.length; k++) selected(templateCards[k], templates[k].equals(value));
             });
-            selected(choice, i == 0);
+            selected(choice, templates[i].equals(choices.template));
         }
         card.body.addView(templateRow, new LinearLayout.LayoutParams(-1, -2));
-        gap(card.body, 22);
-        card.body.addView(label(owner, "画布大小", 13, AppColors.MUTED));
-        gap(card.body, 10);
-        String[] keys = {"A3", "A4", "A5", "B4", "B5", "Letter", "infinite"};
-        String[] sizes = {"297 × 420 mm", "210 × 297 mm", "148 × 210 mm", "250 × 353 mm", "176 × 250 mm", "216 × 279 mm", "宽度与长度自由延伸"};
+        LinearLayout pageChoices = column(owner);
+        gap(pageChoices, 22);
+        pageChoices.addView(label(owner, "分页纸张尺寸", 13, AppColors.MUTED));
+        gap(pageChoices, 10);
+        String[] keys = {"A3", "A4", "A5", "B4", "B5", "Letter"};
+        String[] sizes = {"297 × 420 mm", "210 × 297 mm", "148 × 210 mm", "250 × 353 mm", "176 × 250 mm", "216 × 279 mm"};
         View[] sizeCards = new View[keys.length];
-        for (int r = 0; r < 4; r++) {
+        for (int r = 0; r < 3; r++) {
             LinearLayout sizeRow = row(owner);
             for (int col = 0; col < 2 && r * 2 + col < keys.length; col++) {
                 final int index = r * 2 + col;
                 LinearLayout tile = column(owner);
                 tile.setPadding(dp(owner, 13), dp(owner, 11), dp(owner, 13), dp(owner, 11));
-                TextView title = label(owner, keys[index].equals("infinite") ? "∞  无限画布" : keys[index], 14, AppColors.INK);
+                TextView title = label(owner, keys[index], 14, AppColors.INK);
                 title.setTypeface(null, 1);
                 tile.addView(title);
                 TextView detail = label(owner, sizes[index], 10, AppColors.MUTED);
@@ -102,16 +114,20 @@ public final class NoteDialogs {
                 if (col > 0) params.leftMargin = dp(owner, 8);
                 sizeRow.addView(tile, params);
                 tile.setOnClickListener(v -> {
-                    chosen[1] = keys[index];
-                    for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(chosen[1]));
+                    choices.size(keys[index]);
+                    for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(choices.size));
                 });
-                selected(tile, keys[index].equals(chosen[1]));
+                selected(tile, keys[index].equals(choices.size));
             }
-            card.body.addView(sizeRow, new LinearLayout.LayoutParams(-1, -2));
-            if (r < 3) gap(card.body, 8);
+            pageChoices.addView(sizeRow, new LinearLayout.LayoutParams(-1, -2));
+            if (r < 2) gap(pageChoices, 8);
         }
+        card.body.addView(pageChoices, new LinearLayout.LayoutParams(-1, -2));
+        pageChoices.setVisibility("infinite".equals(choices.size) ? View.GONE : View.VISIBLE);
+        draft.setOnClickListener(v -> {choices.draft(); pageChoices.setVisibility(View.GONE); selected(draft, true); selected(paged, false);});
+        paged.setOnClickListener(v -> {choices.paged(); pageChoices.setVisibility(View.VISIBLE); selected(draft, false); selected(paged, true); for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(choices.size));});
         gap(card.body, 14);
-        TextView hint = label(owner, "所有底纹均支持固定纸张与无限画布。双指缩放，随时移动到新的位置。", 12, AppColors.MUTED);
+        TextView hint = label(owner, "无限草稿可自由延伸；分页笔记可上下连续书写。两种模式都支持当前底纹。", 12, AppColors.MUTED);
         hint.setLineSpacing(dp(owner, 3), 1f);
         card.body.addView(hint);
         gap(card.body, 20);
@@ -120,10 +136,11 @@ public final class NoteDialogs {
             String title = name.getText().toString().trim();
             if (title.isEmpty()) { name.setError("给笔记取个名字吧"); name.requestFocus(); return; }
             card.dismiss();
-            if (!owner.isFinishing() && !owner.isDestroyed()) callback.created(title, chosen[0], chosen[1]);
+            if (!owner.isFinishing() && !owner.isDestroyed()) choices.submit(title, callback::created);
         });
         card.body.addView(submit, new LinearLayout.LayoutParams(-1, -2));
         card.show();
+        NoteMotion.enter(card.body);
         return card;
     }
 
@@ -144,7 +161,7 @@ public final class NoteDialogs {
         reset.setOnClickListener(v -> {card.dismiss(); fit.run();});
         card.body.addView(reset, new LinearLayout.LayoutParams(-1, -2));
         gap(card.body, 20);
-        TextView help = label(owner, "图片：点击图片选择，拖动移动，拖动四角等比例缩放。选择后可用垃圾桶删除。\n\n图形：选择直线、圆形、矩形或箭头后，在画布按住拖动，松手完成。长按或再次点击工具可调节粗细与颜色。\n\n无限画布：上下左右均可平移延伸，底纹跟随画布。笔记修改会自动保存。", 12, AppColors.MUTED);
+        TextView help = label(owner, "图片与文本：点击后选择，拖动移动，拖动四角调整大小。文本按钮可插入或编辑文字；选择后可用垃圾桶删除。\n\n图形：选择直线、圆形、矩形或箭头后，在画布按住拖动，松手完成。长按或再次点击工具可调节粗细与颜色。套索可框选内容；橡皮可选局部擦除或整笔擦除。\n\n无限草稿：上下左右均可平移延伸，最高可缩放至 1000%；分页笔记最高 300%。适应页面可恢复初始视图。笔记修改会自动保存。", 12, AppColors.MUTED);
         help.setLineSpacing(dp(owner, 4), 1f);
         card.body.addView(help);
         gap(card.body, 20);
@@ -204,18 +221,22 @@ public final class NoteDialogs {
     static LinearLayout column(Context context) { LinearLayout view = new LinearLayout(context); view.setOrientation(LinearLayout.VERTICAL); return view; }
     static LinearLayout row(Context context) { LinearLayout view = new LinearLayout(context); view.setGravity(Gravity.CENTER_VERTICAL); return view; }
     static TextView label(Context context, String value, int size, int color) { TextView text = new TextView(context); text.setText(value); text.setTextSize(size); text.setTextColor(color); return text; }
-    static GradientDrawable shape(Context context, int color, int radius) { GradientDrawable background = new GradientDrawable(); background.setColor(color); background.setCornerRadius(dp(context, radius)); return background; }
+    static GradientDrawable shape(Context context, int color, int radius) {
+        GradientDrawable background = new GradientDrawable(); background.setColor(color); background.setCornerRadius(dp(context, radius));
+        if (!AppColors.isClassic() && radius > 0) background.setStroke(dp(context, 1), color == AppColors.ACCENT ? AppColors.ACCENT : AppColors.BORDER);
+        return background;
+    }
     static void gap(LinearLayout parent, int size) { parent.addView(new View(parent.getContext()), new LinearLayout.LayoutParams(1, dp(parent.getContext(), size))); }
     private static void selected(View view, boolean selected) {
         if (view == null) return;
-        GradientDrawable background = shape(view.getContext(), selected ? 0xffffedde : AppColors.BACKGROUND, 13);
+        GradientDrawable background = shape(view.getContext(), selected ? (AppColors.isClassic() ? 0xffffedde : AppColors.SOFT) : AppColors.BACKGROUND, 13);
         background.setStroke(dp(view.getContext(), 1), selected ? AppColors.ACCENT : AppColors.BORDER);
         view.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ad4a14), background, null));
         view.setSelected(selected); view.setFocusable(true);
     }
     private static Button button(Activity owner, String title, boolean primary) {
         Button button = new Button(owner); button.setText(title); button.setTextSize(14); button.setAllCaps(false);
-        button.setTextColor(primary ? AppColors.SURFACE : AppColors.ACCENT_DARK);
+        button.setTextColor(primary ? AppColors.ON_ACCENT : AppColors.ACCENT_DARK);
         button.setPadding(dp(owner, 14), dp(owner, 12), dp(owner, 14), dp(owner, 12));
         button.setMinHeight(dp(owner, 48)); button.setMinimumHeight(dp(owner, 48)); button.setStateListAnimator(null); button.setElevation(0);
         button.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ad4a14), shape(owner, primary ? AppColors.ACCENT : AppColors.SOFT, 14), null));

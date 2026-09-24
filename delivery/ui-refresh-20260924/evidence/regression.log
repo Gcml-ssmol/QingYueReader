@@ -1,0 +1,157 @@
+QingYuePDF regression run
+Project:   C:\Users\xsh12\Documents\ChatGPT\笔记app\QingYuePDF
+Artifacts: C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regression\20260924-111439995-efe64398
+[RUN ] pure-java/compile
+[PASS] pure-java/compile
+[RUN ] pure-java/InkPageTest
+PASS: v1 compatibility, v2 pressure/shapes, immutable snapshots, undo/redo, clear recovery, whole/local erase, lasso move/copy, zoom coordinates, pen-only routing, cancellation, corrupt rejection, page isolation
+[PASS] pure-java/InkPageTest
+[RUN ] pure-java/PageMathTest
+PASS: bitmap bounds, extreme aspect ratios, normal aspect ratio, invalid dimensions
+[PASS] pure-java/PageMathTest
+[RUN ] pure-java/PageLayoutTest
+PASS: continuous page layout, mixed sizes, gaps, boundaries, visible ranges, jumps, long documents and invalid inputs
+[PASS] pure-java/PageLayoutTest
+[RUN ] pure-java/ReaderNavigationTest
+PASS: fitted-page swipes, threshold, vertical/diagonal rejection, zoomed panning and outward edge navigation
+[PASS] pure-java/ReaderNavigationTest
+[RUN ] pure-java/ToolSizeTest
+PASS: exact endpoints, independent ranges, exponential response, monotonic sizes, slider round trips, nearest rounding, clamping, invalid floats/tools, InkPage size compatibility
+[PASS] pure-java/ToolSizeTest
+[RUN ] pure-java/ColorPickInputTest
+PASS: finger sampling, pen priority, palm rejection, pointer identity, up/cancel and missing-pointer handling
+[PASS] pure-java/ColorPickInputTest
+[RUN ] pure-java/PopupPlacementTest
+PASS: phone/tablet, anchor edges, keyboard bounds, screen offsets, tiny windows, off-screen anchors, direction selection, invalid screens, 20000 containment cases, and 20000 usable-height fallback cases
+[PASS] pure-java/PopupPlacementTest
+[RUN ] pure-java/TwoFingerTapTest
+PASS: two-finger timing, motion and pinch rejection, identities, stylus/palm, third touch, cancellation, single-tap separation and duplicate prevention
+[PASS] pure-java/TwoFingerTapTest
+[RUN ] pure-java/HorizontalPagingTest
+PASS: page fit across orientations, first/last boundaries, short/diagonal/vertical rejection, zoomed pan and edge turns
+[PASS] pure-java/HorizontalPagingTest
+[RUN ] pure-java/SearchTextTest
+SearchTextTest passed
+[PASS] pure-java/SearchTextTest
+[RUN ] pure-java/NoteDocumentTest
+NoteDocumentTest passed: 21 paper/template combinations, two-axis coordinates, vector shapes, image geometry, undo/redo, serialization and corrupt data rejection.
+[PASS] pure-java/NoteDocumentTest
+[RUN ] script/note-store
+NoteDocumentTest passed: 21 paper/template combinations, two-axis coordinates, vector shapes, image geometry, undo/redo, serialization and corrupt data rejection.
+NoteStoreTest passed: atomic disk roundtrip, pending reopen, stale async save, deletion races, image cleanup and unsafe ID rejection. Desktop Android shims only; no device claim.
+InkStoreDeleteTest passed: pending and disk annotations, deletion, retention and repeated removal.
+[PASS] script/note-store
+[RUN ] script/document-import
+ע: C:\Users\xsh12\Documents\ChatGPT\�ʼ�app\QingYuePDF\app\src\main\java\cn\qingyue\pdf\DocumentText.javaʹ�û򸲸����ѹ�ʱ�� API��
+ע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣
+2026-09-24T03:14:46.823701400Z main ERROR Log4j API could not find a logging provider.
+DocumentImportTest: 23 checks passed; genuine DOC/Word6/DOCX, shared text, cancellation, encodings, limits and invalid inputs
+ImportSessionTest: 33 checks passed; replay, progress, claim, retry and cancellation
+EpubImportTest: spine, paths, XHTML, CJK, DOCTYPE, limits, encryption, XXE and cancellation passed
+[PASS] script/document-import
+[RUN ] script/pdf-search-smoke
+ע: C:\Users\xsh12\Documents\ChatGPT\�ʼ�app\QingYuePDF\app\src\main\java\cn\qingyue\pdf\PdfAnnotationExporter.javaʹ�û򸲸����ѹ�ʱ�� API��
+ע: �й���ϸ��Ϣ, ��ʹ�� -Xlint:deprecation ���±��롣
+PdfSearchSmoke passed: actual PDFBox AAR, per-hit coordinates, selectable text ranges, English + Chinese CMap, page indices, blank text, no match, 200-page cap, replacement cancellation (desktop Android shims; not device UI validation).
+PdfExportSmoke passed: vector overlays/layer order, per-mark alpha reset, source immutability, text retention, range export, cancellation, heap/side/pixel PNG bounds, OOM cleanup, PDF 1.4 upgrade, rotation/crop transforms (desktop PDFBox; no Android renderer/SAF validation).
+[PASS] script/pdf-search-smoke
+[RUN ] script/basic-note-export
+PASS: fixed paper, empty infinite canvas, negative coordinates, pixel caps and excessive range rejection
+[PASS] script/basic-note-export
+[RUN ] script/zoom
+PASS: 50%-300% limits, display, fitted note scales, persistence compatibility and reversed pinches
+[PASS] script/zoom
+[RUN ] script/library-index
+PASS: legacy item isolation, top-level save guard, v2 metadata, filters and stable sorting
+[PASS] script/library-index
+[RUN ] script/library-manager
+javac 17.0.18
+PASS: revision guard, synchronized atomic reads, damaged-index safety, attachment ownership, retryable and durable trash transactions
+[PASS] script/library-manager
+[RUN ] script/backup-archive
+BackupArchiveTest: 69 checks passed; roundtrip, checksums, strict paths, duplicates, limits, cancellation and staging rollback. Desktop Java test only; SAF/device behavior is not claimed.
+[PASS] script/backup-archive
+[RUN ] script/backup-session
+BackupCoordinatorTest: 33 checks passed; replay, rotation, cancellation and retention
+[PASS] script/backup-session
+[RUN ] script/reader-core
+ReaderModuleTest passed: metadata/store/source links, revision-safe async load and cross-instance handoff, corrupt rejection, page calibration, bounded detail tiles, durable clear recovery and post-clear merge.
+[PASS] script/reader-core
+[RUN ] script/backup-integration
+BackupReaderRoundTripTest passed: pending snapshot, KEEP_BOTH, reader/ink/clear, delete rollback
+[PASS] script/backup-integration
+[RUN ] script/tool-preferences
+[PASS] script/tool-preferences
+[RUN ] script/navigation-smoke
+NavigationSmoke passed: named and GoTo targets, nested outline, broken-label fallback, corrupt PDF, cyclic outline; all loads bounded to 10 seconds.
+[PASS] script/navigation-smoke
+[RUN ] script/thumbnail-lifecycle
+ThumbnailLifecycleSmoke passed: delivered bitmaps survive eviction and close; open errors and late callbacks are bounded.
+[PASS] script/thumbnail-lifecycle
+[RUN ] script/crash-diagnostics
+CrashDiagnosticsTest passed: privacy, bounded causes, fatal precedence, prompts, exit attribution, handler delegation
+[PASS] script/crash-diagnostics
+[RUN ] script/delete-lifecycle
+Delete lifecycle and quick eraser static source checks passed
+[PASS] script/delete-lifecycle
+[RUN ] script/recognition
+OCR model bytes, installer pin, and manifest match
+OcrHocrTest passed
+OcrCancellationTest passed
+OcrSelectionTest passed
+[PASS] script/recognition
+[RUN ] script/library-sidebar
+LibrarySidebarModelTest passed
+[PASS] script/library-sidebar
+[RUN ] script/pdf-text-import
+PdfTextImportTest passed: UTF8, UTF16, GB18030, multiline, invalid/binary/empty and size limits
+[PASS] script/pdf-text-import
+[RUN ] script/global-search
+GlobalSearchTest passed: cross-source PDF/note/OCR/summary results, 0-based jumps, persistence, incremental reuse, changed/deleted invalidation, cancellation atomicity, size bounds, corrupt-cache rejection, and actual PDFBox English/Chinese extraction (desktop Android shims; not device UI validation).
+RecognitionOcrFingerprintTest passed
+[PASS] script/global-search
+[RUN ] script/ocr-sidecar-v2
+OcrSidecarV2Test passed: legacy converted preservation, strict search, verified round trip, changed PDF/identity, malformed data.
+[PASS] script/ocr-sidecar-v2
+
+Regression summary
+
+Name                           Status Seconds Detail
+----                           ------ ------- ------
+pure-java/compile              PASS      1.30 11 tests
+pure-java/InkPageTest          PASS      0.10 cn.qingyue.pdf.InkPageTest
+pure-java/PageMathTest         PASS      0.09 cn.qingyue.pdf.PageMathTest
+pure-java/PageLayoutTest       PASS      0.10 cn.qingyue.pdf.PageLayoutTest
+pure-java/ReaderNavigationTest PASS      0.08 cn.qingyue.pdf.ReaderNavigationTest
+pure-java/ToolSizeTest         PASS      0.10 cn.qingyue.pdf.ToolSizeTest
+pure-java/ColorPickInputTest   PASS      0.10 cn.qingyue.pdf.ColorPickInputTest
+pure-java/PopupPlacementTest   PASS      0.13 cn.qingyue.pdf.PopupPlacementTest
+pure-java/TwoFingerTapTest     PASS      0.07 cn.qingyue.pdf.TwoFingerTapTest
+pure-java/HorizontalPagingTest PASS      0.10 cn.qingyue.pdf.HorizontalPagingTest
+pure-java/SearchTextTest       PASS      0.13 cn.qingyue.pdf.SearchTextTest
+pure-java/NoteDocumentTest     PASS      0.12 cn.qingyue.pdf.NoteDocumentTest
+script/note-store              PASS      2.26 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/document-import         PASS      2.94 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/pdf-search-smoke        PASS      3.73 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/basic-note-export       PASS      1.36 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/zoom                    PASS      0.97 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/library-index           PASS      1.45 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/library-manager         PASS      3.04 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/backup-archive          PASS      1.77 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/backup-session          PASS      1.45 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/reader-core             PASS      1.76 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/backup-integration      PASS      3.73 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/tool-preferences        PASS      1.25 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/navigation-smoke        PASS      2.08 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/thumbnail-lifecycle     PASS      1.40 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/crash-diagnostics       PASS      1.44 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/delete-lifecycle        PASS      0.38 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/recognition             PASS      1.46 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/library-sidebar         PASS      1.25 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/pdf-text-import         PASS      1.18 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/global-search           PASS      3.77 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+script/ocr-sidecar-v2          PASS      2.62 C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regress…
+
+
+PASS=33 FAIL=0 SKIP=0
+Artifacts: C:\Users\xsh12\Documents\ChatGPT\笔记app\work\ui-refresh-20260924\regression\20260924-111439995-efe64398

@@ -1,0 +1,1 @@
+package android.util; import java.util.*; public class LruCache<K,V>{private final Map<K,V> values=new HashMap<>();public LruCache(int limit){} protected int sizeOf(K k,V v){return 1;} public V get(K k){return values.get(k);} public V put(K k,V v){return values.put(k,v);}public void evictAll(){values.clear();}}

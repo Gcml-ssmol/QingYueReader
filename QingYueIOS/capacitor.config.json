@@ -1,0 +1,7 @@
+{
+  "appId": "cn.qingyue.ios",
+  "appName": "晴阅",
+  "webDir": "www",
+  "server": { "hostname": "localhost", "iosScheme": "capacitor" },
+  "ios": { "contentInset": "never", "preferredContentMode": "mobile" }
+}

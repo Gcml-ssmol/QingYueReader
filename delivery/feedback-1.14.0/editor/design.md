@@ -1,0 +1,14 @@
+# 1.14.0 editor assessment (read-only)
+
+Baseline: `outputs/1.13.5/QingYuePDF`. Reference: `work/feedback-1.13.4/interaction/reference/apk2-resources.txt` from the supplied Yunji APK. Static resource strings show available concepts; they do not establish exact live gestures or screen layout.
+
+Already present: pen/ballpoint/pencil/highlighter, color and width controls; partial vector eraser; line/circle/rectangle/arrow; one-image-or-text selection and drag/resize; text and image insertion; finite continuous pages, insert/reorder and preview; document-wide blank/ruled/grid templates; infinite canvas; relative 50–300% zoom; local autosave, PDF/PNG export and opaque-file backup.
+
+Reference gaps with direct string evidence: `string/lasso_hint_text` promises multi-object move/scale/stretch/rotate/copy/paste/recolor; `lasso_handwriting`, `lasso_graphics`, `lasso_highlighter_pen`, `lasso_picture`, `lasso_text_box` name target filters. `setting_erase_markpen_detail` and `setting_stroke_clear_detail` expose eraser variants. `vip_power_standar_graph`, `vip_power_stroke_molding`, `setting_graph_detection_detail` name standard/smart shapes. `detail_outline_menu_copy`, `clear_page`, `change_template`, `choose_a_paper_template`, `first_layer_name`, and `detail_menu_ten_scale` strings indicate more page, layer and zoom actions. Resource names should be checked against actual APK XML before claiming exact screen placement.
+
+Compatible first implementation: multi-object lasso and group move/uniform resize/copy/recolor using existing Item fields; whole-stroke erasing; page copy/clear/delete with one atomic document operation, global IDs, image filename references retained, and undo where feasible. Existing v3 storage and PDF/PNG/preview/backup should continue to read these ordinary items. Tests must include old v1/v2/v3 reads, backup restore, export and repeated image references. Selection and clipboard are transient UI state, not persisted.
+
+Features requiring a coordinated format or renderer design: arbitrary rotation of text/images (current items are axis-aligned), per-page template (current `template` is final and document-wide), layers and brush kind metadata (not represented in v3), marker-only erasure by semantic brush kind. Do not use alpha as a permanent marker discriminator: pencil also uses transparency. Do not add private sidecar data without backup/restore/export handling. Audio, AI, accounts, cloud and purchase controls need real supporting services or separate scope.
+
+Owned implementation after API agreement: isolated `work/feedback-1.14.0/editor/QingYuePDF` copy; NoteDocument.java, NoteCanvasView.java, NotePageLayout.java, NoteStore.java, new editor model classes and tests. UI owner keeps NoteActivity.java, NoteDialogs.java, MainActivity.java. Coordinate Canvas command names and Host callbacks before implementation.
+

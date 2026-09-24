@@ -1,0 +1,422 @@
+{
+  "date": "2026-09-24",
+  "kind": "isolated-review-repository",
+  "files": [
+    {
+      "file": "QingYueIOS/README.md",
+      "status": "modified",
+      "before": "856e312c0e32fea22bc525408e3f741a3705487c63f9c74f4b031a5fe36c68b5",
+      "after": "1431855771cb44a1680480a8df3d5814cf3d8dc33d82a88aa5ac91f28b231f40"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/Info.plist",
+      "status": "modified",
+      "before": "3d80bec67863cac43f19beb0c7e6a6e373f661c8a658e2b1f7ac116ac7f5e224",
+      "after": "bf00b2720807914b6b9e31ba71fcd0a97203919d65ca29fbee6404281338fa21"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/app.mjs",
+      "status": "modified",
+      "before": "ca2423b44b76285c10a96832ca1dbe5e891b6d5a0044a5a106706cd1c6124394",
+      "after": "eebb963dede2d0865b373cdff4866185ae5f6fc14511d17999da5b98f5c9437d"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/appearance.css",
+      "status": "added",
+      "before": null,
+      "after": "a36954ba4114d7416688ac6e840118f52fb11a73bc27863fc7c82e86adc1f974"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/appearance.mjs",
+      "status": "added",
+      "before": null,
+      "after": "18de835f2e96bca80c82a04f5124fab9dedb0817547e5c048fa16011a09d3e33"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/assets/library-scene.svg",
+      "status": "added",
+      "before": null,
+      "after": "caaede98d34bf086ccd247b27f4af1fa15f4a0d205dfc96f3c4ec2dd95f06ad1"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/bundle-integrity.json",
+      "status": "modified",
+      "before": "a6c790e7b646f6d36be82ae8d21e0984fbe5781476a04b552590dd4bfa9d3593",
+      "after": "6c87c8e7794e661917935eafb783fcfb014997db88482bc968a433027f83d859"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/index.html",
+      "status": "modified",
+      "before": "29dc626742a76b4b0f0819229e8f522ad3320f0c1e82b36276f0987a559f51af",
+      "after": "de100bb414ccc37dc5d21f1af35ee36d6ddb2c25285129759fd045da27279226"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/native-bridge.js",
+      "status": "modified",
+      "before": "63bcb8ff33e6d00f86322b75e7116a8b532322e0ba876becb02ae5d7db39b168",
+      "after": "349f271f48772c1ae6edb15a0e16c42e063f946055b995166daf73c45a44c10b"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/native-start.mjs",
+      "status": "modified",
+      "before": "aafc2d847e63cdaaafc985d6a86e270885da4b1d03284cd4f853e8bc2ea00e38",
+      "after": "23f0c53b20bed4654e61d6eb77045c4cc5834045217e00a3d4e28ca6fa4b805e"
+    },
+    {
+      "file": "QingYueIOS/ios/App/App/public/ui-icons.mjs",
+      "status": "added",
+      "before": null,
+      "after": "baaf1b2dfc3530c3e62336373b500cf8f49124423760978bf0c5041a0a0de918"
+    },
+    {
+      "file": "QingYueIOS/scripts/configure-ios.mjs",
+      "status": "modified",
+      "before": "2dccc98615c35b52475c696c509d07cc0bd5a56eaea5e1f63d489539c29a5cd2",
+      "after": "374d2a8e35886266f54c298603a6774e31034bf92fd303188ad1487ada5b317a"
+    },
+    {
+      "file": "QingYueIOS/scripts/prepare-web.mjs",
+      "status": "modified",
+      "before": "dde08309d9f8400762c37ca1ab437b557594412c61e63e603ee9720236a4d179",
+      "after": "229d066719c55793808c61263bb2777b97cdd291d1c2770ca03aa0ad8a4e72d2"
+    },
+    {
+      "file": "QingYueIOS/source-web/SOURCE.json",
+      "status": "modified",
+      "before": "e9a066a80c60311fc8bf3c54c696ad00e5a521a17776d4413f0043d9e1683d54",
+      "after": "6e6bd894432b99709eaff45396d4d010a181251700a886eddbb70d37f0c37494"
+    },
+    {
+      "file": "QingYueIOS/source-web/app.mjs",
+      "status": "modified",
+      "before": "2186d743c3513bc96ece0ffdaabda8c31647ee9a371eea96c356f265f605349a",
+      "after": "fa5297248ac5e43fdfffb6f3953b57ff03a5fa74d168a994bb704275acc51e3f"
+    },
+    {
+      "file": "QingYueIOS/source-web/appearance.css",
+      "status": "added",
+      "before": null,
+      "after": "a36954ba4114d7416688ac6e840118f52fb11a73bc27863fc7c82e86adc1f974"
+    },
+    {
+      "file": "QingYueIOS/source-web/appearance.mjs",
+      "status": "added",
+      "before": null,
+      "after": "18de835f2e96bca80c82a04f5124fab9dedb0817547e5c048fa16011a09d3e33"
+    },
+    {
+      "file": "QingYueIOS/source-web/assets/library-scene.svg",
+      "status": "added",
+      "before": null,
+      "after": "caaede98d34bf086ccd247b27f4af1fa15f4a0d205dfc96f3c4ec2dd95f06ad1"
+    },
+    {
+      "file": "QingYueIOS/source-web/index.html",
+      "status": "modified",
+      "before": "a2211102890a2c51ac07c0ac05a6dcde796b4919b170e1784fa54f6e79a74c73",
+      "after": "12f347eb745a2e65ff9790809fb35a3bfb517474d6ff7ca5670fa10c985e1f62"
+    },
+    {
+      "file": "QingYueIOS/source-web/offline.mjs",
+      "status": "added",
+      "before": null,
+      "after": "12b234655b4991f8afa2a5f56e0b433100c80c912100ae124d9a08788c8d53e7"
+    },
+    {
+      "file": "QingYueIOS/source-web/sw.js",
+      "status": "modified",
+      "before": "16a55856d56483246d89c1498f0fcc2b784f84e42133b67688f2b6826e4fd105",
+      "after": "392b2eeaf5713698e1926bba8a9420d3d6f067ab5149f5759d644b2ab0693031"
+    },
+    {
+      "file": "QingYueIOS/source-web/ui-icons.mjs",
+      "status": "added",
+      "before": null,
+      "after": "baaf1b2dfc3530c3e62336373b500cf8f49124423760978bf0c5041a0a0de918"
+    },
+    {
+      "file": "QingYueIOS/src/native-start.mjs",
+      "status": "modified",
+      "before": "aafc2d847e63cdaaafc985d6a86e270885da4b1d03284cd4f853e8bc2ea00e38",
+      "after": "23f0c53b20bed4654e61d6eb77045c4cc5834045217e00a3d4e28ca6fa4b805e"
+    },
+    {
+      "file": "QingYueIOS/tests/appearance.cjs",
+      "status": "added",
+      "before": null,
+      "after": "696dabaf72fa4204fdceca85a8ca2fc8bea408e2664c0bbd3f109f5059991737"
+    },
+    {
+      "file": "QingYueIOS/tests/native-ui.cjs",
+      "status": "modified",
+      "before": "dab5319d275c3a784c8c337be320965cc5cb847551eb0252ba900dadfe2f3353",
+      "after": "a1550166dc9de10e0a5b1bec3b8d034345015980be7a32c32b10981f1c483d36"
+    },
+    {
+      "file": "QingYueIOS/tests/project.test.mjs",
+      "status": "modified",
+      "before": "25bfef2bdf0a27c4047979af6ebe612cc1721d49ca0ddbfd087c8a324a93d7a2",
+      "after": "59c8f0ea5029a439402a153370f9e883a9981e0e6621f62d9913fe43225cf68b"
+    },
+    {
+      "file": "QingYueIOS/www/app.mjs",
+      "status": "modified",
+      "before": "ca2423b44b76285c10a96832ca1dbe5e891b6d5a0044a5a106706cd1c6124394",
+      "after": "eebb963dede2d0865b373cdff4866185ae5f6fc14511d17999da5b98f5c9437d"
+    },
+    {
+      "file": "QingYueIOS/www/appearance.css",
+      "status": "added",
+      "before": null,
+      "after": "a36954ba4114d7416688ac6e840118f52fb11a73bc27863fc7c82e86adc1f974"
+    },
+    {
+      "file": "QingYueIOS/www/appearance.mjs",
+      "status": "added",
+      "before": null,
+      "after": "18de835f2e96bca80c82a04f5124fab9dedb0817547e5c048fa16011a09d3e33"
+    },
+    {
+      "file": "QingYueIOS/www/assets/library-scene.svg",
+      "status": "added",
+      "before": null,
+      "after": "caaede98d34bf086ccd247b27f4af1fa15f4a0d205dfc96f3c4ec2dd95f06ad1"
+    },
+    {
+      "file": "QingYueIOS/www/bundle-integrity.json",
+      "status": "modified",
+      "before": "a6c790e7b646f6d36be82ae8d21e0984fbe5781476a04b552590dd4bfa9d3593",
+      "after": "6c87c8e7794e661917935eafb783fcfb014997db88482bc968a433027f83d859"
+    },
+    {
+      "file": "QingYueIOS/www/index.html",
+      "status": "modified",
+      "before": "29dc626742a76b4b0f0819229e8f522ad3320f0c1e82b36276f0987a559f51af",
+      "after": "de100bb414ccc37dc5d21f1af35ee36d6ddb2c25285129759fd045da27279226"
+    },
+    {
+      "file": "QingYueIOS/www/native-bridge.js",
+      "status": "modified",
+      "before": "63bcb8ff33e6d00f86322b75e7116a8b532322e0ba876becb02ae5d7db39b168",
+      "after": "349f271f48772c1ae6edb15a0e16c42e063f946055b995166daf73c45a44c10b"
+    },
+    {
+      "file": "QingYueIOS/www/native-start.mjs",
+      "status": "modified",
+      "before": "aafc2d847e63cdaaafc985d6a86e270885da4b1d03284cd4f853e8bc2ea00e38",
+      "after": "23f0c53b20bed4654e61d6eb77045c4cc5834045217e00a3d4e28ca6fa4b805e"
+    },
+    {
+      "file": "QingYueIOS/www/ui-icons.mjs",
+      "status": "added",
+      "before": null,
+      "after": "baaf1b2dfc3530c3e62336373b500cf8f49124423760978bf0c5041a0a0de918"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/AppColors.java",
+      "status": "modified",
+      "before": "dcac2e2c7cc33d105c1fdd3076e2ad522d2ae577bf6d572221aed79b2daefb61",
+      "after": "e6f1c47b1ac0aa025f3275e81bdd3d49bd314e842da7a2547374faf7d91851b0"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/AppearanceActivity.java",
+      "status": "modified",
+      "before": "7ce268ce93da547c273fe6f937817144d96facf88f026f1682a6f3dac58fca72",
+      "after": "6f06b77d033ce4884df52d404910fe37b757d28cd723fb03778d0bd00833d17c"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/DocumentDialogs.java",
+      "status": "modified",
+      "before": "f74bd1b485d1f3991db2a8898e14391d48a35423276acc4f47418ef2545c167a",
+      "after": "e7d2869de92aa123bc6a7593b8552a554201c874347a1529bbb3e81eda73d1e8"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/GlobalSearchActivity.java",
+      "status": "modified",
+      "before": "9343a2ca99c36566b24ddbf6f4bd96e3bb0f69eda6e6ba4ac73755ca6b4959b1",
+      "after": "5ac0e5a12104d70186ecd132f7621c7bf9ac0b4b4f00cf33823b8fad943809e8"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/IconButton.java",
+      "status": "modified",
+      "before": "3783357ab69c7da3995ba1a084f5670d83a5cb99b44ee94aea983e1676c2e375",
+      "after": "7bcba374b29c36295026bd24984f876c88d80c312aa0bc3cdd9426d0abebfa1b"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/LibrarySidebar.java",
+      "status": "modified",
+      "before": "f874d4971f54d6759df17c0dec32df7aef6ad3e181284978a1fb90a1281bf572",
+      "after": "78a2e39fb1f6f31b2a64c94450a520febc7a6b9adce096ca82a4e76a9a5a5834"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/MainActivity.java",
+      "status": "modified",
+      "before": "c3a8727773f8838a58a5200758960a48b90ed881c548cf6bd6fdaf0b25939eda",
+      "after": "32f34226c02042757de24a4ab579d62982210545be164baf5627ff8e304cb13b"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+      "status": "modified",
+      "before": "d7f67e6b74def6895e32144f8139381c216889a79487099634998e779c5c5dcc",
+      "after": "88c437cb11fd1a97105919ca2655d412a697287c1a677b4691a11024347db5c6"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java",
+      "status": "modified",
+      "before": "a745fa84cf133a740fe9f7b1f16b9a123418c923878b53a2b64dbea6cc751d0c",
+      "after": "9edc527c4cf39ed80a15575a93442149d27985d9e789629f8ea0edf5e1f2ce01"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/OcrActivity.java",
+      "status": "modified",
+      "before": "bfcd18368d17f9ec686cf7c108574484951cfb671dfed4db1fdef1e7dd91d2fb",
+      "after": "075cc775a4cad1b19514a334a1d473341df74ba8307aae58e7a902b8fc6cafd8"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/ReaderDialogs.java",
+      "status": "modified",
+      "before": "5bf77a255efc56434438bcef4f8af5691d463a59cb819355c16f6b8323c2bd0b",
+      "after": "55cdae46263ae351d8f2e4cfaabbab1911824ef5181f3b6debc8287a87d95b1b"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/ReadingArtView.java",
+      "status": "added",
+      "before": null,
+      "after": "53cab57e9b6d6bf09952abc4badf68c224e4f0426db10eaae5519fd05ff44863"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/ThemedActivity.java",
+      "status": "modified",
+      "before": "d3b2f12e2443e64605d21942a1d5dbd4312be713daafd5f08e2e1dee761ee45d",
+      "after": "f2f9b5ba03e0422bf450be1cfd878ecf4d30e8108bea52cd5e1c5173ed02e371"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/java/cn/qingyue/pdf/WarmBackdrop.java",
+      "status": "modified",
+      "before": "757ca61e3679f913c515305c248b34af4565bd7852fedf22bb945e851ceb84f2",
+      "after": "88669878cfa38e0ea64b1786802c548c143f3e026620a57b17fa3456dc0df6e0"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/res/drawable/cream_dialog_background.xml",
+      "status": "added",
+      "before": null,
+      "after": "9f43c87160f52b6bfe10e51915e1a94147ca758e742b205bc895a900d8d2a9a5"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/res/drawable/cream_dialog_background_dark.xml",
+      "status": "added",
+      "before": null,
+      "after": "8d82f5b61ed2e461a39ebf4845560a511fe6806489ecb2fe71969a1897c5c133"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/res/values-v27/styles.xml",
+      "status": "modified",
+      "before": "9a6c2981367a8a51e44be603e5263bef6d14e04eebaf9e5cceef48917b9c0529",
+      "after": "9a0403df5a10f2b6faf6728466ad1b16e37a44b561558294c5d260e3965a2389"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/res/values/dark-styles.xml",
+      "status": "modified",
+      "before": "8b0664bd6c6576220b946de7ca69aff2428c164375a6f3aa3fbb9f4df303d60a",
+      "after": "775a38059ce60d9f1dacb1abec3ba4ee6b40d368f0a9e6639e90127cb1d2d589"
+    },
+    {
+      "file": "QingYuePDF/app/src/main/res/values/styles.xml",
+      "status": "modified",
+      "before": "a88e3b289faa505f412bc584d5ef8769ae047954adcc0ea5e17f84523f97862b",
+      "after": "292fca90d81a6dd6dc0f54bbf52790a3f1c5ea5a3b76b1aaa265067e4e44982a"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/AppearancePreferencesTest.java",
+      "status": "added",
+      "before": null,
+      "after": "520c1b974d3198a12829ebd0feba505a46c9331df1adc144c481efd701977123"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/run.ps1",
+      "status": "added",
+      "before": null,
+      "after": "d7be4ad8fe2824154e9ece9029f616410d59a5d4ccefd9b724a6bbcdf6bf871c"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/stubs/android/content/Context.java",
+      "status": "added",
+      "before": null,
+      "after": "de63ee8b0433a404952ed4f47858162e842c70b0e975e36191ab66f0593080c5"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/stubs/android/content/SharedPreferences.java",
+      "status": "added",
+      "before": null,
+      "after": "7e1a376722e6459c99915aff6accb4efa320702c5f631fba183d5842cd860ba5"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/stubs/android/content/res/Configuration.java",
+      "status": "added",
+      "before": null,
+      "after": "8bcdbdbb40f5134a78226c498d33237f245771eb045ae5746bf916a1402fcc50"
+    },
+    {
+      "file": "QingYuePDF/tests/appearance/stubs/android/content/res/Resources.java",
+      "status": "added",
+      "before": null,
+      "after": "711dbfa6e19826d01f735c5dd93e4f2b7f5e9dd13e773155400d220608826caf"
+    },
+    {
+      "file": "QingYueWeb/dist/app.mjs",
+      "status": "modified",
+      "before": "d1d564bd9a5f4b6f6303acc83fc66e3c7d1fdec7d9e17ae843df01732ff19986",
+      "after": "fa5297248ac5e43fdfffb6f3953b57ff03a5fa74d168a994bb704275acc51e3f"
+    },
+    {
+      "file": "QingYueWeb/dist/appearance.css",
+      "status": "added",
+      "before": null,
+      "after": "a36954ba4114d7416688ac6e840118f52fb11a73bc27863fc7c82e86adc1f974"
+    },
+    {
+      "file": "QingYueWeb/dist/appearance.mjs",
+      "status": "added",
+      "before": null,
+      "after": "18de835f2e96bca80c82a04f5124fab9dedb0817547e5c048fa16011a09d3e33"
+    },
+    {
+      "file": "QingYueWeb/dist/assets/library-scene.svg",
+      "status": "added",
+      "before": null,
+      "after": "caaede98d34bf086ccd247b27f4af1fa15f4a0d205dfc96f3c4ec2dd95f06ad1"
+    },
+    {
+      "file": "QingYueWeb/dist/index.html",
+      "status": "modified",
+      "before": "a2211102890a2c51ac07c0ac05a6dcde796b4919b170e1784fa54f6e79a74c73",
+      "after": "12f347eb745a2e65ff9790809fb35a3bfb517474d6ff7ca5670fa10c985e1f62"
+    },
+    {
+      "file": "QingYueWeb/dist/sw.js",
+      "status": "modified",
+      "before": "d7f452838d5a241807f6f813435df2fa9a028da4f7c5387201ebb17f12690f85",
+      "after": "392b2eeaf5713698e1926bba8a9420d3d6f067ab5149f5759d644b2ab0693031"
+    },
+    {
+      "file": "QingYueWeb/dist/ui-icons.mjs",
+      "status": "added",
+      "before": null,
+      "after": "baaf1b2dfc3530c3e62336373b500cf8f49124423760978bf0c5041a0a0de918"
+    },
+    {
+      "file": "QingYueWeb/tests/appearance.cjs",
+      "status": "added",
+      "before": null,
+      "after": "d6611890b0364241a906156f953d0cd87586d9a130dfce7b0cdd1f9f0b00e13e"
+    },
+    {
+      "file": "QingYueWeb/tests/appearance.test.mjs",
+      "status": "added",
+      "before": null,
+      "after": "f85a8fcad2746717d0dd5e87ef96f70613db98d06a523b4231edf4f338d2a2ff"
+    }
+  ],
+  "baselineCommit": "9e82cd7ec646f29ba2a7d09a6ac4ead29486e408",
+  "reviewCommit": "bcdfdc17b2bb2b94bbebb113c65e5fddc022f182"
+}

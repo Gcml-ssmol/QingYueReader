@@ -1,0 +1,37 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/LibraryStore.java",
+    "before": "ea858c26f1109c2220b9c56056720e500bdaa291de949f838f032b1b26847c89",
+    "after": "09eb5826af21cdd9f9dbc5ff07363cb885be3e58bcacaa6d60c3c498546f8a14"
+  },
+  {
+    "file": "tests/library-manager/ManagerRegressionTest.java",
+    "before": "4f65968b5b291e9aba067f413a7f8e888c0cc38850e3047d52d40ec784287920",
+    "after": "c2ea2d0b9b4f0031b3bf88c57edc98c592ba194c36d735ab0aa6061c80f0a84b"
+  },
+  {
+    "file": "tests/library-manager/BackupReaderRoundTripTest.java",
+    "before": "8f3d665c8cc3a4697aabf958e252eb94dc86ed2b22877fb52bc632cd844876f3",
+    "after": "93f6f8f2f4857f13e1de2699c0010e3c2316596b3918d832b9eaab4044fd70e6"
+  },
+  {
+    "file": "app/build.gradle",
+    "before": "2448065e9878a4b01aac35b7e5f4e827f66886d9e6067a5256ea77c5f9909882",
+    "after": "913be085d90d3405f40dc52309b19c7202934eac4df42af817fa7e9327353d47"
+  },
+  {
+    "file": "app/src/main/AndroidManifest.xml",
+    "before": "088613b405bbd8a6cb7676a2d515d3cfc9fd985438b592e9d67aa110ff7d1a53",
+    "after": "91509f044bad8a1c0d620c3704164cf17c29e1e3454b1f6022cbc560c924b956"
+  },
+  {
+    "file": "build-apk.ps1",
+    "before": "5dc4d366e04a1fbff5ade6c0ad53ef4ce13e023289931073638e4bf3860c7c22",
+    "after": "64fa970d84a524386102a9158f77a24419a570eedb7f456ac3a1ea53f77af9b6"
+  },
+  {
+    "file": "README.md",
+    "before": "81f3fa324e517efcafbe8740038fb0624bbe4e051542b6b231a7d067ea7583d8",
+    "after": "cfd5b0ce3246732ef46a5c3feb025579da4a40439b25e25ae46e6e57898c2e31"
+  }
+]

@@ -1,0 +1,18 @@
+N: android=http://schemas.android.com/apk/res/android (line=2)
+  N: app=http://schemas.android.com/apk/res-auto (line=2)
+    E: LinearLayout (line=2)
+      A: http://schemas.android.com/apk/res/android:orientation(0x010100c4)=0
+      A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=-2
+      A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=-2
+        E: TextView (line=8)
+          A: http://schemas.android.com/apk/res/android:textSize(0x01010095)=@0x7f07023f [dimen/dp14]
+          A: http://schemas.android.com/apk/res/android:textColor(0x01010098)=@0x7f0603e7 [color/selector_crop_img_textcolor]
+          A: http://schemas.android.com/apk/res/android:gravity(0x010100af)=0x00000011
+          A: http://schemas.android.com/apk/res/android:id(0x010100d0)=@0x7f091a38 [id/tv_crop]
+          A: http://schemas.android.com/apk/res/android:background(0x010100d4)=@0x7f080ea2 [drawable/selector_crop_img_bg]
+          A: http://schemas.android.com/apk/res/android:focusable(0x010100da)=false
+          A: http://schemas.android.com/apk/res/android:layout_width(0x010100f4)=@0x7f070376 [dimen/dp42]
+          A: http://schemas.android.com/apk/res/android:layout_height(0x010100f5)=@0x7f0702ae [dimen/dp24]
+          A: http://schemas.android.com/apk/res/android:text(0x0101014f)=@0x7f11037f [string/crop]
+          A: http://schemas.android.com/apk/res-auto:layout_constraintLeft_toLeftOf(0x7f04056a)=0
+          A: http://schemas.android.com/apk/res-auto:layout_constraintTop_toTopOf(0x7f040574)=0

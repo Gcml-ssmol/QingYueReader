@@ -1,0 +1,67 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActivity.java",
+    "before": "4e4931f0f7baf89fa76093ba84667eaaf00621a90f9e64be9b6e991039e65963",
+    "after": "8637ed9b3ab0b3e14c94ec18cd51127bfe9c22bb4bfdca7740dffdc03cdd905e"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteActionMenu.java",
+    "before": "b7b50ca24f86c80fa7cbba11ebb19e940eb889811333226726c60cf3015cf29d",
+    "after": "e6a5d6e687ee63300287a09ab3bf682def227cf7d0c990ab11d51879e534398b"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePageSidebar.java",
+    "before": "bec8664161131892ce349a483bac21a249e35f88c17a9a00875ba9fab15a47bc",
+    "after": "5cf32568e916657b8981cd2e0c944b4b8f573dbb38fcc5362c147fbc6820c96d"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/IconButton.java",
+    "before": "aaf0086078ca4c9fbb5d91cfb689ff195c1941e1423089dd3aa0d5fefeb9be4d",
+    "after": "4639c8363d56c32bc40a13d08ffdf14ba5fef0c8e66e40d5b1506f389fee54ae"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NotePenPresets.java",
+    "before": null,
+    "after": "a41e43b8287dec15276fb2fc46d1b135cf89058cd1fc167374a48592dfa9a5f9"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteEditorPresentation.java",
+    "before": null,
+    "after": "34d84138ae5cd1c09234d8af89f55ee3512f0eb9876e61708e718dba5794a085"
+  },
+  {
+    "file": "tests/note-view-qa/run.ps1",
+    "before": "eafe0a7e5b12538a99273dc21f5f24234d372ce238b0a7cc181e3b58ee152635",
+    "after": "a42fa0afb351ba16834658e2b5c377f47cbd0e3a78771eca27699244c04bf7d0"
+  },
+  {
+    "file": "tests/note-view-qa/README.md",
+    "before": "1e2f9a5c76b19499738b5ba0da15cd9e9aef8d2142224fefb0de3c11c41dd79e",
+    "after": "3a5c3b67b350761bc70a22895b5b162616411e397f1a78bdd729b74464c770f4"
+  },
+  {
+    "file": "tests/note-view-qa/src/android/view/View.java",
+    "before": "c90d3adf03602e6af99639f3cc98aa25339890728cfbcb3e582e8ae7d11b6531",
+    "after": "a44b7f92de1a0971b5e53858787e2852cd5d3b4fbbe2d8ae7995359f587ffc14"
+  },
+  {
+    "file": "tests/note-view-qa/src/android/graphics/Path.java",
+    "before": "6faf843586d19bdc08bbe94741a4392286afb3bd384cc06861152309ba062676",
+    "after": "ad661d41fc6f610235993180cbda03154b95417e808e59508315f4c1f7b1669b"
+  },
+  {
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/Support.java",
+    "before": "fde3da6af8ed882c98e327c853d5e2fa891b24befaa7e45eac6576ce181dc3d4",
+    "after": "4ae908fa240007b790669f05df8cb0474c2e41130e25fa2c690a0dcde3920c86"
+  },
+  {
+    "file": "tests/note-view-qa/src/cn/qingyue/pdf/NoteViewQaTest.java",
+    "before": "48c8c979bbe217b43dafffdef45b7c74471049679543898c1be06b1299151d17",
+    "after": "7e7e9fc3df0cd098c165e75ce60e37524e37ae8044ddcdda3e8230a250c11cdc"
+  },
+  {
+    "file": "delivery/1.14.0-editor-reference-qa.md",
+    "before": null,
+    "after": "4059990d5dd5e37a02bba889fe047e182c6e7ae5422b7ba6c3110c645e0ec572"
+  }
+]

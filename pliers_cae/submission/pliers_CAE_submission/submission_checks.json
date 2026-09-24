@@ -1,0 +1,18 @@
+[
+  {
+    "CAE_open": true, 
+    "completed_load_steps": 5, 
+    "instances": 3, 
+    "job": "Pliers_Main", 
+    "parts": 2, 
+    "ODB_fields_and_contact_history": true
+  }, 
+  {
+    "CAE_open": true, 
+    "completed_load_steps": 1, 
+    "instances": 3, 
+    "job": "Pliers_Fine", 
+    "parts": 2, 
+    "ODB_fields_and_contact_history": true
+  }
+]

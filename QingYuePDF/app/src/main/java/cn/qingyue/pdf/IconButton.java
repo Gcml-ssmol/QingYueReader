@@ -18,6 +18,7 @@ public final class IconButton extends View {
     private boolean active;
     private int tint = AppColors.INK;
     private boolean customTint;
+    private String visualLabel;
 
     public IconButton(Context context, String kind, String label) {
         super(context);
@@ -42,6 +43,12 @@ public final class IconButton extends View {
     public void setTint(int color) {
         tint = color;
         customTint = true;
+        invalidate();
+    }
+
+    /** Optional short caption for the spacious paper-style tool strip. */
+    public void setVisualLabel(String label) {
+        visualLabel = label;
         invalidate();
     }
 
@@ -86,15 +93,29 @@ public final class IconButton extends View {
         paint.setColor(customTint ? tint : active ? AppColors.ACCENT_DARK : AppColors.INK);
         paint.setAlpha(Math.round(((paint.getColor() >>> 24) & 255) * opacity));
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1.8f);
+        paint.setStrokeWidth(AppColors.isClassic() ? 1.8f : 1.55f);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeJoin(Paint.Join.ROUND);
         canvas.save();
-        float size = dp(24);
-        canvas.translate((getWidth() - size) / 2f, (getHeight() - size) / 2f);
+        boolean labeled = !AppColors.isClassic() && visualLabel != null && !visualLabel.isEmpty()
+                && getHeight() >= dp(48);
+        float size = dp(labeled ? 22 : 24);
+        canvas.translate((getWidth() - size) / 2f,
+                labeled ? Math.max(dp(6), (getHeight() - dp(46)) / 2f) : (getHeight() - size) / 2f);
         canvas.scale(size / 24f, size / 24f);
         drawIcon(canvas);
         canvas.restore();
+        if (labeled) {
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(active ? AppColors.ACCENT_DARK : AppColors.MUTED);
+            paint.setAlpha(Math.round(255 * opacity));
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTextSize(10f * getResources().getDisplayMetrics().scaledDensity);
+            float available = getWidth() - dp(5);
+            if (paint.measureText(visualLabel) > available)
+                paint.setTextSize(paint.getTextSize() * available / paint.measureText(visualLabel));
+            canvas.drawText(visualLabel, getWidth() / 2f, getHeight() - dp(9), paint);
+        }
     }
 
     private void line(Canvas c, float x1, float y1, float x2, float y2) {
@@ -123,6 +144,24 @@ public final class IconButton extends View {
 
     private void drawIcon(Canvas c) {
         switch (kind) {
+            case "sidebar":
+            case "pages":
+                rect.set(3, 4, 21, 20);
+                c.drawRoundRect(rect, 1.5f, 1.5f, paint);
+                line(c, 7.5f, 4, 7.5f, 20);
+                break;
+            case "gear":
+                for (int i = 0; i < 8; i++) {
+                    double angle = i * Math.PI / 4;
+                    float x1 = 12 + (float)Math.cos(angle) * 8;
+                    float y1 = 12 + (float)Math.sin(angle) * 8;
+                    float x2 = 12 + (float)Math.cos(angle) * 10;
+                    float y2 = 12 + (float)Math.sin(angle) * 10;
+                    line(c, x1, y1, x2, y2);
+                }
+                c.drawCircle(12, 12, 7.5f, paint);
+                c.drawCircle(12, 12, 2.7f, paint);
+                break;
             case "note":
                 rect.set(5, 3, 20, 21);
                 c.drawRoundRect(rect, 2, 2, paint);
@@ -134,6 +173,13 @@ public final class IconButton extends View {
                 rect.set(3, 4, 21, 20); c.drawRoundRect(rect, 2, 2, paint);
                 c.drawCircle(8, 9, 1.5f, paint);
                 poly(c, false, 4, 18, 9, 13, 12, 16, 17, 10, 21, 15);
+                break;
+            case "text":
+                line(c, 4, 5, 20, 5);
+                line(c, 4, 5, 4, 8);
+                line(c, 20, 5, 20, 8);
+                line(c, 12, 5, 12, 19);
+                line(c, 8, 19, 16, 19);
                 break;
             case "line":
                 line(c, 4, 19, 20, 5); dot(c, 4, 19, 1.6f); dot(c, 20, 5, 1.6f);
@@ -147,6 +193,12 @@ public final class IconButton extends View {
             case "arrow":
                 line(c, 4, 20, 20, 4); poly(c, false, 11, 4, 20, 4, 20, 13);
                 break;
+            case "lasso":
+                rect.set(3,3,20,17);c.drawOval(rect,paint);path.reset();path.moveTo(17,16);path.cubicTo(23,19,11,24,9,18);c.drawPath(path,paint);break;
+            case "read":
+                path.reset();path.moveTo(2,12);path.cubicTo(7,3,17,3,22,12);path.cubicTo(17,21,7,21,2,12);c.drawPath(path,paint);c.drawCircle(12,12,3,paint);break;
+            case "penbox":
+                rect.set(3,7,21,21);c.drawRoundRect(rect,2,2,paint);line(c,7,3,7,17);line(c,12,2,12,17);line(c,17,4,17,17);break;
             case "select":
                 poly(c, true, 5, 3, 19, 12, 12, 13, 9, 20);
                 line(c, 12, 13, 17, 21);
@@ -173,6 +225,12 @@ public final class IconButton extends View {
                 poly(c, false, 14, 3, 14, 8, 19, 8);
                 line(c, 9, 12, 16, 12);
                 line(c, 9, 16, 14, 16);
+                break;
+            case "grid":
+                for (int row = 0; row < 2; row++) for (int col = 0; col < 2; col++) {
+                    rect.set(3 + col * 10, 3 + row * 10, 10 + col * 10, 10 + row * 10);
+                    c.drawRoundRect(rect, 1.2f, 1.2f, paint);
+                }
                 break;
             case "vertical":
                 rect.set(5, 8, 19, 16);
@@ -272,6 +330,16 @@ public final class IconButton extends View {
                 break;
             case "pen":
                 pen(c);
+                break;
+            case "ballpoint":
+                poly(c, true, 5, 18, 6, 14, 17, 3, 20, 6, 9, 17, 5, 18);
+                line(c, 14, 6, 17, 9);
+                dot(c, 4.5f, 20, 1.3f);
+                break;
+            case "pencil":
+                poly(c, true, 3.5f, 20.5f, 6.5f, 14, 17, 3.5f, 20.5f, 7, 10, 17.5f);
+                poly(c, false, 6.5f, 14, 10, 17.5f, 3.5f, 20.5f);
+                line(c, 14.5f, 6, 18, 9.5f);
                 break;
             case "marker":
                 poly(c, true, 8, 14, 15.5f, 3.5f, 21, 7.5f, 13.5f, 18);

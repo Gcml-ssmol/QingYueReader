@@ -1,0 +1,25 @@
+{
+  "name": "qingyue-ios",
+  "version": "0.1.0",
+  "private": true,
+  "description": "晴阅 iPad 优先的 iPhone / iPad App 项目",
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/prepare-web.mjs",
+    "sync": "pnpm build && cap sync ios && node scripts/configure-ios.mjs",
+    "open": "cap open ios",
+    "test": "node tests/export-file.test.mjs && node tests/project.test.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.5.2",
+    "@capacitor/filesystem": "8.1.3",
+    "@capacitor/ios": "8.5.2",
+    "@capacitor/share": "8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "esbuild": "0.28.2"
+  }
+}

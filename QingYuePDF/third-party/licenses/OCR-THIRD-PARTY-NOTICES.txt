@@ -1,0 +1,45 @@
+Offline OCR third-party notices
+================================
+
+The application includes the following unmodified binary artifacts and model files.
+
+Tesseract4Android 4.9.0
+  Copyright (C) 2019 Adaptech s.r.o., Robert Pösel
+  Based in part on tess-two / Tesseract Tools for Android code from Google Inc.
+  Source: https://github.com/adaptech-cz/Tesseract4Android/tree/4.9.0
+  Binary: https://jitpack.io/cz/adaptech/tesseract4android/tesseract4android/4.9.0/
+  License: Apache License 2.0; see Tesseract4Android-4.9.0-LICENSE.txt.
+
+The Tesseract4Android 4.9.0 binary reports the following bundled native projects upstream:
+
+* Tesseract OCR 5.5.1, Apache License 2.0.
+  https://github.com/tesseract-ocr/tesseract/tree/5.5.1
+* Leptonica 1.85.0, two-clause BSD-style license.
+  https://github.com/DanBloomberg/leptonica/tree/1.85.0
+  See Leptonica-1.85.0-LICENSE.txt.
+* Independent JPEG Group libjpeg 9f, IJG license.
+  https://www.ijg.org/files/jpegsrc.v9f.tar.gz
+  The full upstream README and its LEGAL ISSUES section are retained in
+  libjpeg-9f-README-LICENSE.txt.
+* libpng 1.6.48, PNG Reference Library License version 2.
+  https://github.com/pnggroup/libpng/tree/v1.6.48
+  See libpng-1.6.48-LICENSE.txt.
+
+tessdata_best model: chi_sim.traineddata
+  Source: https://github.com/tesseract-ocr/tessdata_best/tree/e12c65a915945e4c28e237a9b52bc4a8f39a0cec
+  License: Apache License 2.0; see Tesseract4Android-4.9.0-LICENSE.txt for
+  the complete Apache License 2.0 text.
+
+tessdata_fast 4.1.0 model: eng.traineddata
+  Source: https://github.com/tesseract-ocr/tessdata_fast/tree/4.1.0
+  License: Apache License 2.0; see Tesseract4Android-4.9.0-LICENSE.txt for
+  the complete Apache License 2.0 text.
+
+AndroidX Annotation 1.3.0
+  Copyright The Android Open Source Project
+  Source: https://dl.google.com/dl/android/maven2/androidx/annotation/annotation/1.3.0/
+  License: Apache License 2.0; see Tesseract4Android-4.9.0-LICENSE.txt for
+  the complete Apache License 2.0 text.
+
+The models and native libraries are used only on the device. QingYue does not send OCR
+inputs or results to a service, and the application does not request Internet permission.

@@ -1,0 +1,27 @@
+# -*- coding: mbcs -*-
+#
+# Abaqus/CAE Release 6.14-2 replay file
+# Internal Version: 2014_08_22-22.00.46 134497
+# Run by xsh12 on Thu Sep 24 22:14:42 2026
+#
+
+# from driverUtils import executeOnCaeGraphicsStartup
+# executeOnCaeGraphicsStartup()
+#: Executing "onCaeGraphicsStartup()" in the site directory ...
+from abaqus import *
+from abaqusConstants import *
+session.Viewport(name='Viewport: 1', origin=(1.00762, 1.0075), width=148.321, 
+    height=99.9438)
+session.viewports['Viewport: 1'].makeCurrent()
+from driverUtils import executeOnCaeStartup
+executeOnCaeStartup()
+execfile('build_pliers.py', __main__.__dict__)
+#: 新的模型数据库已创建.
+#: 模型 "Model-1" 已创建.
+session.viewports['Viewport: 1'].setValues(displayedObject=None)
+#* AttributeError: 'Model' object has no attribute 'Coupling'
+#* File "build_pliers.py", line 63, in <module>
+#*     
+#* m.Coupling(name='PinCoupling_'+name,controlPoint=a.sets['PIN_'+name],
+#* surface=a.instances[name].surfaces['PinBore'],influenceRadius=WHOLE_SURFACE,
+#* couplingType=KINEMATIC,localCsys=None,u1=ON,u2=ON,u3=ON,ur1=ON,ur2=ON,ur3=ON)

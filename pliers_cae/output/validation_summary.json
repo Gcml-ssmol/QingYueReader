@@ -1,0 +1,22 @@
+{
+  "main_100N_left": {
+    "clamping_force_N": 190.70880126953125,
+    "nominal_pressure_MPa": 2.0074610659950656,
+    "active_mean_pressure_MPa": 79.67672805833851,
+    "peak_pressure_MPa": 27.060720443725586,
+    "max_mises_MPa": 138.2707061767578,
+    "max_displacement_mm": 0.2837893744706816,
+    "contact_area_mm2": 2.3935320377349854
+  },
+  "mesh_change_percent": {
+    "clamping_force_N": 0.0654009363839475,
+    "peak_pressure_MPa": -29.7994355779842,
+    "max_mises_MPa": 7.6210679464546915,
+    "max_displacement_mm": 0.08558681812460338,
+    "active_mean_pressure_MPa": 6.013036671373656,
+    "contact_area_mm2": -5.610287113486422
+  },
+  "max_force_balance_error_percent": 0.006608861249192148,
+  "max_moment_balance_error_percent": 0.00019783489811366585,
+  "max_left_right_difference_percent": 0.00018402514519583955
+}

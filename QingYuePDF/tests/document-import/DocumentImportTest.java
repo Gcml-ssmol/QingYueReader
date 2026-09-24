@@ -36,10 +36,25 @@ public final class DocumentImportTest {
         File blank=new File(tmp,"blank.txt");Files.write(blank.toPath(),new byte[0]);reject(blank,"blank.txt","empty content");
         File large=new File(tmp,"large.txt");char[] chars=new char[DocumentText.MAX_CHARACTERS+1];java.util.Arrays.fill(chars,'A');Files.write(large.toPath(),new String(chars).getBytes(StandardCharsets.UTF_8));reject(large,"large.txt","text limit");
         File zipBomb=new File(tmp,"huge.docx");zip(zipBomb,prefix+"<w:p><w:r><w:t>"+new String(chars)+"</w:t></w:r></w:p>"+suffix);reject(zipBomb,"huge.docx","decompressed text limit");
-        System.out.println("DocumentImportTest: "+checks+" checks passed; genuine DOC/Word6/DOCX, Chinese, encodings, limits and invalid inputs");
+        check(DocumentText.prepareSharedText("\u6674\u9605\r\n\u7b2c\u4e8c\u884c\u000b\u7b2c\u4e09\u884c").equals("\u6674\u9605\n\u7b2c\u4e8c\u884c\n\u7b2c\u4e09\u884c"),"shared text normalization");
+        String exact=new String(chars,0,DocumentText.MAX_CHARACTERS);
+        check(DocumentText.prepareSharedText(exact).length()==DocumentText.MAX_CHARACTERS,"shared text exact character limit");
+        rejectShared(new String(chars),"shared text character limit");
+        rejectShared(" \t\n\u200b ","shared text visible content");
+        rejectShared("abc\u0000def","shared text binary character");
+        final int[] callbacks={0};
+        try {
+            DocumentText.extract(utf8,"utf8.txt","text/plain",new DocumentText.Monitor(){
+                public boolean isCancelled(){return callbacks[0]>0;}
+                public void progress(long completed,long total){callbacks[0]++;}
+            });
+            throw new AssertionError("cancelled extraction was accepted");
+        } catch(InterruptedIOException expected) {check(expected.getMessage().contains("\u53d6\u6d88"),"cooperative extraction cancellation");}
+        System.out.println("DocumentImportTest: "+checks+" checks passed; genuine DOC/Word6/DOCX, shared text, cancellation, encodings, limits and invalid inputs");
     }
     static void check(boolean condition,String label){checks++;if(!condition)throw new AssertionError(label);}
     static void reject(File file,String name,String label)throws Exception {checks++;try{DocumentText.extract(file,name,null);throw new AssertionError(label+" was accepted");}catch(IOException expected){}}
+    static void rejectShared(CharSequence text,String label)throws Exception {checks++;try{DocumentText.prepareSharedText(text);throw new AssertionError(label+" was accepted");}catch(IOException expected){}}
     static void zip(File file,String xml)throws Exception {zipBytes(file,xml.getBytes(StandardCharsets.UTF_8));}
     static void zipBytes(File file,byte[] xml)throws Exception {try(ZipOutputStream out=new ZipOutputStream(new FileOutputStream(file))){out.putNextEntry(new ZipEntry("word/document.xml"));out.write(xml);out.closeEntry();}}
 }

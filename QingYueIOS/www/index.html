@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN" data-ui="warm" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff7ed"><meta name="description" content="晴阅平板优先网页版：iPad 与 iPhone 的本地 PDF 阅读、文件夹与文字笔记。">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="晴阅">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23d66c23'/%3E%3Cpath d='M16 17h14l4 4h14v29H16z' fill='%23fff7ed'/%3E%3Cpath d='M23 29h18M23 36h18M23 43h12' stroke='%23d66c23' stroke-width='3'/%3E%3C/svg%3E">
+<script>try{var qy=JSON.parse(localStorage.getItem('qingyue-appearance')||'{}');document.documentElement.dataset.ui=qy.style==='classic'?'classic':'warm';document.documentElement.dataset.theme=qy.mode==='dark'||qy.mode!=='light'&&qy.mode!=='dark'&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch{}</script>
+<link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./tablet.css"><link rel="stylesheet" href="./appearance.css"><title>晴阅</title>
+</head>
+<body>
+<main id="library">
+ <aside id="library-sidebar" aria-label="资料库导航"><h2>资料库</h2><nav id="library-tree"></nav><p>资料保存在此设备<br>跨设备可通过备份转移</p></aside>
+ <div class="library-main">
+ <header class="brand"><div><h1>晴阅 <small>阅读 · 笔记</small></h1><p class="classic-only">阅读与笔记，都在手边</p><p class="warm-only">把阅读，留给自己</p></div><span class="local-badge warm-only">本地 · 离线</span></header>
+ <header class="search-header warm-only"><button id="search-back" class="icon-button" aria-label="返回资料库">‹</button><div><h2>资料搜索</h2><p>在本机资料库中，按名称查找</p></div></header>
+ <button id="settings-button" class="settings-gear" aria-label="设置与备份"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m10 2-.6 2.5-2 .9L5 4.6 2.6 8.7l1.8 1.8v3l-1.8 1.8L5 19.4l2.4-.8 2 .9L10 22h4l.6-2.5 2-.9 2.4.8 2.4-4.1-1.8-1.8v-3l1.8-1.8L19 4.6l-2.4.8-2-.9L14 2z"/><circle cx="12" cy="12" r="3.4"/></svg></button>
+ <section class="library-welcome">
+ <div class="welcome-copy warm-only"><p class="eyebrow">READ & REMEMBER</p><h2>你的随身文档库</h2><p class="welcome-subtitle">读一份文档，记下一点灵感。</p><p class="welcome-detail">文档、笔记与批注保存在本机<br>随时阅读，安心记录。</p></div>
+ <img class="welcome-art warm-only" src="./assets/library-scene.svg" alt="" aria-hidden="true">
+ <div class="main-actions"><button id="continue-reading" class="primary warm-only">开始阅读</button><button id="import-button" class="primary">＋ 导入 PDF</button><button id="new-note">新建笔记</button></div>
+ </section>
+ <input id="file-input" type="file" accept="application/pdf,.pdf" multiple hidden>
+ <div class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="搜索资料名称" aria-label="搜索资料名称"><button id="clear-search" class="warm-only" aria-label="清空搜索" hidden>×</button></div>
+ <div id="search-kinds" class="warm-only" aria-label="搜索资料类型"><button data-kind="all" class="selected">全部</button><button data-kind="pdf">PDF</button><button data-kind="note">笔记</button></div>
+ <div class="library-heading"><nav id="breadcrumbs" aria-label="文件夹路径">全部资料</nav><button id="new-folder" class="text-button">＋ 文件夹</button></div>
+ <div class="tabs"><button data-filter="all" class="selected">全部资料</button><button data-filter="unfiled">未分类</button><button data-filter="trash">最近删除</button></div>
+ <div class="list-heading"><h2 id="list-title" class="warm-only">最近更新</h2><p id="library-count" class="muted">正在读取本地资料…</p></div>
+ <section id="items" aria-label="资料列表"></section>
+ <p class="library-footer">资料仅保存在这台设备 · <button id="backup-shortcut" class="text-button">备份资料</button></p>
+ <nav id="bottom-nav" class="warm-only" aria-label="主导航"><button data-nav="library" aria-current="page"><span>资料库</span></button><button data-nav="search"><span>资料搜索</span></button><button data-nav="trash"><span>最近删除</span></button><button data-nav="settings"><span>设置</span></button></nav>
+ </div>
+</main>
+<section id="reader" hidden aria-label="PDF 阅读器">
+ <header class="reader-header"><button id="reader-back" class="icon-button" aria-label="返回资料库">‹</button><button id="reader-page-toggle" class="icon-button" aria-label="收起或展开页面栏" aria-expanded="true">▤</button><div><h2 id="document-name"></h2><span id="save-status" role="status">已保存到本机</span></div><button id="reader-more" class="icon-button" aria-label="阅读工具">•••</button></header>
+ <div class="reader-controls">
+ <div id="tools" class="toolbar" aria-label="批注工具"><button data-tool="browse" class="selected">浏览</button><button data-tool="pen">画笔</button><button data-tool="highlight">荧光笔</button><button data-tool="eraser">橡皮</button><button data-tool="text">文字</button><button id="undo">撤销</button></div>
+ <div class="style-bar"><label>颜色 <input id="tool-color" type="color" value="#25201c"></label><label>粗细 <input id="tool-width" type="range" min="1" max="24" step="1" value="3"></label><output id="width-value">3</output><button id="bookmark" aria-label="当前页书签">☆</button><button id="export-pdf" class="text-button">导出 PDF</button></div>
+ </div>
+ <div id="reader-workspace">
+ <aside id="page-sidebar" aria-label="页面预览"><div class="page-sidebar-title"><h3>页面</h3><button id="rail-add-page" class="text-button">＋ 新页</button></div><div id="page-rail"></div><p>预览包含本机批注</p></aside>
+ <div id="page-scroll"><div id="page-stage"><canvas id="pdf-canvas"></canvas><svg id="ink-overlay" xmlns="http://www.w3.org/2000/svg" aria-label="批注画布"></svg></div><p id="page-message" role="status"></p></div>
+ </div>
+ <footer class="reader-footer"><button id="prev-page" aria-label="上一页">‹</button><label class="page-label"><input id="page-input" type="number" min="1" value="1" aria-label="页码"><span id="page-total">/ 1</span></label><button id="next-page" aria-label="下一页">›</button><span class="footer-divider"></span><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-value" aria-label="设置缩放比例">100%</button><button id="zoom-in" aria-label="放大">＋</button></footer>
+</section>
+<dialog id="modal"><form id="modal-form"><div class="modal-heading"><h2 id="modal-title"></h2><button type="button" id="modal-close" class="icon-button" aria-label="关闭">×</button></div><div id="modal-body"></div><p id="modal-error" role="alert"></p><div id="modal-actions"></div></form></dialog>
+<div id="busy" hidden role="status"><div class="spinner"></div><p id="busy-text">处理中…</p></div><div id="toast" role="status" hidden></div>
+<script src="./vendor/pdf-lib.min.js"></script><script src="./vendor/fontkit.umd.min.js"></script><script src="./vendor/jszip.min.js"></script><script src="./native-bridge.js"></script><script type="module" src="./native-start.mjs"></script>
+</body></html>

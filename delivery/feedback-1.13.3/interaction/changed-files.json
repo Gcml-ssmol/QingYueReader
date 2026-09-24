@@ -1,0 +1,67 @@
+[
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/InkInput.java",
+    "before": "ca57d2d4f9edcb402b2fb343be0bda4800ac5caa77fd87205d14ab50b86cd3f9",
+    "after": "1dbb185a22bd5a4db9fbc8fe54549d355dfbd5541bc44d255e26bc35f411d3b3"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/InkPage.java",
+    "before": "0606769ca37655d04ae03242e862675227aea52ea073e8467eb7cb9c3b50ec26",
+    "after": "c4bf05779df4adc1e29638b00a940d82a8e5d6b6f688e8cd25a3f77c94a504ce"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/InkStrokeRenderer.java",
+    "before": null,
+    "after": "998805e70b9589e7551d906db945632001b6db06f4569c1a7ea7e8facff39e98"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/NoteCanvasView.java",
+    "before": "7a3429c98be2b3ec2630aa1c5bde1757e27ab55b1a11c6b4837ae5304b579c67",
+    "after": "f099d4efe98c84c28f0c90e5be4dba48763306213218f301e06cf3b40f621c8d"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfAnnotationExporter.java",
+    "before": "d7d49c9ebaeb81a31551441a81ba7f49367a71550128630d2fd5dc81e37d680c",
+    "after": "fc23b9251a1140adee1c5749e84eb0e60ca9570b164c0b35a05d650439f52a75"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/PdfReaderView.java",
+    "before": "bb08a9e86af532154ee49fe784bac73c9df3cad41ce664c0294a4d7cf881cfa1",
+    "after": "974c5002c5784ac562fa61bbfb552e57f399ff13dd845aa01907021c3255b0b6"
+  },
+  {
+    "file": "app/src/main/java/cn/qingyue/pdf/TouchNavigation.java",
+    "before": null,
+    "after": "0d5c787c7b6149e9c563ed909a32cd8c5033ead5e214eedf5147020d10a845e5"
+  },
+  {
+    "file": "tests/interaction/InteractionTest.java",
+    "before": null,
+    "after": "43e4da8a82a2c000f62103bf849103a1f97b2e6db50ee2a24c2b5aef6910e879"
+  },
+  {
+    "file": "tests/interaction/run.ps1",
+    "before": null,
+    "after": "ac023c24ce1fd3cefa39c7f72d2c0aa7d4118ca75c9fa9a899bce777ff9e4065"
+  },
+  {
+    "file": "tests/pdf-search-smoke/android/graphics/Canvas.java",
+    "before": "0af783c1ccc415c76efe80c4e1e1dd5b1239d385a78cda8da803ed6b7d853a12",
+    "after": "a5437cfb474497c00da885dbc1a43d3bf529571b0e1e595a6295b8c0c450916e"
+  },
+  {
+    "file": "tests/pdf-search-smoke/android/graphics/Path.java",
+    "before": "cc5bbcf636f8b6d95ddebefc57552da3b89f957765c010c57454a775b60a7142",
+    "after": "f00771c8bd5b4312950da29d4ff5a7ab00ca6b18e7d24e2fa2d5c2f3f1e03fc0"
+  },
+  {
+    "file": "tests/pdf-search-smoke/PdfExportSmoke.java",
+    "before": "7a5bf0a22850a7f79ad23a0ce5f8643971c656352003958643c2b77ab03fc09f",
+    "after": "b3975a9cbedf25ac29b6262e1539710f5406b6f893e1d01559f11149835457f7"
+  },
+  {
+    "file": "tests/pdf-search-smoke/run.ps1",
+    "before": "ffda6a6be130f2c4fae8ab2217dd3333ddd57811d4c64f9ac9f84cad1ffbdb68",
+    "after": "fb39d54c2991c6feb9e76c5b03345143ac7df6a4998b41f7fb4d6f62dae0b7f2"
+  }
+]

@@ -1,0 +1,572 @@
+From 86a315cb0e76f934079b54a90f7840612dfad55e Mon Sep 17 00:00:00 2001
+From: QingYue Creation Task <creation-task@local>
+Date: Thu, 24 Sep 2026 23:18:55 +0800
+Subject: [PATCH 1/3] Default to infinite draft with tested creation and motion
+
+---
+ .../java/cn/qingyue/pdf/MainActivity.java     |  2 +-
+ .../cn/qingyue/pdf/NoteCreationChoices.java   | 43 ++++++++++++++
+ .../main/java/cn/qingyue/pdf/NoteDialogs.java | 55 +++++++++++------
+ .../main/java/cn/qingyue/pdf/NoteMotion.java  | 59 +++++++++++++++++++
+ app/src/main/res/anim/note_enter.xml          |  4 ++
+ app/src/main/res/anim/note_exit.xml           |  3 +
+ app/src/main/res/anim/note_return_enter.xml   |  3 +
+ app/src/main/res/anim/note_return_exit.xml    |  4 ++
+ .../NoteCreationChoicesTest.java              | 39 ++++++++++++
+ tests/note-creation/run.ps1                   |  9 +++
+ .../android/content/SharedPreferences.java    |  6 ++
+ tests/note-motion/NoteMotionTest.java         | 33 +++++++++++
+ tests/note-motion/run.ps1                     | 10 ++++
+ .../stubs/android/app/Activity.java           |  5 ++
+ .../android/content/ContentResolver.java      |  2 +
+ .../stubs/android/content/Context.java        |  9 +++
+ .../stubs/android/content/res/Resources.java  |  5 ++
+ .../stubs/android/provider/Settings.java      | 15 +++++
+ .../note-motion/stubs/android/view/View.java  | 32 ++++++++++
+ .../stubs/cn/qingyue/pdf/NoteDialogs.java     |  3 +
+ 20 files changed, 321 insertions(+), 20 deletions(-)
+ create mode 100644 app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java
+ create mode 100644 app/src/main/java/cn/qingyue/pdf/NoteMotion.java
+ create mode 100644 app/src/main/res/anim/note_enter.xml
+ create mode 100644 app/src/main/res/anim/note_exit.xml
+ create mode 100644 app/src/main/res/anim/note_return_enter.xml
+ create mode 100644 app/src/main/res/anim/note_return_exit.xml
+ create mode 100644 tests/note-creation/NoteCreationChoicesTest.java
+ create mode 100644 tests/note-creation/run.ps1
+ create mode 100644 tests/note-creation/stubs/android/content/SharedPreferences.java
+ create mode 100644 tests/note-motion/NoteMotionTest.java
+ create mode 100644 tests/note-motion/run.ps1
+ create mode 100644 tests/note-motion/stubs/android/app/Activity.java
+ create mode 100644 tests/note-motion/stubs/android/content/ContentResolver.java
+ create mode 100644 tests/note-motion/stubs/android/content/Context.java
+ create mode 100644 tests/note-motion/stubs/android/content/res/Resources.java
+ create mode 100644 tests/note-motion/stubs/android/provider/Settings.java
+ create mode 100644 tests/note-motion/stubs/android/view/View.java
+ create mode 100644 tests/note-motion/stubs/cn/qingyue/pdf/NoteDialogs.java
+
+diff --git a/app/src/main/java/cn/qingyue/pdf/MainActivity.java b/app/src/main/java/cn/qingyue/pdf/MainActivity.java
+index 360d5a0..43efc89 100644
+--- a/app/src/main/java/cn/qingyue/pdf/MainActivity.java
++++ b/app/src/main/java/cn/qingyue/pdf/MainActivity.java
+@@ -661,7 +661,7 @@ public class MainActivity extends ThemedActivity {
+     private void addIcon(LinearLayout row,IconButton button){row.addView(button,new LinearLayout.LayoutParams(dp(44),dp(44)));}
+     private void open(LibraryItem d) {
+         if(d==null||d.isTrashed())return;
+-        if(d.isNote()){d.opened=System.currentTimeMillis();if(!save())return;lastOpenedNoteId=d.id;startActivity(new Intent(this,NoteActivity.class).putExtra("id",d.id).putExtra("name",d.name));return;}
++        if(d.isNote()){d.opened=System.currentTimeMillis();if(!save())return;lastOpenedNoteId=d.id;startActivity(new Intent(this,NoteActivity.class).putExtra("id",d.id).putExtra("name",d.name));NoteMotion.applyActivityTransition(this,true);return;}
+         if(inserting!=null&&!inserting.finished){toast("正在插入页面，请稍候");return;}
+         generation++;releaseView();current=d;readerQuery="";headerCollapsed=false;requestedPage=d.page;
+         PdfInsertJob retained=INSERTIONS.get(d.id);
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java b/app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java
+new file mode 100644
+index 0000000..b5ac179
+--- /dev/null
++++ b/app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java
+@@ -0,0 +1,43 @@
++package cn.qingyue.pdf;
++
++import android.content.SharedPreferences;
++
++/** Creation choices shared by the dialog and its preference regression test. */
++final class NoteCreationChoices {
++    interface Created { void created(String name, String template, String size); }
++    String template, size, finiteSize;
++    private final SharedPreferences preferences;
++
++    NoteCreationChoices(SharedPreferences preferences) {
++        this.preferences = preferences;
++        template = validTemplate(preferences.getString("template", "blank"));
++        size = validSize(preferences.getString("size", "infinite"));
++        finiteSize = validFinite(preferences.getString("finiteSize", "A4"));
++        if (!"infinite".equals(size)) finiteSize = size;
++    }
++
++    void draft() { size = "infinite"; }
++    void paged() { size = finiteSize; }
++    void size(String value) { finiteSize = validFinite(value); size = finiteSize; }
++    void template(String value) { template = validTemplate(value); }
++
++    boolean submit(String name, Created callback) {
++        String clean = name == null ? "" : name.trim();
++        if (clean.isEmpty()) return false;
++        preferences.edit().putString("template", template).putString("size", size)
++                .putString("finiteSize", finiteSize).apply();
++        callback.created(clean, template, size);
++        return true;
++    }
++
++    private static String validTemplate(String value) {
++        return "ruled".equals(value) || "grid".equals(value) ? value : "blank";
++    }
++    private static String validFinite(String value) {
++        return "A3".equals(value) || "A5".equals(value) || "B4".equals(value)
++                || "B5".equals(value) || "Letter".equals(value) ? value : "A4";
++    }
++    private static String validSize(String value) {
++        return "infinite".equals(value) ? value : validFinite(value);
++    }
++}
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java b/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java
+index aaacfb8..a033ddc 100644
+--- a/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java
++++ b/app/src/main/java/cn/qingyue/pdf/NoteDialogs.java
+@@ -35,7 +35,7 @@ public final class NoteDialogs {
+ 
+     public static Dialog create(Activity owner, Created callback) {
+         Card card = new Card(owner);
+-        header(card, "新建笔记", "一张纸，装下新的想法", "note");
++        header(card, "新建笔记", "从无限草稿开始，也可选分页纸张", "note");
+         gap(card.body, 18);
+         EditText name = new EditText(owner);
+         name.setSingleLine(true);
+@@ -52,7 +52,18 @@ public final class NoteDialogs {
+         gap(card.body, 22);
+         card.body.addView(label(owner, "纸张底纹", 13, AppColors.MUTED));
+         gap(card.body, 10);
+-        final String[] chosen = {"blank", "A4"};
++        NoteCreationChoices choices = new NoteCreationChoices(owner.getSharedPreferences("note_creation", Context.MODE_PRIVATE));
++        LinearLayout modes = row(owner);
++        TextView draft = label(owner, "∞ 无限草稿\n自由延伸的画布", 14, AppColors.INK);
++        TextView paged = label(owner, "▤ 分页笔记\n连续的固定纸张", 14, AppColors.INK);
++        draft.setGravity(Gravity.CENTER); paged.setGravity(Gravity.CENTER);
++        draft.setPadding(dp(owner, 8), dp(owner, 11), dp(owner, 8), dp(owner, 11));
++        paged.setPadding(dp(owner, 8), dp(owner, 11), dp(owner, 8), dp(owner, 11));
++        modes.addView(draft, new LinearLayout.LayoutParams(0, -2, 1));
++        LinearLayout.LayoutParams pagedSize = new LinearLayout.LayoutParams(0, -2, 1); pagedSize.leftMargin = dp(owner, 8); modes.addView(paged, pagedSize);
++        selected(draft, "infinite".equals(choices.size)); selected(paged, !"infinite".equals(choices.size));
++        card.body.addView(modes, new LinearLayout.LayoutParams(-1, -2));
++        gap(card.body, 16);
+         String[] templates = {"blank", "ruled", "grid"};
+         String[] titles = {"全空", "横线", "网格"};
+         LinearLayout templateRow = row(owner);
+@@ -73,25 +84,26 @@ public final class NoteDialogs {
+             if (i > 0) params.leftMargin = dp(owner, 8);
+             templateRow.addView(choice, params);
+             choice.setOnClickListener(v -> {
+-                chosen[0] = value;
++                choices.template(value);
+                 for (int k = 0; k < templateCards.length; k++) selected(templateCards[k], templates[k].equals(value));
+             });
+-            selected(choice, i == 0);
++            selected(choice, templates[i].equals(choices.template));
+         }
+         card.body.addView(templateRow, new LinearLayout.LayoutParams(-1, -2));
+-        gap(card.body, 22);
+-        card.body.addView(label(owner, "画布大小", 13, AppColors.MUTED));
+-        gap(card.body, 10);
+-        String[] keys = {"A3", "A4", "A5", "B4", "B5", "Letter", "infinite"};
+-        String[] sizes = {"297 × 420 mm", "210 × 297 mm", "148 × 210 mm", "250 × 353 mm", "176 × 250 mm", "216 × 279 mm", "宽度与长度自由延伸"};
++        LinearLayout pageChoices = column(owner);
++        gap(pageChoices, 22);
++        pageChoices.addView(label(owner, "分页纸张尺寸", 13, AppColors.MUTED));
++        gap(pageChoices, 10);
++        String[] keys = {"A3", "A4", "A5", "B4", "B5", "Letter"};
++        String[] sizes = {"297 × 420 mm", "210 × 297 mm", "148 × 210 mm", "250 × 353 mm", "176 × 250 mm", "216 × 279 mm"};
+         View[] sizeCards = new View[keys.length];
+-        for (int r = 0; r < 4; r++) {
++        for (int r = 0; r < 3; r++) {
+             LinearLayout sizeRow = row(owner);
+             for (int col = 0; col < 2 && r * 2 + col < keys.length; col++) {
+                 final int index = r * 2 + col;
+                 LinearLayout tile = column(owner);
+                 tile.setPadding(dp(owner, 13), dp(owner, 11), dp(owner, 13), dp(owner, 11));
+-                TextView title = label(owner, keys[index].equals("infinite") ? "∞  无限画布" : keys[index], 14, AppColors.INK);
++                TextView title = label(owner, keys[index], 14, AppColors.INK);
+                 title.setTypeface(null, 1);
+                 tile.addView(title);
+                 TextView detail = label(owner, sizes[index], 10, AppColors.MUTED);
+@@ -102,16 +114,20 @@ public final class NoteDialogs {
+                 if (col > 0) params.leftMargin = dp(owner, 8);
+                 sizeRow.addView(tile, params);
+                 tile.setOnClickListener(v -> {
+-                    chosen[1] = keys[index];
+-                    for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(chosen[1]));
++                    choices.size(keys[index]);
++                    for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(choices.size));
+                 });
+-                selected(tile, keys[index].equals(chosen[1]));
++                selected(tile, keys[index].equals(choices.size));
+             }
+-            card.body.addView(sizeRow, new LinearLayout.LayoutParams(-1, -2));
+-            if (r < 3) gap(card.body, 8);
++            pageChoices.addView(sizeRow, new LinearLayout.LayoutParams(-1, -2));
++            if (r < 2) gap(pageChoices, 8);
+         }
++        card.body.addView(pageChoices, new LinearLayout.LayoutParams(-1, -2));
++        pageChoices.setVisibility("infinite".equals(choices.size) ? View.GONE : View.VISIBLE);
++        draft.setOnClickListener(v -> {choices.draft(); pageChoices.setVisibility(View.GONE); selected(draft, true); selected(paged, false);});
++        paged.setOnClickListener(v -> {choices.paged(); pageChoices.setVisibility(View.VISIBLE); selected(draft, false); selected(paged, true); for (int k = 0; k < sizeCards.length; k++) selected(sizeCards[k], keys[k].equals(choices.size));});
+         gap(card.body, 14);
+-        TextView hint = label(owner, "所有底纹均支持固定纸张与无限画布。双指缩放，随时移动到新的位置。", 12, AppColors.MUTED);
++        TextView hint = label(owner, "无限草稿可自由延伸；分页笔记可上下连续书写。两种模式都支持当前底纹。", 12, AppColors.MUTED);
+         hint.setLineSpacing(dp(owner, 3), 1f);
+         card.body.addView(hint);
+         gap(card.body, 20);
+@@ -120,10 +136,11 @@ public final class NoteDialogs {
+             String title = name.getText().toString().trim();
+             if (title.isEmpty()) { name.setError("给笔记取个名字吧"); name.requestFocus(); return; }
+             card.dismiss();
+-            if (!owner.isFinishing() && !owner.isDestroyed()) callback.created(title, chosen[0], chosen[1]);
++            if (!owner.isFinishing() && !owner.isDestroyed()) choices.submit(title, callback::created);
+         });
+         card.body.addView(submit, new LinearLayout.LayoutParams(-1, -2));
+         card.show();
++        NoteMotion.enter(card.body);
+         return card;
+     }
+ 
+@@ -144,7 +161,7 @@ public final class NoteDialogs {
+         reset.setOnClickListener(v -> {card.dismiss(); fit.run();});
+         card.body.addView(reset, new LinearLayout.LayoutParams(-1, -2));
+         gap(card.body, 20);
+-        TextView help = label(owner, "图片与文本：点击后选择，拖动移动，拖动四角调整大小。文本按钮可插入或编辑文字；选择后可用垃圾桶删除。\n\n图形：选择直线、圆形、矩形或箭头后，在画布按住拖动，松手完成。长按或再次点击工具可调节粗细与颜色。\n\n无限画布：上下左右均可平移延伸，底纹跟随画布。缩放按钮可选择 50% 至 300%，适应页面可恢复初始视图。笔记修改会自动保存。", 12, AppColors.MUTED);
++        TextView help = label(owner, "图片与文本：点击后选择，拖动移动，拖动四角调整大小。文本按钮可插入或编辑文字；选择后可用垃圾桶删除。\n\n图形：选择直线、圆形、矩形或箭头后，在画布按住拖动，松手完成。长按或再次点击工具可调节粗细与颜色。套索可框选内容；橡皮可选局部擦除或整笔擦除。\n\n无限草稿：上下左右均可平移延伸，最高可缩放至 1000%；分页笔记最高 300%。适应页面可恢复初始视图。笔记修改会自动保存。", 12, AppColors.MUTED);
+         help.setLineSpacing(dp(owner, 4), 1f);
+         card.body.addView(help);
+         gap(card.body, 20);
+diff --git a/app/src/main/java/cn/qingyue/pdf/NoteMotion.java b/app/src/main/java/cn/qingyue/pdf/NoteMotion.java
+new file mode 100644
+index 0000000..cdd313a
+--- /dev/null
++++ b/app/src/main/java/cn/qingyue/pdf/NoteMotion.java
+@@ -0,0 +1,59 @@
++package cn.qingyue.pdf;
++
++import android.app.Activity;
++import android.content.Context;
++import android.provider.Settings;
++import android.view.View;
++import java.util.WeakHashMap;
++
++/** Short navigation transitions outside the writing canvas. */
++public final class NoteMotion {
++    private static final WeakHashMap<View, View.OnAttachStateChangeListener> DETACH = new WeakHashMap<>();
++    private NoteMotion() { }
++
++    public static boolean enabled(Context context) {
++        try {
++            return Settings.Global.getFloat(context.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
++                    && Settings.Global.getFloat(context.getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, 1f) > 0f
++                    && Settings.Global.getFloat(context.getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1f) > 0f;
++        } catch (SecurityException ignored) { return true; }
++    }
++
++    public static void enter(View target) {
++        if (target == null) return;
++        target.animate().cancel();
++        View.OnAttachStateChangeListener previous = DETACH.remove(target);
++        if (previous != null) target.removeOnAttachStateChangeListener(previous);
++        target.setAlpha(1f);
++        target.setTranslationY(0f);
++        if (!enabled(target.getContext()) || !target.isAttachedToWindow()) return;
++        View.OnAttachStateChangeListener detachReset = new View.OnAttachStateChangeListener() {
++            @Override public void onViewAttachedToWindow(View view) { }
++            @Override public void onViewDetachedFromWindow(View view) {
++                view.animate().cancel(); view.setAlpha(1f); view.setTranslationY(0f);
++                view.removeOnAttachStateChangeListener(this);
++                DETACH.remove(view);
++            }
++        };
++        target.addOnAttachStateChangeListener(detachReset);
++        DETACH.put(target, detachReset);
++        target.setAlpha(0f);
++        target.setTranslationY(NoteDialogs.dp(target.getContext(), 10));
++        target.animate().alpha(1f).translationY(0f).setDuration(180).withEndAction(() -> {
++            target.setAlpha(1f); target.setTranslationY(0f);
++            target.removeOnAttachStateChangeListener(detachReset);
++            if (DETACH.get(target) == detachReset) DETACH.remove(target);
++        }).start();
++    }
++
++    public static void applyActivityTransition(Activity activity, boolean entering) {
++        if (activity == null || !enabled(activity)) return;
++        int first = anim(activity, entering ? "note_enter" : "note_return_enter");
++        int second = anim(activity, entering ? "note_exit" : "note_return_exit");
++        if (first != 0 && second != 0) activity.overridePendingTransition(first, second);
++    }
++
++    private static int anim(Context context, String name) {
++        return context.getResources().getIdentifier(name, "anim", context.getPackageName());
++    }
++}
+diff --git a/app/src/main/res/anim/note_enter.xml b/app/src/main/res/anim/note_enter.xml
+new file mode 100644
+index 0000000..cb12b0b
+--- /dev/null
++++ b/app/src/main/res/anim/note_enter.xml
+@@ -0,0 +1,4 @@
++<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/decelerate_interpolator">
++    <alpha android:fromAlpha="0" android:toAlpha="1" android:duration="180"/>
++    <translate android:fromYDelta="12dp" android:toYDelta="0" android:duration="180"/>
++</set>
+diff --git a/app/src/main/res/anim/note_exit.xml b/app/src/main/res/anim/note_exit.xml
+new file mode 100644
+index 0000000..db531ab
+--- /dev/null
++++ b/app/src/main/res/anim/note_exit.xml
+@@ -0,0 +1,3 @@
++<set xmlns:android="http://schemas.android.com/apk/res/android">
++    <alpha android:fromAlpha="1" android:toAlpha="0.92" android:duration="180"/>
++</set>
+diff --git a/app/src/main/res/anim/note_return_enter.xml b/app/src/main/res/anim/note_return_enter.xml
+new file mode 100644
+index 0000000..4bc0a35
+--- /dev/null
++++ b/app/src/main/res/anim/note_return_enter.xml
+@@ -0,0 +1,3 @@
++<set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/decelerate_interpolator">
++    <alpha android:fromAlpha="0.92" android:toAlpha="1" android:duration="160"/>
++</set>
+diff --git a/app/src/main/res/anim/note_return_exit.xml b/app/src/main/res/anim/note_return_exit.xml
+new file mode 100644
+index 0000000..326d648
+--- /dev/null
++++ b/app/src/main/res/anim/note_return_exit.xml
+@@ -0,0 +1,4 @@
++<set xmlns:android="http://schemas.android.com/apk/res/android">
++    <alpha android:fromAlpha="1" android:toAlpha="0" android:duration="160"/>
++    <translate android:fromYDelta="0" android:toYDelta="8dp" android:duration="160"/>
++</set>
+diff --git a/tests/note-creation/NoteCreationChoicesTest.java b/tests/note-creation/NoteCreationChoicesTest.java
+new file mode 100644
+index 0000000..00e18ef
+--- /dev/null
++++ b/tests/note-creation/NoteCreationChoicesTest.java
+@@ -0,0 +1,39 @@
++package cn.qingyue.pdf;
++
++import android.content.SharedPreferences;
++import java.util.HashMap;
++import java.util.Map;
++
++public final class NoteCreationChoicesTest {
++    private static final class MemoryPreferences implements SharedPreferences, SharedPreferences.Editor {
++        final Map<String,String> values=new HashMap<>();
++        @Override public String getString(String key,String fallback){return values.getOrDefault(key,fallback);}
++        @Override public Editor edit(){return this;}
++        @Override public Editor putString(String key,String value){values.put(key,value);return this;}
++        @Override public void apply(){}
++    }
++    private static void check(boolean condition,String message){if(!condition)throw new AssertionError(message);}
++    public static void main(String[] args){
++        MemoryPreferences p=new MemoryPreferences();
++        NoteCreationChoices fresh=new NoteCreationChoices(p);
++        check("infinite".equals(fresh.size)&&"blank".equals(fresh.template),"fresh creation must default to infinite blank draft");
++        fresh.paged();fresh.size("B5");fresh.template("grid");fresh.draft();
++        check(p.values.isEmpty(),"closing dialog without submit must not write preferences");
++        final int[] calls={0};
++        check(!fresh.submit("  ",(name,template,size)->calls[0]++),"empty title must fail");
++        check(calls[0]==0&&p.values.isEmpty(),"empty title must not create or save");
++        check(fresh.submit("  草稿  ",(name,template,size)->{
++            calls[0]++;check("草稿".equals(name)&&"grid".equals(template)&&"infinite".equals(size),"create callback values");
++        }),"valid draft submit");
++        check(calls[0]==1,"single creation callback");
++        NoteCreationChoices restored=new NoteCreationChoices(p);
++        check("infinite".equals(restored.size)&&"grid".equals(restored.template),"draft preference restored");
++        restored.paged();check("B5".equals(restored.size),"last finite size restored");
++        restored.submit("分页",(name,template,size)->check("B5".equals(size),"paged callback size"));
++        NoteCreationChoices paged=new NoteCreationChoices(p);
++        check("B5".equals(paged.size),"paged preference restored");
++        p.values.put("size","bad");p.values.put("template","bad");
++        NoteCreationChoices invalid=new NoteCreationChoices(p);
++        check("A4".equals(invalid.size)&&"blank".equals(invalid.template),"invalid stored values must fall back safely");
++    }
++}
+diff --git a/tests/note-creation/run.ps1 b/tests/note-creation/run.ps1
+new file mode 100644
+index 0000000..97533ab
+--- /dev/null
++++ b/tests/note-creation/run.ps1
+@@ -0,0 +1,9 @@
++param([Parameter(Mandatory=$true)][string]$BuildDirectory)
++$ErrorActionPreference='Stop'
++$projectRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
++$classes=Join-Path $BuildDirectory 'classes'
++New-Item -ItemType Directory -Force -Path $classes | Out-Null
++& javac -encoding UTF-8 --release 8 -d $classes (Join-Path $PSScriptRoot 'stubs/android/content/SharedPreferences.java') (Join-Path $projectRoot 'app/src/main/java/cn/qingyue/pdf/NoteCreationChoices.java') (Join-Path $PSScriptRoot 'NoteCreationChoicesTest.java')
++if($LASTEXITCODE -ne 0){throw 'Note creation choices compilation failed'}
++& java -cp $classes cn.qingyue.pdf.NoteCreationChoicesTest
++if($LASTEXITCODE -ne 0){throw 'Note creation choices regression failed'}
+diff --git a/tests/note-creation/stubs/android/content/SharedPreferences.java b/tests/note-creation/stubs/android/content/SharedPreferences.java
+new file mode 100644
+index 0000000..4d0bf19
+--- /dev/null
++++ b/tests/note-creation/stubs/android/content/SharedPreferences.java
+@@ -0,0 +1,6 @@
++package android.content;
++public interface SharedPreferences {
++    String getString(String key,String fallback);
++    Editor edit();
++    interface Editor { Editor putString(String key,String value); void apply(); }
++}
+diff --git a/tests/note-motion/NoteMotionTest.java b/tests/note-motion/NoteMotionTest.java
+new file mode 100644
+index 0000000..c83ad31
+--- /dev/null
++++ b/tests/note-motion/NoteMotionTest.java
+@@ -0,0 +1,33 @@
++package cn.qingyue.pdf;
++import android.app.Activity;
++import android.view.View;
++
++public final class NoteMotionTest {
++    private static void check(boolean value,String message){if(!value)throw new AssertionError(message);}
++    public static void main(String[] args){
++        Activity activity=new Activity();View view=new View(activity);
++        NoteMotion.enter(view);
++        check(view.alpha==0&&view.translationY==10&&view.animator.starts==1,"entry animation starts");
++        NoteMotion.enter(view);
++        check(view.listeners.size()==1&&view.animator.cancels==2,"repeat replaces old animation and detach listener");
++        view.detach();
++        check(view.alpha==1&&view.translationY==0&&view.listeners.isEmpty(),"detached view restores normal state");
++        View disabled=new View(activity);
++        for(int axis=0;axis<3;axis++){
++            activity.resolver.animator=activity.resolver.transition=activity.resolver.window=1;
++            if(axis==0)activity.resolver.animator=0;
++            if(axis==1)activity.resolver.transition=0;
++            if(axis==2)activity.resolver.window=0;
++            disabled.setAlpha(.4f);disabled.setTranslationY(7);
++            NoteMotion.enter(disabled);
++            check(disabled.alpha==1&&disabled.translationY==0&&disabled.animator.starts==0,"disabled scale restores view");
++            NoteMotion.applyActivityTransition(activity,true);
++            check(activity.calls==0,"disabled scale skips activity transition");
++        }
++        activity.resolver.animator=activity.resolver.transition=activity.resolver.window=1;
++        NoteMotion.applyActivityTransition(activity,true);
++        check(activity.calls==1&&activity.first=="note_enter".hashCode()&&activity.second=="note_exit".hashCode(),"enter resources");
++        NoteMotion.applyActivityTransition(activity,false);
++        check(activity.calls==2&&activity.first=="note_return_enter".hashCode()&&activity.second=="note_return_exit".hashCode(),"return resources");
++    }
++}
+diff --git a/tests/note-motion/run.ps1 b/tests/note-motion/run.ps1
+new file mode 100644
+index 0000000..313d079
+--- /dev/null
++++ b/tests/note-motion/run.ps1
+@@ -0,0 +1,10 @@
++param([Parameter(Mandatory=$true)][string]$BuildDirectory)
++$ErrorActionPreference='Stop'
++$projectRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
++$classes=Join-Path $BuildDirectory 'classes'
++New-Item -ItemType Directory -Force -Path $classes | Out-Null
++$stubs=@(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'stubs') -Recurse -Filter '*.java' | ForEach-Object FullName)
++& javac -encoding UTF-8 --release 8 -d $classes @stubs (Join-Path $projectRoot 'app/src/main/java/cn/qingyue/pdf/NoteMotion.java') (Join-Path $PSScriptRoot 'NoteMotionTest.java')
++if($LASTEXITCODE -ne 0){throw 'Note motion compilation failed'}
++& java -cp $classes cn.qingyue.pdf.NoteMotionTest
++if($LASTEXITCODE -ne 0){throw 'Note motion regression failed'}
+diff --git a/tests/note-motion/stubs/android/app/Activity.java b/tests/note-motion/stubs/android/app/Activity.java
+new file mode 100644
+index 0000000..959e234
+--- /dev/null
++++ b/tests/note-motion/stubs/android/app/Activity.java
+@@ -0,0 +1,5 @@
++package android.app;
++public class Activity extends android.content.Context {
++    public int first,second,calls;
++    public void overridePendingTransition(int first,int second){this.first=first;this.second=second;calls++;}
++}
+diff --git a/tests/note-motion/stubs/android/content/ContentResolver.java b/tests/note-motion/stubs/android/content/ContentResolver.java
+new file mode 100644
+index 0000000..9ef77fa
+--- /dev/null
++++ b/tests/note-motion/stubs/android/content/ContentResolver.java
+@@ -0,0 +1,2 @@
++package android.content;
++public class ContentResolver { public float animator=1,transition=1,window=1; }
+diff --git a/tests/note-motion/stubs/android/content/Context.java b/tests/note-motion/stubs/android/content/Context.java
+new file mode 100644
+index 0000000..08af710
+--- /dev/null
++++ b/tests/note-motion/stubs/android/content/Context.java
+@@ -0,0 +1,9 @@
++package android.content;
++import android.content.res.Resources;
++public class Context {
++    public final ContentResolver resolver=new ContentResolver();
++    public final Resources resources=new Resources();
++    public ContentResolver getContentResolver(){return resolver;}
++    public Resources getResources(){return resources;}
++    public String getPackageName(){return "cn.qingyue.pdf";}
++}
+diff --git a/tests/note-motion/stubs/android/content/res/Resources.java b/tests/note-motion/stubs/android/content/res/Resources.java
+new file mode 100644
+index 0000000..8e78718
+--- /dev/null
++++ b/tests/note-motion/stubs/android/content/res/Resources.java
+@@ -0,0 +1,5 @@
++package android.content.res;
++public class Resources {
++    public String lastName;
++    public int getIdentifier(String name,String type,String pkg){lastName=name;return name.hashCode();}
++}
+diff --git a/tests/note-motion/stubs/android/provider/Settings.java b/tests/note-motion/stubs/android/provider/Settings.java
+new file mode 100644
+index 0000000..7bb74a4
+--- /dev/null
++++ b/tests/note-motion/stubs/android/provider/Settings.java
+@@ -0,0 +1,15 @@
++package android.provider;
++import android.content.ContentResolver;
++public class Settings {
++    public static class Global {
++        public static final String ANIMATOR_DURATION_SCALE="animator";
++        public static final String TRANSITION_ANIMATION_SCALE="transition";
++        public static final String WINDOW_ANIMATION_SCALE="window";
++        public static float getFloat(ContentResolver resolver,String key,float fallback){
++            if(key.equals(ANIMATOR_DURATION_SCALE))return resolver.animator;
++            if(key.equals(TRANSITION_ANIMATION_SCALE))return resolver.transition;
++            if(key.equals(WINDOW_ANIMATION_SCALE))return resolver.window;
++            return fallback;
++        }
++    }
++}
+diff --git a/tests/note-motion/stubs/android/view/View.java b/tests/note-motion/stubs/android/view/View.java
+new file mode 100644
+index 0000000..2ec7747
+--- /dev/null
++++ b/tests/note-motion/stubs/android/view/View.java
+@@ -0,0 +1,32 @@
++package android.view;
++import android.content.Context;
++import java.util.ArrayList;
++public class View {
++    public interface OnAttachStateChangeListener {void onViewAttachedToWindow(View view);void onViewDetachedFromWindow(View view);}
++    public final Context context;
++    public final Animator animator=new Animator(this);
++    public final ArrayList<OnAttachStateChangeListener> listeners=new ArrayList<>();
++    public float alpha=1,translationY;
++    public boolean attached=true;
++    public View(Context context){this.context=context;}
++    public Context getContext(){return context;}
++    public Animator animate(){return animator;}
++    public void setAlpha(float value){alpha=value;}
++    public void setTranslationY(float value){translationY=value;}
++    public boolean isAttachedToWindow(){return attached;}
++    public void addOnAttachStateChangeListener(OnAttachStateChangeListener listener){listeners.add(listener);}
++    public void removeOnAttachStateChangeListener(OnAttachStateChangeListener listener){listeners.remove(listener);}
++    public void detach(){attached=false;for(OnAttachStateChangeListener listener:new ArrayList<>(listeners))listener.onViewDetachedFromWindow(this);}
++    public static class Animator {
++        private final View view;private Runnable end;
++        public int cancels,starts;public long duration;
++        Animator(View view){this.view=view;}
++        public Animator alpha(float value){return this;}
++        public Animator translationY(float value){return this;}
++        public Animator setDuration(long value){duration=value;return this;}
++        public Animator withEndAction(Runnable value){end=value;return this;}
++        public void start(){starts++;}
++        public void cancel(){cancels++;end=null;}
++        public void finish(){if(end!=null){Runnable action=end;end=null;action.run();}}
++    }
++}
+diff --git a/tests/note-motion/stubs/cn/qingyue/pdf/NoteDialogs.java b/tests/note-motion/stubs/cn/qingyue/pdf/NoteDialogs.java
+new file mode 100644
+index 0000000..2032274
+--- /dev/null
++++ b/tests/note-motion/stubs/cn/qingyue/pdf/NoteDialogs.java
+@@ -0,0 +1,3 @@
++package cn.qingyue.pdf;
++import android.content.Context;
++public class NoteDialogs { static int dp(Context context,int value){return value;} }
+-- 
+2.53.0.windows.3
+

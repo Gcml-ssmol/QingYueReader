@@ -5,6 +5,15 @@ public final class InkInput {
     private InkInput(){}
     public static boolean isPen(int toolType){return toolType==2||toolType==4;}
     public static boolean canTouchDraw(boolean penOnly){return !penOnly;}
+    /** Same stored alpha for PDF and note markers; existing colors remain untouched. */
+    public static int markerColor(int color){return (color&0x00ffffff)|0x55000000;}
+    /** Keeps lift-off's zero pressure from replacing the last drawn pressure. */
+    public static final class PressureSamples {
+        private float last;
+        public void begin(float pressure){last=Float.isNaN(pressure)||Float.isInfinite(pressure)?1:pressure;}
+        public float move(float pressure){if(!Float.isNaN(pressure)&&!Float.isInfinite(pressure)&&pressure>0)last=pressure;return pressure;}
+        public float release(float pressure){return Float.isNaN(pressure)||Float.isInfinite(pressure)||pressure<=0?last:pressure;}
+    }
     public static final int TOUCH=0,BEGIN=1,MOVE=2,END=3,CANCEL=4,IGNORE=5;
     /** Color picking permits a finger, but a real pen takes priority over a resting palm. */
     public static final class Picker {

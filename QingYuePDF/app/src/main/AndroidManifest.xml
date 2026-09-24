@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.qingyue.pdf" android:versionCode="8" android:versionName="1.7.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.qingyue.pdf" android:versionCode="24" android:versionName="1.14.0">
     <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="35" />
-    <application android:label="晴阅" android:icon="@drawable/ic_launcher" android:theme="@style/AppTheme" android:allowBackup="false" android:supportsRtl="true" android:enableOnBackInvokedCallback="false">
+    <application android:name=".QingYueApplication" android:label="晴阅" android:icon="@drawable/ic_launcher" android:theme="@style/AppTheme" android:allowBackup="false" android:supportsRtl="true" android:enableOnBackInvokedCallback="false">
         <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -11,10 +11,17 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="qingyue" android:host="source" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" android:mimeType="application/pdf" />
                 <data android:mimeType="application/msword" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
                 <data android:mimeType="text/plain" />
+                <data android:mimeType="application/epub+zip" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -23,8 +30,12 @@
                 <data android:mimeType="application/msword" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
                 <data android:mimeType="text/plain" />
+                <data android:mimeType="application/epub+zip" />
             </intent-filter>
         </activity>
         <activity android:name=".NoteActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".OcrActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".GlobalSearchActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".AppearanceActivity" android:exported="false" />
     </application>
 </manifest>
