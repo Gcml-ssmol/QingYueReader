@@ -33,10 +33,16 @@ import java.util.Set;
 /** Atomic Android storage, 1.7 migration, and explicit local-library reconstruction. */
 public final class LibraryStore {
     private static final Object WRITE_LOCK = new Object();
+    private static volatile CacheEntry cache;
+    private static final class CacheEntry {
+        final String path;final long modified,length;final State state;
+        CacheEntry(File file,State state){this.path=file.getAbsolutePath();this.modified=file.lastModified();this.length=file.length();this.state=new State(state);}
+        boolean matches(File file){return path.equals(file.getAbsolutePath())&&file.isFile()&&modified==file.lastModified()&&length==file.length()&&!new File(file.getPath()+".bak").exists();}
+    }
     private static volatile String recoveryWarning="";
     private static volatile Thread recoveryThread;
     static Object transactionLock(){return WRITE_LOCK;}
-    static void recoveryGate(String warning,Thread owner){recoveryThread=owner;recoveryWarning=warning==null?"":warning;}
+    static void recoveryGate(String warning,Thread owner){recoveryThread=owner;recoveryWarning=warning==null?"":warning;cache=null;}
     private static String recoveryWarning(){return Thread.currentThread()==recoveryThread?"":recoveryWarning;}
     private static final String LEGACY_PREFERENCES = "MainActivity";
     private static final String LEGACY_KEY = "library";
@@ -67,6 +73,12 @@ public final class LibraryStore {
             this.migrated = migrated;
             this.warning = warning == null ? "" : warning;
             this.revision = logicalRevision(items, folders);
+        }
+        private State(State source){
+            items=new ArrayList<>(source.items.size());for(LibraryItem item:source.items)items.add(item.copy());
+            folders=new ArrayList<>(source.folders.size());for(LibraryFolder folder:source.folders)folders.add(folder.copy());
+            damaged=new ArrayList<>(source.damaged);allowSave=source.allowSave;migrated=source.migrated;
+            warning=source.warning;revision=source.revision;
         }
     }
 
@@ -105,6 +117,16 @@ public final class LibraryStore {
     }
 
     private static State loadLocked(Context context) {
+        File file=indexFile(context);if(cache!=null&&cache.matches(file))return new State(cache.state);
+        State loaded=readLocked(context);
+        if(file.isFile()&&!new File(file.getPath()+".bak").exists())cache=new CacheEntry(file,loaded);else cache=null;
+        return loaded;
+    }
+
+    /** Use after an external restore/recovery that may replace the index outside LibraryStore. */
+    public static State loadFresh(Context context){synchronized(WRITE_LOCK){cache=null;return loadLocked(context);}}
+
+    private static State readLocked(Context context) {
         Context app = context.getApplicationContext();
         File index = indexFile(app);
         AtomicFile atomic = new AtomicFile(index);
@@ -180,6 +202,7 @@ public final class LibraryStore {
                 output.write(bytes);
                 output.flush();
                 atomic.finishWrite(output);
+                cache=null;
             } catch (IOException | RuntimeException failure) {
                 if (output != null) atomic.failWrite(output);
                 if (failure instanceof IOException) throw (IOException) failure;
@@ -218,6 +241,7 @@ public final class LibraryStore {
             }
             if (!expectedRevision.equals(current.revision)) throw new StaleIndexException();
             Collection<LibraryFolder> nextFolders = folders == null ? current.folders : folders;
+            if(logicalRevision(items,nextFolders).equals(current.revision))return current.revision;
             save(context, items, nextFolders);
             return loadLocked(context).revision;
         }
@@ -237,6 +261,22 @@ public final class LibraryStore {
             mutation.apply(next);
             save(context, next);
             return loadLocked(context);
+        }
+    }
+    /** Commits only the reader position against the latest index, preserving concurrent metadata. */
+    public static State updatePage(Context context,String id,int page) throws IOException {
+        if(!LibraryItem.isUuid(id)||page<0)throw new IOException("无效的阅读位置");
+        synchronized(WRITE_LOCK){
+            State current=loadLocked(context);
+            if(!current.allowSave)throw new IOException(current.warning.isEmpty()?"资料库索引当前不可写":current.warning);
+            ArrayList<LibraryItem> next=new ArrayList<>(current.items.size());boolean found=false,changed=false;
+            for(LibraryItem source:current.items){LibraryItem item=source.copy();if(id.equals(item.id)){
+                if(item.isTrashed()||page>=item.pages)throw new IOException("文档页码已变化，请重新打开");
+                found=true;if(item.page!=page){item.page=page;changed=true;}
+            }next.add(item);}
+            if(!found)throw new IOException("文档已移除，请重新打开");
+            if(changed)save(context,next,current.folders);
+            return changed?loadLocked(context):current;
         }
     }
 
@@ -440,7 +480,6 @@ public final class LibraryStore {
         item.created = item.created > 0 ? item.created : Math.max(1, sourceModified);
         item.modified = Math.max(item.modified, Math.max(1, sourceModified));
         item.opened = Math.max(0, item.opened);
-        item.trashedAt = 0;
         item.name = empty(item.name) ? (note ? "恢复的笔记" : "恢复的 PDF") : item.name;
         item.originalName = empty(item.originalName) ? item.name : item.originalName;
         return item;

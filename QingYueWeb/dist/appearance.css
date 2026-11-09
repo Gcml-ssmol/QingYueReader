@@ -1,0 +1,189 @@
+/* Classic keeps the original style.css + tablet.css layout intact. */
+html[data-ui=classic] .warm-only,html[data-ui=warm] .classic-only{display:none!important}
+.ui-icon{width:22px;height:22px;flex-shrink:0;vertical-align:middle}
+html[data-ui=classic] .toolbar .ui-icon,html[data-ui=classic] .file-icon .ui-icon{display:none}
+html[data-ui=classic] .tool-label{display:contents}
+html[data-ui=classic] .main-actions>#import-button{flex:1.4}
+:root[data-ui=warm]{--paper:#fff9f1;--surface:#fffcf8;--ink:#30251e;--muted:#938578;--accent:#d85917;--soft:#ffead5;--line:#eddfce;--danger:#aa3b2d;background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+html[data-ui=warm] body{background:radial-gradient(ellipse at 95% 8%,#fce6ce66,transparent 38%),var(--paper)}
+html[data-ui=warm] button{border-radius:13px;transition:background-color .15s,border-color .15s;box-shadow:none}
+html[data-ui=warm] button:focus-visible,html[data-ui=warm] input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+html[data-ui=warm] .primary{background:linear-gradient(130deg,#eb701f,#cf4c0c);border-color:#d85a14;color:#fff;box-shadow:inset 0 1px 0 #ffffff55,0 3px 7px #d75b1310}
+html[data-ui=warm] #library{max-width:1320px;padding:calc(25px + env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+html[data-ui=warm] .brand{margin-bottom:20px;align-items:flex-start}
+html[data-ui=warm] .brand h1{font-family:"Songti SC","STSong","SimSun",serif;font-weight:800;font-size:32px;letter-spacing:1px;line-height:1.12;color:#653115}
+html[data-ui=warm] .brand h1 small{display:none}
+html[data-ui=warm] .brand p{font-size:13px;margin-top:7px;letter-spacing:1px}
+html[data-ui=warm] .local-badge{display:inline-flex;background:var(--soft);border-radius:30px;color:#a94c1f;font-size:11px;font-weight:600;letter-spacing:.5px;padding:7px 12px;margin-top:2px}
+html[data-ui=warm] .settings-gear{display:none}
+html[data-ui=warm] .library-welcome{position:relative;overflow:hidden;isolation:isolate;min-height:231px;padding:23px 16px 14px;background:linear-gradient(112deg,#ffe0bc 0%,#ffedd8 56%,#fce1c4 100%);border:1px solid #f8dabc;border-radius:20px;margin-bottom:17px}
+html[data-ui=warm] .welcome-copy{position:relative;z-index:1;pointer-events:none}
+html[data-ui=warm] .eyebrow{color:#a45c31;font-size:9px;font-weight:600;letter-spacing:2.4px;margin-bottom:9px}
+html[data-ui=warm] .welcome-copy h2{font-size:24px;letter-spacing:.5px;line-height:1.3;color:#432915;font-family:"Songti SC","STSong","SimSun",serif;font-weight:800}
+html[data-ui=warm] .welcome-subtitle{margin-top:5px;color:#68503d;font-size:13px;letter-spacing:.5px}
+html[data-ui=warm] .welcome-detail{font-size:11px;line-height:1.6;margin-top:10px;color:#80674f}
+html[data-ui=warm] .welcome-art{position:absolute;right:-42px;bottom:48px;width:206px;z-index:-1;opacity:.95}
+html[data-ui=warm] .main-actions{display:flex;position:relative;align-items:center;gap:7px;margin:22px 0 0;max-width:none}
+html[data-ui=warm] .main-actions>button{flex:1;min-height:41px;padding:8px 9px;font-size:12px;font-weight:600;white-space:nowrap;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px}
+html[data-ui=warm] .main-actions .ui-icon{width:15px;height:15px}
+html[data-ui=warm] #continue-reading{order:0;flex:1.35}
+html[data-ui=warm] #new-note{order:1;background:#fffcf5;border-color:#eddac3}
+html[data-ui=warm] #import-button{order:2;background:#fffcf5;border-color:#eddac3;color:#493425;box-shadow:none}
+html[data-ui=warm] .search-box{border-radius:16px;min-height:49px;box-shadow:0 1px 0 #fff9;padding:0 13px;gap:10px}
+html[data-ui=warm] .search-box>span{font-size:0;display:flex;color:#8e7a69}
+html[data-ui=warm] .search-box input{font-size:13px;min-height:47px}
+html[data-ui=warm] #clear-search{border:0;background:none;padding:0;width:32px;min-height:36px;font-size:23px;color:var(--muted)}
+html[data-ui=warm] .library-heading{margin:16px 0 8px;font-size:13px}
+html[data-ui=warm] #breadcrumbs button{min-height:36px;font-size:13px;padding:3px 0}
+html[data-ui=warm] #new-folder{font-size:12px}
+html[data-ui=warm] .tabs{gap:8px}
+html[data-ui=warm] .tabs button,html[data-ui=warm] #search-kinds button{min-height:34px;padding:6px 13px;font-size:12px;border-radius:22px}
+html[data-ui=warm] .selected{background:var(--soft)!important;color:var(--accent)!important;border-color:#e9ba95!important}
+html[data-ui=warm] .tabs .selected,html[data-ui=warm] #search-kinds .selected{background:var(--accent)!important;color:white!important;border-color:var(--accent)!important}
+html[data-ui=warm] .list-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:23px 2px 12px}
+html[data-ui=warm] .list-heading h2{font-size:16px;font-weight:650;white-space:nowrap}
+html[data-ui=warm] #library-count{margin:0;font-size:11px;text-align:right;color:var(--muted)}
+html[data-ui=warm] #items{gap:10px;grid-template-columns:minmax(0,1fr)}
+html[data-ui=warm] .item{border-radius:15px;box-shadow:none;min-height:99px;background:linear-gradient(110deg,var(--surface),var(--surface))}
+html[data-ui=warm] .item-open{gap:14px;padding:13px 12px;min-height:97px}
+html[data-ui=warm] .item-info strong{font-size:14px;line-height:1.5;font-weight:600}
+html[data-ui=warm] .item-info span{font-size:11px;line-height:1.7;margin-top:5px}
+html[data-ui=warm] .file-icon{height:66px;width:47px;display:flex;flex-direction:column;justify-content:center;gap:5px;border:0;border-radius:9px;background:#ffe8d2;color:#d65d1c;font-size:11px;font-weight:650}
+html[data-ui=warm] .file-icon.note{background:#f0e9de;color:#947757;font-size:0}
+html[data-ui=warm] .file-icon.folder{font-size:27px;background:var(--soft)}
+html[data-ui=warm] .file-icon .ui-icon{width:18px;height:20px}
+html[data-ui=warm] .file-icon.note .ui-icon{width:25px;height:29px}
+html[data-ui=warm] .item>.icon-button{font-size:19px;margin-right:6px;width:29px;min-height:44px;color:#776355}
+html[data-ui=warm] .empty{grid-column:1/-1;border-style:solid;background:var(--surface);padding:35px 20px;border-radius:16px}
+html[data-ui=warm] .empty .empty-icon{font-size:35px;margin-bottom:12px}
+html[data-ui=warm] .empty h2{font-size:17px}
+html[data-ui=warm] .empty p{font-size:12px}
+html[data-ui=warm] .empty button{font-size:13px;min-height:40px}
+html[data-ui=warm] .library-footer{margin-top:24px;font-size:11px}
+html[data-ui=warm] .library-footer button{font-size:11px}
+html[data-ui=warm] #bottom-nav{position:fixed;z-index:6;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-around;padding:6px max(9px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left));border:1px solid var(--line);border-radius:22px 22px 0 0;background:var(--surface);box-shadow:0 -3px 12px #a06b3405}
+html[data-ui=warm] #bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:0;background:none;min-height:55px;font-size:10px;color:var(--muted);width:25%;padding:5px}
+html[data-ui=warm] #bottom-nav button[aria-current=page]{color:var(--accent);font-weight:650}
+html[data-ui=warm] #bottom-nav .ui-icon{width:21px;height:21px}
+html[data-ui=warm] #bottom-nav button[aria-current=page] .ui-icon{stroke-width:2}
+html[data-ui=warm] .search-header,html[data-ui=warm] #search-kinds{display:none}
+html[data-ui=warm] #library.search-view .brand,html[data-ui=warm] #library.search-view .library-welcome,html[data-ui=warm] #library.search-view .library-heading,html[data-ui=warm] #library.search-view .tabs{display:none}
+html[data-ui=warm] #library.search-view .search-header{display:flex;align-items:center;gap:4px;margin-bottom:21px;margin-left:-10px}
+html[data-ui=warm] .search-header h2{font-size:19px;margin-bottom:4px}
+html[data-ui=warm] .search-header p{font-size:12px;color:var(--muted)}
+html[data-ui=warm] #library.search-view #search-kinds{display:flex;gap:9px;margin-top:13px}
+html[data-ui=warm] #library.search-view .list-heading{margin-top:30px}
+html[data-ui=warm] #library.trash-view .library-welcome{display:none}
+html[data-ui=warm] #reader{background:var(--paper);padding-top:env(safe-area-inset-top)}
+html[data-ui=warm] .reader-header{border:0;background:transparent;padding:12px 13px 12px 4px;gap:4px}
+html[data-ui=warm] .reader-header h2{font-size:14px;line-height:1.6}
+html[data-ui=warm] .reader-header span{font-size:11px}
+html[data-ui=warm] .reader-controls{margin:0 12px 8px;border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--surface);box-shadow:0 3px 12px #e6c09910}
+html[data-ui=warm] .toolbar{border:0;padding:7px 5px;gap:1px;justify-content:space-around;background:transparent}
+html[data-ui=warm] .toolbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;line-height:1.2;padding:6px 8px;min-height:56px;min-width:43px;background:transparent;border-color:transparent;border-radius:11px}
+html[data-ui=warm] .toolbar .ui-icon{width:23px;height:23px}
+html[data-ui=warm] .toolbar .selected{border-color:transparent!important;background:var(--soft)!important}
+html[data-ui=warm] .style-bar{font-size:11px;gap:8px;background:transparent;border-top:1px solid var(--line);padding:3px 9px}
+html[data-ui=warm] .style-bar .text-button{font-size:11px}
+html[data-ui=warm] .style-bar input[type=range]{width:58px}
+html[data-ui=warm] #page-scroll{padding:5px 12px 20px}
+html[data-ui=warm] #page-stage{box-shadow:0 2px 12px #7454350a;outline:1px solid var(--line);border-radius:8px;overflow:hidden}
+html[data-ui=warm] .reader-footer{margin:0 12px 12px;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:var(--surface);border:1px solid var(--line);border-radius:15px;gap:2px}
+html[data-ui=warm] .reader-footer .page-label{background:var(--soft);color:var(--accent);border-radius:11px;padding:4px 12px}
+html[data-ui=warm] .reader-footer .page-label input{border:0;background:transparent;color:var(--accent);width:34px}
+html[data-ui=warm] .reader-footer button{font-size:19px}
+html[data-ui=warm] .reader-footer #zoom-value{font-size:12px}
+html[data-ui=warm] dialog{padding:22px;border-radius:25px;background:var(--paper);box-shadow:0 18px 70px #56361926}
+html[data-ui=warm] dialog::backdrop{background:#49382869;backdrop-filter:blur(3px)}
+html[data-ui=warm] .modal-heading{margin-bottom:18px}
+html[data-ui=warm] dialog h2{font-size:20px}
+html[data-ui=warm] #modal-body{gap:12px}
+html[data-ui=warm] #modal-body .menu-action{background:var(--surface);padding:14px 15px;border-radius:13px;font-size:14px}
+html[data-ui=warm] #modal-body p{font-size:12px;line-height:1.8}
+html[data-ui=warm] #modal-body input:not([type=color]):not([type=range]),html[data-ui=warm] #modal-body textarea,html[data-ui=warm] #modal-body select{background:var(--surface);border-radius:12px}
+html[data-ui=warm] #busy{background:#fff9f0eb}
+.appearance-section{margin:1px 0 10px}
+.appearance-section h3{margin:0 0 2px;font-size:15px}
+.appearance-section>p{margin-bottom:12px}
+.appearance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.appearance-grid.themes{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.appearance-choice{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:14px 12px;border:1px solid var(--line);background:var(--surface);min-width:0;min-height:138px}
+.appearance-choice strong{font-size:13px;line-height:1.45}
+.appearance-choice small{font-size:11px;color:var(--muted);line-height:1.65}
+.appearance-choice[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.appearance-choice[aria-pressed=true]::after{content:'✓';position:absolute;right:7px;top:7px;width:16px;height:16px;border-radius:50%;color:white;background:var(--accent);font-size:11px;text-align:center;line-height:16px}
+dialog.appearance-dialog{max-height:calc(100dvh - 32px);width:min(590px,calc(100% - 28px))}
+#modal.appearance-dialog #modal-body{max-height:calc(100dvh - 164px);padding:2px;margin:-2px;overscroll-behavior:contain}
+.appearance-grid.themes .appearance-choice{padding:14px 8px;gap:7px;min-height:148px}
+.appearance-grid.themes .appearance-choice strong{font-size:11px;word-break:keep-all}
+.theme-sample{width:47px;height:47px;border-radius:50%;display:grid;place-items:center;background:#f6f0e7;color:#b99d7b;margin:0 0 2px}
+.theme-sample.light{background:#fff1dc;color:#e9691d}.theme-sample.dark{background:#ece7e0;color:#766b62}.theme-sample .ui-icon{width:27px;height:27px}
+.style-sample{width:100%;height:72px;border-radius:9px;background:#fff6e9;border:1px solid #ecddc8;padding:8px;display:grid;grid-template-columns:28% 1fr;gap:5px;overflow:hidden}
+.style-sample i{display:block;border-radius:4px;background:#f4e8d9}.style-sample i:first-child{grid-row:span 2;background:#f8cb9f}.style-sample i:last-child{background:#fffbf4;border:1px solid #eee2d3}
+.style-sample.classic{grid-template-columns:1fr}.style-sample.classic i:first-child{grid-row:auto;height:12px;background:#cc6320}.style-sample.classic i:last-child{height:17px}
+:root[data-theme=dark]{color-scheme:dark;--paper:#252321;--surface:#302d29;--ink:#eee4d8;--muted:#b7aa9a;--accent:#f49355;--soft:#523c2e;--line:#4c433a;--danger:#ffae98;background:var(--paper)}
+html[data-theme=dark] body{background:var(--paper)}
+html[data-theme=dark] .danger{background:#49302a}html[data-theme=dark] .selected{color:var(--accent)!important;background:var(--soft)!important;border-color:#976543!important}
+html[data-theme=dark] .empty{background:var(--surface)}html[data-theme=dark] #reader{background:#211f1d}html[data-theme=dark] #busy{background:#252321ed}
+html[data-theme=dark] #page-message{color:var(--muted)}html[data-theme=dark] .file-icon{background:var(--soft);color:var(--accent);border-color:var(--line)}
+html[data-ui=warm][data-theme=dark] .brand h1{color:#f3cbad}html[data-ui=warm][data-theme=dark] .local-badge{color:#f5b585}
+html[data-ui=warm][data-theme=dark] .library-welcome{background:linear-gradient(115deg,#493426,#3c3027);border-color:#59412d}
+html[data-ui=warm][data-theme=dark] .welcome-copy h2{color:#ffe6c9}html[data-ui=warm][data-theme=dark] .welcome-subtitle{color:#e4c6a5}html[data-ui=warm][data-theme=dark] .welcome-detail,html[data-ui=warm][data-theme=dark] .eyebrow{color:#c3a384}
+html[data-ui=warm][data-theme=dark] .welcome-art{opacity:.5}html[data-ui=warm][data-theme=dark] #new-note,html[data-ui=warm][data-theme=dark] #import-button{background:#362d26;border-color:#69513c;color:#efd5b8}
+html[data-ui=warm][data-theme=dark] .file-icon{background:#523c2e;color:#f9a36c}html[data-ui=warm][data-theme=dark] .file-icon.note{background:#474138;color:#cdb998}
+html[data-ui=warm][data-theme=dark] .tabs .selected,html[data-ui=warm][data-theme=dark] #search-kinds .selected{color:#2a211a!important}
+html[data-theme=dark] .style-sample{background:#3e3328;border-color:#6a5140}html[data-theme=dark] .style-sample i{background:#584333}html[data-theme=dark] .style-sample i:first-child{background:#986d48}html[data-theme=dark] .style-sample i:last-child{background:#302923;border-color:#69513f}
+@media(min-width:760px){
+ html[data-ui=warm] #library{grid-template-columns:205px minmax(0,1fr);gap:32px;padding-top:34px;padding-left:28px;padding-right:28px}
+ html[data-ui=warm] #library-sidebar{top:34px;padding:25px 12px;border-radius:21px;background:var(--surface);box-shadow:0 4px 20px #b2835110;min-height:calc(100dvh - 70px);max-height:calc(100dvh - 70px);padding-bottom:96px}
+ html[data-ui=warm] #library-sidebar h2{font-size:21px;font-family:"Songti SC","STSong","SimSun",serif;margin-bottom:25px}
+ html[data-ui=warm] .tree-row{min-height:43px;font-size:13px;border-radius:11px}
+ html[data-ui=warm] #library-sidebar p{font-size:11px}
+ html[data-ui=warm] #bottom-nav{left:40px;bottom:45px;right:auto;width:181px;display:grid;grid-template-columns:1fr 1fr;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:9px 0 0;gap:2px;background:var(--surface)}
+ html[data-ui=warm] #bottom-nav button{width:100%;min-height:47px;flex-direction:row;gap:8px;font-size:11px}
+ html[data-ui=warm] #bottom-nav .ui-icon{width:18px;height:18px}
+ html[data-ui=warm] .brand{margin:2px 0 24px}
+ html[data-ui=warm] .brand h1{font-size:38px}
+ html[data-ui=warm] .brand p{font-size:14px;margin-top:9px}
+ html[data-ui=warm] .local-badge{font-size:12px;padding:8px 14px;margin-top:6px}
+ html[data-ui=warm] .library-welcome{min-height:264px;padding:29px 25px 22px;border-radius:24px;margin-bottom:22px}
+ html[data-ui=warm] .welcome-copy h2{font-size:29px}
+ html[data-ui=warm] .welcome-subtitle{font-size:14px}
+ html[data-ui=warm] .welcome-detail{font-size:12px;margin-top:13px}
+ html[data-ui=warm] .welcome-art{width:260px;right:-29px;bottom:40px}
+ html[data-ui=warm] .main-actions{max-width:420px;gap:9px;margin-top:26px}
+ html[data-ui=warm] .main-actions>button{font-size:13px;min-height:45px}
+ html[data-ui=warm] .search-box input{font-size:14px;min-height:51px}
+ html[data-ui=warm] .library-heading{margin-top:18px}
+ html[data-ui=warm] .list-heading{margin-top:18px}
+ html[data-ui=warm] .list-heading h2{font-size:18px}
+ html[data-ui=warm] #library-count{font-size:12px}
+ html[data-ui=warm] .item{min-height:105px}
+ html[data-ui=warm] .item-info strong{font-size:15px}
+ html[data-ui=warm] .item-info span{font-size:12px}
+ html[data-ui=warm] .item-open{padding:15px;gap:15px}
+ html[data-ui=warm] .reader-header{padding:16px 20px 15px 8px}
+ html[data-ui=warm] .reader-header h2{font-size:17px}
+ html[data-ui=warm] .reader-controls{margin:0 20px 13px}
+ html[data-ui=warm] .toolbar{gap:10px;padding:8px 12px;justify-content:center}
+ html[data-ui=warm] .toolbar button{min-width:64px;font-size:11px}
+ html[data-ui=warm] .style-bar{padding:5px 18px;gap:15px}
+ html[data-ui=warm] .style-bar input[type=range]{width:100px}
+ html[data-ui=warm] #page-sidebar{border:1px solid var(--line);border-radius:17px;margin:5px 0 15px 20px;flex-basis:160px;background:var(--surface)}
+ html[data-ui=warm] #page-scroll{padding:5px 20px 24px}
+ html[data-ui=warm] .reader-footer{max-width:600px;align-self:center;width:calc(100% - 40px);gap:15px;margin-bottom:17px}
+ html[data-ui=warm] dialog{width:min(590px,calc(100% - 48px));padding:29px}
+ .appearance-choice{padding:17px;min-height:155px}.appearance-choice strong{font-size:14px}.appearance-choice small{font-size:12px}.style-sample{height:88px}
+}
+@media(min-width:1100px){
+ html[data-ui=warm] #library{grid-template-columns:232px minmax(0,1fr);gap:42px;padding-left:32px;padding-right:32px}
+ html[data-ui=warm] #bottom-nav{left:max(44px,calc((100vw - 1320px)/2 + 44px));width:208px}
+ html[data-ui=warm] .library-welcome{padding:31px;min-height:278px}
+ html[data-ui=warm] .welcome-copy h2{font-size:32px}
+ html[data-ui=warm] .welcome-art{width:340px;right:12px;bottom:2px}
+ html[data-ui=warm] .main-actions{max-width:390px}
+ html[data-ui=warm] #items{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html[data-ui=warm] .reader-controls{display:flex;justify-content:space-between}
+ html[data-ui=warm] .style-bar{border:0}
+}
+@media(max-width:359px){html[data-ui=warm] #library{padding-left:14px;padding-right:14px}html[data-ui=warm] .welcome-copy h2{font-size:22px}html[data-ui=warm] .main-actions{gap:5px}html[data-ui=warm] .main-actions>button{font-size:11px;padding:8px 5px}html[data-ui=warm] .main-actions .ui-icon{width:13px}.appearance-choice{padding:12px 8px}.appearance-choice strong{font-size:12px}.appearance-choice small{font-size:10px}.appearance-grid.themes{gap:6px}html[data-ui=warm] .toolbar button{padding:6px;min-width:40px}}

@@ -26,8 +26,8 @@ public final class IconButton extends View {
         setContentDescription(label);
         setClickable(true);
         setFocusable(true);
-        setMinimumWidth(dp(48));
-        setMinimumHeight(dp(48));
+        setMinimumWidth(UiMetrics.touch(context));
+        setMinimumHeight(UiMetrics.touch(context));
         setOnLongClickListener(v -> {
             Toast.makeText(getContext(), label, Toast.LENGTH_SHORT).show();
             return true;
@@ -57,7 +57,8 @@ public final class IconButton extends View {
     }
 
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
-        setMeasuredDimension(resolveSize(dp(48), widthSpec), resolveSize(dp(48), heightSpec));
+        setMeasuredDimension(resolveSize(UiMetrics.touch(getContext()), widthSpec),
+                resolveSize(UiMetrics.touch(getContext()), heightSpec));
     }
 
     @Override protected void drawableStateChanged() {
@@ -110,7 +111,7 @@ public final class IconButton extends View {
             paint.setColor(active ? AppColors.ACCENT_DARK : AppColors.MUTED);
             paint.setAlpha(Math.round(255 * opacity));
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setTextSize(10f * getResources().getDisplayMetrics().scaledDensity);
+            paint.setTextSize(UiMetrics.sp(getContext(), 10));
             float available = getWidth() - dp(5);
             if (paint.measureText(visualLabel) > available)
                 paint.setTextSize(paint.getTextSize() * available / paint.measureText(visualLabel));
@@ -291,6 +292,11 @@ public final class IconButton extends View {
             case "plus":
                 line(c, 12, 5, 12, 19);
                 line(c, 5, 12, 19, 12);
+                break;
+            case "import":
+                line(c, 12, 3, 12, 15);
+                poly(c, false, 7, 10, 12, 15, 17, 10);
+                poly(c, false, 4, 17, 4, 21, 20, 21, 20, 17);
                 break;
             case "sun":
                 c.drawCircle(12, 12, 4.5f, paint);

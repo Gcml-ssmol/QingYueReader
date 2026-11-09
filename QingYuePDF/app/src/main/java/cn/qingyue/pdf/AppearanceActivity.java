@@ -46,9 +46,9 @@ public final class AppearanceActivity extends ThemedActivity {
         content.setPadding(0, dp(12), 0, dp(12));
         scroll.addView(content);
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
-        heading(content, "界面风格", "选择你喜欢的晴阅，随时可以切换");
+        heading(content, "界面风格", "选择资料库与阅读器的界面");
         LinearLayout styles = choiceRow(content, 2);
-        tile(styles, "奶油 · 杏橙", "柔和留白，圆角卡片", "style", AppColors.STYLE_CREAM,
+        tile(styles, "Codex · 极简", "中性色与清晰层级", "style", AppColors.STYLE_CREAM,
                 AppColors.style(), "cream");
         tile(styles, "经典 · 原版", "保留原来的界面样式", "style", AppColors.STYLE_CLASSIC,
                 AppColors.style(), "classic");
@@ -56,14 +56,19 @@ public final class AppearanceActivity extends ThemedActivity {
         int mode = prefs.getInt("mode", 0);
         if (AppColors.isClassic()) {
             choice(content, "跟随系统", "自动适应设备的深浅色设置", "◐", 0, mode, "mode", false);
-            choice(content, "浅色 · 奶油白", "柔和底色与杏橙点缀", "☀", 1, mode, "mode", false);
-            choice(content, "深色 · 暖灰", "夜间阅读更舒适", "☾", 2, mode, "mode", true);
+            choice(content, "浅色 · 中性", "明亮界面与清晰层级", "☀", 1, mode, "mode", false);
+            choice(content, "深色 · 中性", "低亮度阅读界面", "☾", 2, mode, "mode", true);
         } else {
             LinearLayout themes = choiceRow(content, 3);
             tile(themes, "跟随系统", "自动适应\n设备的深浅色", "mode", 0, mode, "system");
-            tile(themes, "浅色 · 奶油白", "柔和底色\n与杏橙点缀", "mode", 1, mode, "light");
-            tile(themes, "深色 · 暖灰", "夜间阅读\n更舒适", "mode", 2, mode, "dark");
+            tile(themes, "浅色 · 中性", "明亮界面\n与清晰层级", "mode", 1, mode, "light");
+            tile(themes, "深色 · 中性", "低亮度\n阅读界面", "mode", 2, mode, "dark");
         }
+        heading(content, "阅读页面夜间显示", "只改变屏幕显示；PDF 照片可能变色，笔记附图保持原色");
+        int nightPages = UiDisplayMode.selected(this);
+        choice(content, "跟随界面主题", "深色界面自动显示夜间页面", "◐", UiDisplayMode.FOLLOW_THEME, nightPages, "nightPages", false);
+        choice(content, "保持原色", "PDF 页面与笔记画布照原色显示", "▤", UiDisplayMode.ORIGINAL, nightPages, "nightPages", false);
+        choice(content, "夜间页面", "PDF 页面照片可能变色；笔记附图保持原色", "☾", UiDisplayMode.NIGHT_PAGE, nightPages, "nightPages", true);
         heading(content, "笔记纸张", "纸张预览底色独立于界面主题");
         int paper = prefs.getInt("paper", 0);
         if (AppColors.isClassic()) {
@@ -177,16 +182,16 @@ public final class AppearanceActivity extends ThemedActivity {
             float width = getWidth(), height = getHeight();
             if (kind.equals("cream") || kind.equals("classic")) {
                 boolean classic = kind.equals("classic");
-                int background = AppColors.isDark() ? 0xff29231f : classic ? 0xfffff5e9 : 0xfffff8ef;
-                int surface = AppColors.isDark() ? 0xff40332a : classic ? 0xfffffcf6 : 0xfffffcf7;
-                int soft = AppColors.isDark() ? 0xff65422d : classic ? 0xffffe6cf : 0xffffe7d1;
-                int accent = AppColors.isDark() ? 0xfff2a16b : classic ? 0xffd8702a : 0xffde5c16;
+                int background = classic ? (AppColors.isDark() ? 0xff211d19 : 0xfffff5e9) : (AppColors.isDark() ? 0xff191919 : 0xfff8f8f7);
+                int surface = classic ? (AppColors.isDark() ? 0xff2d2722 : 0xfffffcf6) : (AppColors.isDark() ? 0xff222222 : 0xffffffff);
+                int soft = classic ? (AppColors.isDark() ? 0xff473426 : 0xffffe6cf) : (AppColors.isDark() ? 0xff323232 : 0xffececeb);
+                int accent = classic ? (AppColors.isDark() ? 0xffffb783 : 0xffa6430c) : (AppColors.isDark() ? 0xffffb783 : 0xffa9490f);
                 round(canvas, 0, 0, width, height, 8, background);
                 round(canvas, dp(7), dp(7), width * .4f, dp(11), 2, accent);
                 round(canvas, dp(7), dp(17), width - dp(7), dp(35), classic ? 4 : 7, soft);
                 round(canvas, dp(7), dp(41), width - dp(7), height - dp(6), classic ? 3 : 6, surface);
                 round(canvas, dp(12), dp(45), dp(21), height - dp(10), 2, accent);
-                round(canvas, dp(27), dp(46), width * .78f, dp(49), 1, AppColors.isDark() ? 0xffb99880 : 0xffbb9d83);
+                round(canvas, dp(27), dp(46), width * .78f, dp(49), 1, AppColors.MUTED);
             } else if (kind.equals("ivory") || kind.equals("white")) {
                 float right = Math.min(width, dp(66));
                 round(canvas, 1, 1, right - 1, height - 1, 7, kind.equals("white") ? 0xffffffff : AppColors.EXPORT_PAPER);
@@ -201,12 +206,12 @@ public final class AppearanceActivity extends ThemedActivity {
                 boolean system = kind.equals("system"), night = kind.equals("dark");
                 float center = Math.min(width * .5f, dp(34));
                 round(canvas, center - dp(28), dp(3), center + dp(28), height - dp(3), 22,
-                        night ? 0xffede7df : system ? 0xfff1eae0 : 0xfffff0de);
+                        night ? 0xff303030 : system ? 0xffe8e8e7 : 0xfff3f3f2);
                 if (system) {
-                    sun(canvas, center - dp(12), height / 2, 0xff7c7065, 7);
-                    moon(canvas, center + dp(12), height / 2, 0xfffffcf7, 0xfff1eae0, 10);
-                } else if (night) moon(canvas, center, height / 2, 0xff72685e, 0xffede7df, 14);
-                else sun(canvas, center, height / 2, 0xffde5c16, 10);
+                    sun(canvas, center - dp(12), height / 2, 0xff444444, 7);
+                    moon(canvas, center + dp(12), height / 2, 0xfff2f2f1, 0xffe8e8e7, 10);
+                } else if (night) moon(canvas, center, height / 2, 0xfff2f2f1, 0xff303030, 14);
+                else sun(canvas, center, height / 2, 0xff20201f, 10);
             }
         }
         private void round(Canvas canvas, float l, float t, float r, float b, int radius, int color) {

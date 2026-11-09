@@ -12,7 +12,10 @@ final class PdfTextBoxes {
     static float lineHeight(ReaderDocument.TextBox box){return box.size*1.25f;}
     static float estimatedWidth(ReaderDocument.TextBox box){float width=0;for(String line:lines(box.text))width=Math.max(width,line.codePointCount(0,line.length())*box.size*.95f);return Math.max(width,.06f);}
     static void draw(Canvas canvas,Paint paint,ReaderDocument.TextBox box){
-        paint.setStyle(Paint.Style.FILL);paint.setColor(box.color);paint.setTypeface(android.graphics.Typeface.create("sans-serif",android.graphics.Typeface.NORMAL));paint.setTextAlign(Paint.Align.LEFT);paint.setTextSize(box.size);
+        draw(canvas,paint,box,box.color);
+    }
+    static void draw(Canvas canvas,Paint paint,ReaderDocument.TextBox box,int displayColor){
+        paint.setStyle(Paint.Style.FILL);paint.setColor(displayColor);paint.setTypeface(android.graphics.Typeface.create("sans-serif",android.graphics.Typeface.NORMAL));paint.setTextAlign(Paint.Align.LEFT);paint.setTextSize(box.size);
         int index=0;for(String line:lines(box.text)){canvas.drawText(line,box.x,box.y+box.size+index*lineHeight(box),paint);index++;}
     }
     static boolean hit(ReaderDocument.TextBox box,float x,float y){

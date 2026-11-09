@@ -1,11 +1,11 @@
 <resources>
     <style name="DarkAppTheme" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#E6A36F</item>
-        <item name="android:colorControlActivated">#E6A36F</item>
-        <item name="android:colorControlNormal">#C0B09F</item>
+        <item name="android:colorAccent">#FFB783</item>
+        <item name="android:colorControlActivated">#FFB783</item>
+        <item name="android:colorControlNormal">#D2C1B1</item>
         <item name="android:textColorPrimary">#F4E9DD</item>
-        <item name="android:textColorSecondary">#C0B09F</item>
+        <item name="android:textColorSecondary">#D2C1B1</item>
         <item name="android:colorBackground">#211D19</item>
         <item name="android:colorBackgroundFloating">#2D2722</item>
         <item name="android:windowBackground">#211D19</item>
@@ -17,11 +17,11 @@
     </style>
     <style name="DarkAppDialogTheme" parent="android:style/Theme.Material.Dialog.Alert">
         <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#E6A36F</item>
-        <item name="android:colorControlActivated">#E6A36F</item>
-        <item name="android:colorControlNormal">#C0B09F</item>
+        <item name="android:colorAccent">#FFB783</item>
+        <item name="android:colorControlActivated">#FFB783</item>
+        <item name="android:colorControlNormal">#D2C1B1</item>
         <item name="android:textColorPrimary">#F4E9DD</item>
-        <item name="android:textColorSecondary">#C0B09F</item>
+        <item name="android:textColorSecondary">#D2C1B1</item>
         <item name="android:colorBackground">#2D2722</item>
         <item name="android:colorBackgroundFloating">#2D2722</item>
         <item name="android:windowBackground">@drawable/dialog_background_dark</item>
@@ -29,28 +29,28 @@
         <item name="android:backgroundDimAmount">0.35</item>
     </style>
     <style name="CreamDarkAppTheme" parent="DarkAppTheme">
-        <item name="android:colorAccent">#F2A16B</item>
-        <item name="android:colorControlActivated">#F2A16B</item>
-        <item name="android:colorControlNormal">#C9B5A4</item>
-        <item name="android:colorControlHighlight">#33F2A16B</item>
-        <item name="android:textColorPrimary">#F8EEE4</item>
-        <item name="android:textColorSecondary">#C9B5A4</item>
-        <item name="android:colorBackground">#29231F</item>
-        <item name="android:colorBackgroundFloating">#332B25</item>
-        <item name="android:windowBackground">#29231F</item>
-        <item name="android:statusBarColor">#29231F</item>
-        <item name="android:navigationBarColor">#29231F</item>
+        <item name="android:colorAccent">#FFB783</item>
+        <item name="android:colorControlActivated">#FFB783</item>
+        <item name="android:colorControlNormal">#C3C3BF</item>
+        <item name="android:colorControlHighlight">#33FFB783</item>
+        <item name="android:textColorPrimary">#F2F2F1</item>
+        <item name="android:textColorSecondary">#C3C3BF</item>
+        <item name="android:colorBackground">#191919</item>
+        <item name="android:colorBackgroundFloating">#222222</item>
+        <item name="android:windowBackground">#191919</item>
+        <item name="android:statusBarColor">#191919</item>
+        <item name="android:navigationBarColor">#191919</item>
         <item name="android:alertDialogTheme">@style/CreamDarkAppDialogTheme</item>
     </style>
     <style name="CreamDarkAppDialogTheme" parent="DarkAppDialogTheme">
-        <item name="android:colorAccent">#F2A16B</item>
-        <item name="android:colorControlActivated">#F2A16B</item>
-        <item name="android:colorControlNormal">#C9B5A4</item>
-        <item name="android:colorControlHighlight">#33F2A16B</item>
-        <item name="android:textColorPrimary">#F8EEE4</item>
-        <item name="android:textColorSecondary">#C9B5A4</item>
-        <item name="android:colorBackground">#332B25</item>
-        <item name="android:colorBackgroundFloating">#332B25</item>
+        <item name="android:colorAccent">#FFB783</item>
+        <item name="android:colorControlActivated">#FFB783</item>
+        <item name="android:colorControlNormal">#C3C3BF</item>
+        <item name="android:colorControlHighlight">#33FFB783</item>
+        <item name="android:textColorPrimary">#F2F2F1</item>
+        <item name="android:textColorSecondary">#C3C3BF</item>
+        <item name="android:colorBackground">#222222</item>
+        <item name="android:colorBackgroundFloating">#222222</item>
         <item name="android:windowBackground">@drawable/cream_dialog_background_dark</item>
     </style>
 </resources>

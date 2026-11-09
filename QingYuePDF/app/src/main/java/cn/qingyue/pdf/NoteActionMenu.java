@@ -15,16 +15,6 @@ import android.widget.TextView;
 final class NoteActionMenu {
     private NoteActionMenu() { }
 
-    static Dialog show(Context context, View anchor, int page, int count, Runnable sources,
-                       Runnable pdf, Runnable png, Runnable append, Runnable settings) {
-        return showActions(context, anchor, "笔记操作",
-                new Action("↗", "查看来源", "打开笔记里的来源链接", sources),
-                new Action("PDF", "导出 PDF", "导出全部 " + count + " 页", pdf),
-                new Action("PNG", "导出 PNG", "仅导出当前第 " + page + " 页", png),
-                new Action("+", "追加空白页", "在第 " + count + " 页之后继续书写", append),
-                new Action("⚙", "笔记设置", "插页、页面方向与书写选项", settings));
-    }
-
     static final class Action {
         final String symbol, heading, detail; final Runnable run;
         Action(String symbol, String heading, String detail, Runnable run) {

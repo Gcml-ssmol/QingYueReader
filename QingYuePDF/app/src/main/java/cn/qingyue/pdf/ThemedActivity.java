@@ -17,7 +17,10 @@ public class ThemedActivity extends Activity {
         if (style != 0) setTheme(style);
         super.onCreate(state);
     }
-    @Override protected void onPostCreate(Bundle state) { super.onPostCreate(state); applyChrome(); }
+    @Override protected void onPostCreate(Bundle state) {
+        super.onPostCreate(state); applyChrome();
+        NoteMotion.applyActivityTransition(this, true);
+    }
     @Override protected void onResume() {
         super.onResume();
         AppColors.apply(this);
@@ -25,6 +28,10 @@ public class ThemedActivity extends Activity {
         applyChrome();
     }
     @Override protected void onPostResume() { super.onPostResume(); applyChrome(); }
+    @Override public void finish() {
+        super.finish();
+        NoteMotion.applyActivityTransition(this, false);
+    }
     private void applyChrome() {
         getWindow().setStatusBarColor(AppColors.BACKGROUND);
         getWindow().setNavigationBarColor(Build.VERSION.SDK_INT >= 27 ? AppColors.BACKGROUND

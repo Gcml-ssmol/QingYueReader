@@ -23,9 +23,14 @@ final class NoteTextLayout {
     }
 
     static void draw(Canvas canvas, NoteDocument.Item item) {
+        draw(canvas, item, item.color);
+    }
+
+    /** Display override must not mutate the stored item used by export. */
+    static void draw(Canvas canvas, NoteDocument.Item item, int color) {
         int save = canvas.save();
         canvas.translate((float)item.left(), (float)item.top());
-        StaticLayout layout = layout(item.text, item.width, item.color, item.right() - item.left());
+        StaticLayout layout = layout(item.text, item.width, color, item.right() - item.left());
         layout.draw(canvas);
         canvas.restoreToCount(save);
     }

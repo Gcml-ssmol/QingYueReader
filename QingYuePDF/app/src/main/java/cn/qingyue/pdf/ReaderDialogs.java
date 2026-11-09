@@ -62,6 +62,11 @@ public final class ReaderDialogs {
 
     public static Dialog settings(Activity owner, boolean horizontal, boolean twoFinger,
             SettingsChanged callback) {
+        return settings(owner, horizontal, twoFinger, callback, null);
+    }
+
+    public static Dialog settings(Activity owner, boolean horizontal, boolean twoFinger,
+            SettingsChanged callback, Runnable nightOptions) {
         CardDialog dialog = new CardDialog(owner);
         final boolean[] values = {horizontal, twoFinger};
         title(dialog, "阅读设置", "按自己的习惯阅读与批注", "settings", false, true);
@@ -111,9 +116,9 @@ public final class ReaderDialogs {
         toggle.setMinimumHeight(dp(owner, 48));
         toggle.setPadding(dp(owner, 5), 0, 0, 0);
         toggle.setThumbTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
-                new int[]{AppColors.ACCENT, 0xffbaa694}));
+                new int[]{AppColors.ACCENT, AppColors.MUTED}));
         toggle.setTrackTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
-                new int[]{0xffffcc9f, AppColors.BORDER}));
+                new int[]{AppColors.SOFT, AppColors.BORDER}));
         toggle.setOnCheckedChangeListener((button, checked) -> {
             values[1] = checked;
             if (callback != null) callback.changed(values[0], values[1]);
@@ -125,6 +130,13 @@ public final class ReaderDialogs {
         TextView note = text(owner, "两根手指同时短按并抬起即可撤销。双指移动仍用于缩放与平移。", 12, AppColors.MUTED);
         note.setLineSpacing(dp(owner, 3), 1f);
         dialog.body.addView(note, new LinearLayout.LayoutParams(-1, -2));
+        if (nightOptions != null) {
+            gap(dialog.body, 18);
+            LinearLayout night = operation(owner, "sun", "阅读页面显示",
+                    "跟随界面主题、保持原色或夜间页面", false, false);
+            night.setOnClickListener(v -> { dialog.dismiss(); nightOptions.run(); });
+            dialog.body.addView(night, new LinearLayout.LayoutParams(-1, -2));
+        }
         gap(dialog.body, 24);
         singleButton(dialog, "完成", dialog::dismiss);
         dialog.show();

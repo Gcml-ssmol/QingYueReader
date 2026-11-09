@@ -4,7 +4,7 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
     <style name="CreamAppTheme" parent="BaseCreamAppTheme">
-        <item name="android:navigationBarColor">#FFF8EF</item>
+        <item name="android:navigationBarColor">#F8F8F7</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

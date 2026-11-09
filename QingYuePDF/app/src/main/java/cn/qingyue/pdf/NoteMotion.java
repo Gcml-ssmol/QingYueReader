@@ -3,6 +3,7 @@ package cn.qingyue.pdf;
 import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings;
+import android.os.Build;
 import android.view.View;
 import java.util.WeakHashMap;
 
@@ -48,10 +49,25 @@ public final class NoteMotion {
 
     public static void applyActivityTransition(Activity activity, boolean entering) {
         if (activity == null) return;
-        if (!enabled(activity)) { activity.overridePendingTransition(0, 0); return; }
+        if (!enabled(activity)) {
+            if (Build.VERSION.SDK_INT >= 34) Api34.transition(activity, entering, 0, 0);
+            else activity.overridePendingTransition(0, 0);
+            return;
+        }
         int first = anim(activity, entering ? "note_enter" : "note_return_enter");
         int second = anim(activity, entering ? "note_exit" : "note_return_exit");
-        if (first != 0 && second != 0) activity.overridePendingTransition(first, second);
+        if (first != 0 && second != 0) {
+            if (Build.VERSION.SDK_INT >= 34) Api34.transition(activity, entering, first, second);
+            else activity.overridePendingTransition(first, second);
+        }
+    }
+
+    private static final class Api34 {
+        static void transition(Activity activity, boolean entering, int first, int second) {
+            activity.overrideActivityTransition(
+                    entering ? Activity.OVERRIDE_TRANSITION_OPEN : Activity.OVERRIDE_TRANSITION_CLOSE,
+                    first, second);
+        }
     }
 
     private static int anim(Context context, String name) {

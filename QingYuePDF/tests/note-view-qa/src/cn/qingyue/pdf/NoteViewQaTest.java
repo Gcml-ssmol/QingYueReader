@@ -6,6 +6,7 @@ import android.graphics.*;
 import android.view.*;
 import android.widget.*;
 import java.lang.reflect.*;
+import java.io.*;
 import java.util.*;
 
 /** Calls production View dispatch and drawing. Android dependencies record commands only. */
@@ -141,23 +142,81 @@ public final class NoteViewQaTest {
     static void walk(View v,List<View> rows){if(v.getContentDescription()!=null)rows.add(v);if(v instanceof ViewGroup)for(View c:((ViewGroup)v).children)walk(c,rows);}
     static void menu() {
         Context context=new Context();View anchor=new View(context);anchor.layout(0,0,40,40);anchor.screenY=20;
-        String[] labels={"查看来源","导出 PDF","导出 PNG","追加空白页","笔记设置"};
-        for(int index=0;index<5;index++){
-            final int[] calls=new int[5];final Dialog[] holder=new Dialog[1];Runnable[] actions=new Runnable[5];
-            for(int i=0;i<5;i++){final int n=i;actions[i]=()->{check(!holder[0].shown,"menu dismisses before action");calls[n]++;};}
-            holder[0]=NoteActionMenu.show(context,anchor,2,3,actions[0],actions[1],actions[2],actions[3],actions[4]);
+        String[] labels={"查看来源","导出 PDF","导出 PNG","只读浏览","缩放与定位","页面操作","笔记设置"};
+        for(int index=0;index<labels.length;index++){
+            final int[] calls=new int[labels.length];final Dialog[] holder=new Dialog[1];NoteActionMenu.Action[] actions=new NoteActionMenu.Action[labels.length];
+            for(int i=0;i<labels.length;i++){final int n=i;actions[i]=new NoteActionMenu.Action("●",labels[i],
+                    i==2?"导出当前第 2 页":i==5?"插入、复制、清空、删除与调序":"操作",()->{check(!holder[0].shown,"menu dismisses before action");calls[n]++;});}
+            holder[0]=NoteActionMenu.showActions(context,anchor,"笔记操作",actions);
             check(holder[0].content instanceof ScrollView,"menu has scroll container");
-            List<View> rows=new ArrayList<>();walk(holder[0].content,rows);check(rows.size()==5,"menu exposes five operations");
-            for(int i=0;i<5;i++)check(rows.get(i).getContentDescription().toString().startsWith(labels[i]),"operation order and label "+i);
+            List<View> rows=new ArrayList<>();walk(holder[0].content,rows);check(rows.size()==labels.length,"menu exposes production operations");
+            for(int i=0;i<labels.length;i++)check(rows.get(i).getContentDescription().toString().startsWith(labels[i]),"operation order and label "+i);
             check(rows.get(2).getContentDescription().toString().contains("第 2 页"),"PNG describes current page");
-            rows.get(index).performClick();for(int i=0;i<5;i++)check(calls[i]==(i==index?1:0),"callback mapping "+index+"/"+i);
+            rows.get(index).performClick();for(int i=0;i<labels.length;i++)check(calls[i]==(i==index?1:0),"callback mapping "+index+"/"+i);
         }
         anchor.visible.set(0,0,220,180);context.getResources().getDisplayMetrics().scaledDensity=2;
-        Runnable noop=()->{};Dialog small=NoteActionMenu.show(context,anchor,1,500,noop,noop,noop,noop,noop);
+        NoteActionMenu.Action[] actions=new NoteActionMenu.Action[labels.length];for(int i=0;i<labels.length;i++)actions[i]=new NoteActionMenu.Action("●",labels[i],"操作",()->{});
+        Dialog small=NoteActionMenu.showActions(context,anchor,"笔记操作",actions);
         check(small.getWindow().width<=188,"menu fits narrow split window");check(small.getWindow().height<=148,"menu fits short/keyboard window");
         ScrollView scroll=(ScrollView)small.content;check(scroll.children.get(0).getMeasuredHeight()>small.getWindow().height,"large-font menu content remains scrollable");
-        anchor.visible.set(0,0,0,0);Dialog fallback=NoteActionMenu.show(context,anchor,1,1,noop,noop,noop,noop,noop);
+        anchor.visible.set(0,0,0,0);Dialog fallback=NoteActionMenu.showActions(context,anchor,"笔记操作",actions);
         check(fallback.getWindow().width>0&&fallback.getWindow().width<=360,"zero-frame fallback uses display size");
+    }
+    static void textDraftAndPageTarget()throws Exception {
+        Fixture f=new Fixture(3);f.view.selectPage(1);
+        long id=f.doc.newId();f.doc.add(new NoteDocument.Item(id,NoteDocument.TEXT,0xff2464d6,20,
+                new double[]{80,80,300,130},"","before"));
+        NoteTextDraft edit=new NoteTextDraft("after","20",0xff2464d6,f.doc.pageToken(1),1,id,
+                NoteTextDraft.structure(f.doc),false);
+        f.view.insertPage(0);check(edit.resolvePage(f.doc)==2,"draft follows target page after front insertion");
+        f.view.selectPage(edit.resolvePage(f.doc));check(f.view.selectText(edit.itemId),"draft reselects original text item");
+        int count=f.doc.items().size();check(f.view.putText(edit.text,20,edit.color),"edited draft saves successfully");
+        check(f.doc.items().size()==count&&f.doc.find(id)!=null&&f.doc.find(id).color==0xff2464d6
+                &&f.doc.find(id).text.equals("after"),"edit preserves item id, count and arbitrary color");
+        ByteArrayOutputStream wire=new ByteArrayOutputStream();NoteDocument.write(wire,f.doc);
+        NoteDocument reopened=NoteDocument.read(new ByteArrayInputStream(wire.toByteArray()));
+        check(reopened.pageIndex(edit.pageToken)<0,"disk reopen renews transient page tokens");
+        NoteTextDraft rotation=new NoteTextDraft("paused text","24",0xff2464d6,f.doc.pageToken(2),2,id,
+                NoteTextDraft.structure(f.doc),true);
+        check(rotation.resolvePage(reopened)==2,"rotation restores draft using unchanged page structure");
+        NoteCanvasView restored=new NoteCanvasView(f.context,reopened,"qa",new Host());restored.layout(0,0,800,600);
+        restored.selectPage(rotation.resolvePage(reopened));check(restored.selectText(id),"rotation reselects existing object");
+        count=reopened.items().size();check(restored.putText(rotation.text,24,rotation.color),"restored edit saves");
+        check(reopened.items().size()==count&&reopened.find(id).text.equals("paused text"),"rotation edit never inserts duplicate");
+        NoteTextDraft insertion=new NoteTextDraft("new","16",0xff223344,reopened.pageToken(2),2,0,
+                NoteTextDraft.structure(reopened),false);
+        restored.insertPage(0);check(insertion.resolvePage(reopened)==3,"new text draft follows page after insertion");
+        restored.selectPage(3);restored.deletePage();check(insertion.resolvePage(reopened)==-1,"deleted draft page is rejected");
+        restored.setReadOnly(true);int before=reopened.items().size();
+        check(!restored.putText("blocked",20,0xff123456)&&reopened.items().size()==before,"read-only cannot save restored draft");
+    }
+    static void delayedImageTarget()throws Exception {
+        Fixture f=new Fixture(3);f.view.selectPage(1);String token=f.doc.pageToken(1);
+        f.view.selectPage(2);f.view.insertPage(0);f.view.movePage(2,3);
+        int target=f.doc.pageIndex(token);check(target==3,"image target follows insertion and reordering");
+        f.view.selectPage(target);check(f.view.insertImage("photo.png",640,480),"delayed image inserts on captured page");
+        check(f.doc.pageItems(3).size()==1&&f.doc.pageItems(2).isEmpty(),"delayed image never lands on formerly selected page");
+        ByteArrayOutputStream wire=new ByteArrayOutputStream();NoteDocument.write(wire,f.doc);
+        NoteDocument reopened=NoteDocument.read(new ByteArrayInputStream(wire.toByteArray()));
+        check(reopened.pageIndex(token)==-1,"rotation makes in-flight image token invalid for safe cancellation");
+        f.view.deletePage();check(f.doc.pageIndex(token)==-1,"deleted image target is invalidated");
+    }
+    static void delayedTextDismiss(){
+        NoteTextDialogLifecycle lifecycle=new NoteTextDialogLifecycle();
+        final boolean[] draftPresent={true};
+        NoteTextDialogLifecycle.Session beforePause=lifecycle.open();
+        Runnable oldCallback=()->{if(lifecycle.dismissed(beforePause))draftPresent[0]=false;};
+        lifecycle.pause(beforePause);
+        NoteTextDialogLifecycle.Session resumed=lifecycle.open();
+        check(lifecycle.isActive(resumed)&&draftPresent[0],"resume opens a new editor with draft intact");
+        oldCallback.run();
+        check(lifecycle.isActive(resumed)&&draftPresent[0],"late pre-pause dismiss cannot clear resumed editor");
+        check(lifecycle.cancel(resumed),"explicit cancel owns current editor");
+        draftPresent[0]=false;
+        NoteTextDialogLifecycle.Session next=lifecycle.open();
+        check(!lifecycle.dismissed(resumed)&&lifecycle.isActive(next)&&!draftPresent[0],"late cancel dismiss cannot affect a later editor");
+        check(lifecycle.dismissed(next),"ordinary back-dismiss discards current draft");
+        check(!lifecycle.isActive(next),"dismissed editor is no longer active");
     }
     static float wxScreen(Fixture f,double x)throws Exception{return (float)(400+(x-field(f.view,"cx"))*field(f.view,"zoom"));}
     static float wyScreen(Fixture f,double y)throws Exception{return (float)(300+(y-field(f.view,"cy"))*field(f.view,"zoom"));}
@@ -246,8 +305,23 @@ public final class NoteViewQaTest {
         Fixture single=new Fixture("infinite",1);check(!NoteEditorPresentation.hasPageNavigation(single.doc),"new single infinite has location UI");check(NoteEditorPresentation.pagePosition(single.doc).equals("无限草稿"),"single infinite label");
     }
 
+    static void insertionChoiceThroughCanvas(){
+        Fixture f=new Fixture(3);
+        for(int page=0;page<3;page++){f.view.selectPage(page);f.view.putText("original " + page,16,0xff123456);}
+        int before=PageInsertionPosition.index(1,f.doc.pageCount(),true);
+        f.view.insertPage(before);
+        check(f.doc.pageCount()==4&&f.doc.currentPage()==1,"before choice selects inserted page");
+        check(f.doc.pageItems(1).isEmpty(),"before choice creates blank page");
+        check("original 1".equals(f.doc.pageItems(2).get(0).text),"before choice preserves target content after blank");
+        int after=PageInsertionPosition.index(2,f.doc.pageCount(),false);
+        f.view.insertPage(after);
+        check(f.doc.pageCount()==5&&f.doc.currentPage()==3,"after choice selects inserted page");
+        check(f.doc.pageItems(3).isEmpty(),"after choice creates blank page");
+        check("original 1".equals(f.doc.pageItems(2).get(0).text)&&"original 2".equals(f.doc.pageItems(4).get(0).text),"after choice preserves neighbours");
+    }
+
     public static void main(String[] args)throws Exception {
-        try {shapeInteriorSelection();readOnlyAndLegacy();editOperations();eraserPagesAndInfinite();presetsAndDisabledMenus();pinchAndRestore();boundaryEditing();selectionAndAppend();drawingIsolation();palmAndModes();menu();System.out.println("PASS NoteViewQaTest "+assertions+" assertions (production Views, Android recording shims; not device rendering)");System.exit(0);}
+        try {shapeInteriorSelection();readOnlyAndLegacy();insertionChoiceThroughCanvas();editOperations();eraserPagesAndInfinite();presetsAndDisabledMenus();pinchAndRestore();boundaryEditing();selectionAndAppend();drawingIsolation();palmAndModes();menu();textDraftAndPageTarget();delayedImageTarget();delayedTextDismiss();System.out.println("PASS NoteViewQaTest "+assertions+" assertions (production Views, Android recording shims; not device rendering)");System.exit(0);}
         catch(Throwable error){error.printStackTrace();System.exit(1);}
     }
 }

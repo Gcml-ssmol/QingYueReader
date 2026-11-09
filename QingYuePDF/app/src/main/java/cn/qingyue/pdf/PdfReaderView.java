@@ -45,10 +45,11 @@ public final class PdfReaderView extends View {
     private int initialPage,selectedPage;
     private boolean positionPending=true;
     private float pendingY=Float.NaN;
+    private ViewportSnapshot pendingViewport;
     private double scroll;
     private float zoom=1,panX,panY;
     private final ZoomBadge zoomBadge=new ZoomBadge();
-    private boolean horizontalPaging;
+    private boolean horizontalPaging,nightPageDisplay;
     private float slideOffset;
     private int slideTarget=-1;
     private android.animation.ValueAnimator pageAnimator;
@@ -124,6 +125,44 @@ public final class PdfReaderView extends View {
         setBackgroundColor(AppColors.CANVAS);setContentDescription("连续 PDF 页面，上下滚动，左右翻页，双指缩放、短按撤销；手写笔可批注");
         pen.setStrokeCap(Paint.Cap.ROUND);pen.setStrokeJoin(Paint.Join.ROUND);prepare();
     }
+    /** Changes only the on-screen PDF raster; source, ink, and export stay untouched. */
+    public void setNightPageDisplay(boolean enabled){if(nightPageDisplay!=enabled){nightPageDisplay=enabled;invalidate();}}
+    public boolean isNightPageDisplayEnabled(){return nightPageDisplay;}
+    /** Page and page-relative center anchor survive Activity recreation and view resizing. */
+    public static final class ViewportSnapshot {
+        public final int page;
+        public final float zoom,anchorX,anchorY;
+        public final boolean horizontalPaging;
+        public ViewportSnapshot(int page,float zoom,float anchorX,float anchorY,boolean horizontalPaging){
+            this.page=page;this.zoom=zoom;this.anchorX=anchorX;this.anchorY=anchorY;
+            this.horizontalPaging=horizontalPaging;
+        }
+    }
+    public ViewportSnapshot captureViewport(){
+        if(pendingViewport!=null)return pendingViewport;
+        if(layout==null||getWidth()<=0||getHeight()<=0)return new ViewportSnapshot(
+                Math.max(0,Math.min(count-1,selectedPage)),zoom,.5f,.5f,horizontalPaging);
+        int page=selectedPage;
+        float x=ReaderViewportMath.horizontalAnchor(pageWidth(),panX);
+        float y=horizontalPaging
+                ?ReaderViewportMath.horizontalPageAnchor((float)layout.height(page)*pageWidth(),panY)
+                :(float)ReaderViewportMath.selectionAnchor(scroll,layout.top(page),layout.height(page),viewport());
+        return new ViewportSnapshot(page,zoom,clampUnit(x),clampUnit(y),horizontalPaging);
+    }
+    /** Safe before metadata or dimensions arrive; the pending anchor applies when both exist. */
+    public void restoreViewport(ViewportSnapshot snapshot){
+        if(snapshot==null||disposed||count<1)return;
+        if(Float.isNaN(snapshot.zoom)||Float.isInfinite(snapshot.zoom)
+                ||Float.isNaN(snapshot.anchorX)||Float.isInfinite(snapshot.anchorX)
+                ||Float.isNaN(snapshot.anchorY)||Float.isInfinite(snapshot.anchorY))return;
+        finishGesture();stopFling();cancelPageAnimation();cancelDetailRequests();
+        pendingViewport=new ViewportSnapshot(Math.max(0,Math.min(count-1,snapshot.page)),
+                (float)ZoomLimits.clamp(snapshot.zoom),clampUnit(snapshot.anchorX),
+                clampUnit(snapshot.anchorY),snapshot.horizontalPaging);
+        positionPending=false;
+        applyPendingPosition();
+    }
+    private static float clampUnit(float value){return Math.max(0,Math.min(1,value));}
     private float dp(float n){return n*getResources().getDisplayMetrics().density;}
     private float fittedWidth(int page){return HorizontalPaging.fitWidth(getWidth(),getHeight(),layout.height(page),dp(10));}
     private float pageWidth(){return (horizontalPaging&&layout!=null?fittedWidth(selectedPage):Math.max(1,getWidth()-dp(20)))*zoom;}
@@ -250,6 +289,7 @@ public final class PdfReaderView extends View {
         applyPendingPosition();
     }
     private void applyPendingPosition(){
+        if(pendingViewport!=null){applyPendingViewport();return;}
         if(!positionPending||layout==null||getWidth()<=0||getHeight()<=0)return;
         positionPending=false;int page=initialPage;selectedPage=page;
         if(Float.isNaN(pendingY)){scroll=layout.jumpScroll(page,viewport());panX=panY=0;if(horizontalPaging)zoom=1;}
@@ -258,6 +298,22 @@ public final class PdfReaderView extends View {
             else{scroll=layout.clampScroll(layout.top(page)+y-viewport()*.35,viewport());panY=0;}
         }
         notifyHost();invalidate();requestPage();requestDetailSoon();
+    }
+    private void applyPendingViewport(){
+        if(pendingViewport==null||layout==null||getWidth()<=0||getHeight()<=0)return;
+        ViewportSnapshot saved=pendingViewport;pendingViewport=null;
+        horizontalPaging=saved.horizontalPaging;selectedPage=initialPage=saved.page;
+        zoom=saved.zoom;float width=pageWidth();
+        panX=ReaderViewportMath.panX(width,saved.anchorX);
+        if(horizontalPaging){
+            panY=ReaderViewportMath.panY((float)layout.height(saved.page)*width,saved.anchorY);
+            scroll=layout.jumpScroll(saved.page,viewport());
+        }else{
+            panY=0;scroll=ReaderViewportMath.selectionScroll(layout.top(saved.page),layout.height(saved.page),viewport(),saved.anchorY);
+        }
+        updateViewport(true);
+        if(selectedPage==saved.page)notifyHost();
+        requestDetailSoon();
     }
     private void cancelPageAnimation(){
         if(pageAnimator!=null){pageAnimator.removeAllListeners();pageAnimator.removeAllUpdateListeners();pageAnimator.cancel();pageAnimator=null;}
@@ -289,7 +345,7 @@ public final class PdfReaderView extends View {
         super.onSizeChanged(w,h,oldw,oldh);
         if(layout!=null){
             if(horizontalPaging)cancelPageAnimation();
-            if(positionPending)applyPendingPosition();
+            if(positionPending||pendingViewport!=null)applyPendingPosition();
             else if(oldw>0&&oldh>0&&w>0&&h>0){
                 float oldBase=horizontalPaging?HorizontalPaging.fitWidth(oldw,oldh,layout.height(selectedPage),dp(10)):Math.max(1,oldw-dp(20));
                 float oldScale=oldBase*zoom,newBase=horizontalPaging?fittedWidth(selectedPage):Math.max(1,w-dp(20));
@@ -314,7 +370,7 @@ public final class PdfReaderView extends View {
         if(layout==null||disposed)return;
         if(horizontalPaging){panX=HorizontalPaging.clampPan(panX,pageWidth(),getWidth(),dp(10));panY=HorizontalPaging.clampPan(panY,(float)layout.height(selectedPage)*pageWidth(),getHeight(),dp(10));invalidate();requestPage();return;}
         scroll=layout.clampScroll(scroll,viewport());float limit=maxPan();panX=Math.max(-limit,Math.min(limit,panX));
-        if(updateSelection&&writing==null){int next=layout.pageAt(scroll+Math.min(viewport()*0.35,0.5));if(next!=selectedPage){cancelDetailRequests();selectedPage=next;notifyHost();}}
+        if(updateSelection&&writing==null){int next=layout.pageAt(scroll+ReaderViewportMath.selectionProbe(viewport()));if(next!=selectedPage){cancelDetailRequests();selectedPage=next;notifyHost();}}
         invalidate();requestPage();
     }
     private void notifyHost(){if(!disposed)host.changed(selectedPage);}
@@ -356,13 +412,17 @@ public final class PdfReaderView extends View {
     private void recalibratePage(int page,float ratio){
         if(layout==null||page<0||page>=layout.size()||Math.abs(layout.height(page)-ratio)<.0001)return;
         float renderedWidth=pageWidth();double anchorOffset=scroll-layout.top(selectedPage);
-        float centerY=horizontalPaging?(getHeight()/2f-top(selectedPage))/renderedWidth:0;
+        double anchorY=page==selectedPage?(horizontalPaging
+                ?ReaderViewportMath.horizontalPageAnchor((float)layout.height(page)*renderedWidth,panY)
+                :ReaderViewportMath.verticalAnchor(scroll,layout.top(page),layout.height(page),viewport())):0;
         layout=layout.withHeight(page,ratio);
         if(horizontalPaging&&page==selectedPage){
             zoom=(float)ZoomLimits.clamp(renderedWidth/fittedWidth(selectedPage));
-            panY=getHeight()/2f-(getHeight()-ratio*pageWidth())/2f-centerY*pageWidth();
+            panY=ReaderViewportMath.panY(ratio*pageWidth(),(float)anchorY);
         }
-        if(!horizontalPaging)scroll=layout.clampScroll(layout.top(selectedPage)+anchorOffset,viewport());
+        if(!horizontalPaging)scroll=layout.clampScroll(page==selectedPage
+                ?ReaderViewportMath.scroll(layout.top(page),ratio,viewport(),anchorY)
+                :layout.top(selectedPage)+anchorOffset,viewport());
     }
     private void trimCache(){
         if(layout==null)return;int[] visible=visible();long bytes=0;for(PageState p:cache.values())if(p.bitmap!=null)bytes+=p.bitmap.getAllocationByteCount();
@@ -446,21 +506,25 @@ public final class PdfReaderView extends View {
     private void drawStroke(Canvas canvas,InkPage.Stroke stroke){
         InkStrokeRenderer.draw(canvas,pen,stroke);
     }
+    private void drawDisplayStroke(Canvas canvas,InkPage.Stroke stroke){
+        InkStrokeRenderer.draw(canvas,pen,stroke,nightPageDisplay?NightInk.display(stroke.color,NightPageDisplay.PAPER):stroke.color);
+    }
     private void drawPage(Canvas c,int page,float x,float y,float w){
         float h=(float)(layout.height(page)*w);PageState p=cache.get(page);paint.setStyle(Paint.Style.FILL);
         paint.setColor(0x1636291f);c.drawRect(x-dp(1),y+dp(2),x+w+dp(1),y+h+dp(3),paint);
-        paint.setColor(Color.WHITE);c.drawRect(x,y,x+w,y+h,paint);
+        paint.setColor(nightPageDisplay?NightPageDisplay.PAPER:Color.WHITE);c.drawRect(x,y,x+w,y+h,paint);
         if(p==null||p.bitmap==null){paint.setColor(AppColors.MUTED);paint.setTextSize(dp(13));paint.setTextAlign(Paint.Align.CENTER);c.drawText(p!=null&&p.failed?"此页加载失败":"正在加载第 "+(page+1)+" 页",x+w/2,Math.max(dp(24),Math.min(getHeight()-dp(28),y+h/2)),paint);return;}
-        drawPdfLayer(c,p,x,y,w,h);c.save();c.translate(x,y);c.scale(w,w);c.clipRect(0,0,1,(float)layout.height(page));
+        drawPdfLayer(c,p,x,y,w,h,nightPageDisplay);c.save();c.translate(x,y);c.scale(w,w);c.clipRect(0,0,1,(float)layout.height(page));
         List<ReaderDocument.Markup> markups=markupByPage.get(page);if(markups!=null)for(ReaderDocument.Markup markup:markups)drawBoxes(c,markup.boxes,(markup.color&0x00ffffff)|0x55000000,false);
-        for(ReaderDocument.TextBox box:readerDocument.textBoxes(page))PdfTextBoxes.draw(c,paint,box);
+        for(ReaderDocument.TextBox box:readerDocument.textBoxes(page))PdfTextBoxes.draw(c,paint,box,
+                nightPageDisplay?NightInk.display(box.color,NightPageDisplay.PAPER):box.color);
         PdfTextSearch.Hit active=activeSearchHit>=0&&activeSearchHit<searchHits.size()?searchHits.get(activeSearchHit):null;List<PdfTextSearch.Hit> pageHits=searchByPage.get(page);
         if(pageHits!=null)for(PdfTextSearch.Hit hit:pageHits)drawBoxes(c,hit.boxes,hit==active?0x88f28c28:0x55f6c343,hit==active);
         if(textSelection!=null&&textSelection.page==page)drawBoxes(c,textSelection.boxes,0x663b82f6,true);
-        p.inkDrawing.draw(c,pen,strokeCache,p==writing&&erased!=null?erased:p.ink.strokes(),-x/w,-y/w,(getWidth()-x)/w,(getHeight()-y)/w);
+        p.inkDrawing.draw(c,pen,strokeCache,p==writing&&erased!=null?erased:p.ink.strokes(),-x/w,-y/w,(getWidth()-x)/w,(getHeight()-y)/w,nightPageDisplay,NightPageDisplay.PAPER);
         if(p==writing&&draft!=null&&!draft.isEmpty()){
-            float[] points=array(draft);if(isShapeMode()&&points.length>=4){int kind=mode==TOOL_LINE?InkPage.KIND_LINE:mode==TOOL_RECTANGLE?InkPage.KIND_RECTANGLE:mode==TOOL_ELLIPSE?InkPage.KIND_ELLIPSE:InkPage.KIND_ARROW;drawStroke(c,InkPage.shape(kind,draftColor,draftWidth,points[0],points[1],points[2],points[3]));}
-            else if(!isShapeMode())drawStroke(c,draftStroke());
+            float[] points=array(draft);if(isShapeMode()&&points.length>=4){int kind=mode==TOOL_LINE?InkPage.KIND_LINE:mode==TOOL_RECTANGLE?InkPage.KIND_RECTANGLE:mode==TOOL_ELLIPSE?InkPage.KIND_ELLIPSE:InkPage.KIND_ARROW;drawDisplayStroke(c,InkPage.shape(kind,draftColor,draftWidth,points[0],points[1],points[2],points[3]));}
+            else if(!isShapeMode())drawDisplayStroke(c,draftStroke());
         }
         if(selectedInkPage==p&&!selectedInk.isEmpty())drawInkSelection(c,p==writing&&erased!=null?erased:p.ink.strokes());c.restore();
     }
@@ -468,7 +532,10 @@ public final class PdfReaderView extends View {
         float left=Float.MAX_VALUE,top=Float.MAX_VALUE,right=-Float.MAX_VALUE,bottom=-Float.MAX_VALUE;for(int index:selectedInk)if(index>=0&&index<strokes.size())for(int i=0;i<strokes.get(index).points.length;i+=2){float x=strokes.get(index).points[i],y=strokes.get(index).points[i+1];left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);}
         if(left==Float.MAX_VALUE)return;paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(.002f);paint.setColor(0xffd97718);paint.setPathEffect(new DashPathEffect(new float[]{.012f,.008f},0));canvas.drawRoundRect(left-.008f,top-.008f,right+.008f,bottom+.008f,.008f,.008f,paint);paint.setPathEffect(null);paint.setStyle(Paint.Style.FILL);
     }
-    private void drawPdfLayer(Canvas c,PageState state,float x,float y,float w,float h){
+    private void drawPdfLayer(Canvas c,PageState state,float x,float y,float w,float h,boolean night){
+        // Base raster and detail tiles must share the same transform; annotations are drawn later.
+        if(night)paint.setColorFilter(NightPageDisplay.PDF_FILTER);
+        try{
         bitmapDestination.set(x,y,x+w,y+h);c.drawBitmap(state.bitmap,null,bitmapDestination,paint);
         if(detailDrawListDirty){detailDrawList.clear();detailDrawList.addAll(detailCache.entrySet());Collections.sort(detailDrawList,(a,b)->Integer.compare(a.getKey().renderWidth,b.getKey().renderWidth));detailDrawListDirty=false;}
         c.save();c.clipRect(x,y,x+w,y+h);
@@ -479,6 +546,7 @@ public final class PdfReaderView extends View {
             if(right<0||bottom<0||left>getWidth()||top>getHeight())continue;
             bitmapDestination.set(left,top,right,bottom);c.drawBitmap(bitmap,null,bitmapDestination,paint);detailCache.get(key);
         }c.restore();
+        }finally{if(night)paint.setColorFilter(null);}
     }
     private void drawBoxes(Canvas canvas,List<ReaderDocument.Box> boxes,int color,boolean outline){
         paint.setStyle(Paint.Style.FILL);paint.setColor(color);for(ReaderDocument.Box box:boxes)canvas.drawRoundRect(box.left,box.top,box.right,box.bottom,.003f,.003f,paint);
@@ -536,7 +604,8 @@ public final class PdfReaderView extends View {
         // Sample the same rendered PDF + committed ink composition as the page canvas.
         Bitmap pixel=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);
         try{Canvas c=new Canvas(pixel);c.drawColor(Color.WHITE);float w=pageWidth();c.translate(0.5f-x*w,0.5f-y*w);
-            drawPdfLayer(c,p,0,0,w,(float)layout.height(page)*w);c.scale(w,w);
+            drawPdfLayer(c,p,0,0,w,(float)layout.height(page)*w,false);
+            c.scale(w,w);
             for(InkPage.Stroke s:p.ink.strokes())drawStroke(c,s);
             sampledColor=pixel.getPixel(0,0)|0xff000000;sampleValid=true;
         }finally{pixel.recycle();}invalidate();

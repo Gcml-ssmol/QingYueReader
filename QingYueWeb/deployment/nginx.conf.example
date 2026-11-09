@@ -1,0 +1,25 @@
+# Replace the hostname, document root and certificate paths before installing.
+# Place in /etc/nginx/conf.d/qingyue.conf, then run nginx -t before reload.
+server {
+    listen 80;
+    server_name qingyue.example.com;
+    return 301 https://qingyue.example.com$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name qingyue.example.com;
+    ssl_certificate /etc/ssl/qingyue/fullchain.pem;
+    ssl_certificate_key /etc/ssl/qingyue/privkey.pem;
+    root /srv/qingyue/dist;
+    index index.html;
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    # Files retain their names between releases, so revalidate on updates.
+    add_header Cache-Control "no-cache" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    location / { try_files $uri $uri/ =404; }
+    # Explicit MIME types also work with older system mime.types files.
+    location ~ \.m?js$ { types { } default_type text/javascript; try_files $uri =404; }
+    location ~ \.wasm$ { types { } default_type application/wasm; try_files $uri =404; }
+    location ~ \.webmanifest$ { types { } default_type application/manifest+json; try_files $uri =404; }
+}

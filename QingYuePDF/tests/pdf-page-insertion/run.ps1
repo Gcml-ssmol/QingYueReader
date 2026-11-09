@@ -14,7 +14,7 @@ foreach($root in @((Join-Path $project 'tests/pdf-search-smoke/android'),(Join-P
     foreach($file in Get-ChildItem -LiteralPath $root -Filter '*.java' -Recurse){$relative=$file.FullName.Substring($root.Length).Replace('\','/');$sources[$relative]=$file.FullName}
 }
 $sources['/graphics/pdf/PdfRenderer.java']=Join-Path $project 'tests/pdf-search-smoke/android/graphics/pdf/PdfRenderer.java'
-$names=@('PdfPageInsertion','PdfBlankPageEditor','DocumentEditLease','LibraryItem','LibraryFolder','LibraryIndex','LibraryStore','TrashManager','BackupArchive','BackupManager','NoteDocument','NoteStore','InkPage','InkStore','InkHistoryRegistry','ReaderDocument','ReaderSourceLink','ReaderStore','OcrSidecar','PdfAnnotationExporter','PdfTextBoxes','InkStrokeRenderer','PageMath')
+$names=@('PdfPageInsertion','PdfBlankPageEditor','DocumentEditLease','LibraryItem','LibraryFolder','LibraryIndex','LibraryStore','TrashManager','BackupArchive','BackupManager','NoteDocument','NoteStore','InkPage','InkStore','InkHistoryRegistry','ReaderDocument','ReaderSourceLink','ReaderStore','OcrSidecar','PdfAnnotationExporter','PdfTextBoxes','InkStrokeRenderer','NightInk','PageMath')
 $all=@($sources.Values)+@($names | ForEach-Object {Join-Path $production ($_.ToString()+'.java')})+@((Join-Path $PSScriptRoot 'PdfPageInsertionTest.java'))
 $argsFile=Join-Path $run 'javac.args'
 $arguments=@('-encoding','UTF-8','--release','17','-classpath',$cp,'-d',(Join-Path $run 'classes'))+$all

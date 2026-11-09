@@ -49,6 +49,9 @@ public class MainActivity extends ThemedActivity {
     private ReaderActions readerActions;
     private DocumentEditLease editLease;
     private IconButton pdfSidebarToggle;
+    private View pdfEditStrip;
+    private IconButton pdfEditToggle;
+    private boolean pdfToolsExpanded;
     private boolean pdfOpening;
     private PdfInsertJob inserting;
     private static final ConcurrentHashMap<String,PdfInsertJob> INSERTIONS=new ConcurrentHashMap<>();
@@ -84,6 +87,13 @@ public class MainActivity extends ThemedActivity {
     private boolean dead,initialized,librarySaveAllowed=true,batchMode,trashMode,reloadLibraryOnResume;
     private String filter="";
     private String selectedFolder="",selectedTag="",lastOpenedNoteId="",libraryWarning="",libraryRevision="";
+    private String libraryAnchorId="",libraryAnchorScope="",renderedLibraryScope="";
+    private int libraryAnchorPosition,libraryAnchorTop;
+    private PdfReaderView.ViewportSnapshot pendingReaderViewport;
+    private String pendingReaderViewportId="";
+    private final Handler pageSaveHandler=new Handler(Looper.getMainLooper());
+    private boolean pageSavePending;
+    private final Runnable pendingPageSave=()->{if(current!=null&&!dead&&pageSavePending)persistPage();};
     private String pendingImportOfferId="";
     private Bundle pendingStartupState;
     private boolean favoritesOnly;
@@ -118,15 +128,17 @@ public class MainActivity extends ThemedActivity {
         for(int mode=6;mode<=9;mode++)shapeWidths[mode]=ToolSize.clamp(1,getPreferences(0).getFloat(ToolPreferences.pdfSizeKey(mode),0.006f));
         try{JSONArray history=new JSONArray(getPreferences(0).getString("recentColors","[]"));for(int i=0;i<Math.min(6,history.length());i++)recentColors.add(history.getInt(i)|0xff000000);}catch(JSONException ignored){}
         getWindow().setStatusBarColor(BG); getWindow().setNavigationBarColor(android.os.Build.VERSION.SDK_INT>=27?BG:AppColors.INK);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|(android.os.Build.VERSION.SDK_INT>=27?View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR:0));
+        getWindow().getDecorView().setSystemUiVisibility(AppColors.isDark()?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|(android.os.Build.VERSION.SDK_INT>=27?View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR:0));
         setupRoot();TextView starting=text("正在检查资料库…",15,INK);starting.setGravity(Gravity.CENTER);root.addView(starting,new LinearLayout.LayoutParams(-1,0,1));
         final Context app=getApplicationContext();
-        worker.execute(()->{String notice="";try{PdfPageInsertion.awaitRecovery(app);}catch(IOException recoveryFailure){notice="插页事务恢复未完成："+safeMessage(recoveryFailure);}ImportCoordinator.cleanupStale(app);try{TrashManager.RecoveryResult recovered=TrashManager.recoverPending(app);if(recovered.rolledBack>0)notice="已恢复 "+recovered.rolledBack+" 个未完成的删除事务";if(recovered.retained>0)notice="有 "+recovered.retained+" 个删除事务需要手动检查，原文件已保留";}catch(IOException recoveryFailure){notice="删除事务自动恢复未完成，暂存文件已保留";}final String message=notice;runOnUiThread(()->{if(!dead)finishStartup(state,message);});});
+        worker.execute(()->{String notice="";try{PdfPageInsertion.awaitRecovery(app);}catch(IOException recoveryFailure){notice="插页事务恢复未完成："+safeMessage(recoveryFailure);}ImportCoordinator.cleanupStale(app);try{TrashManager.RecoveryResult recovered=TrashManager.recoverPending(app);if(recovered.rolledBack>0)notice="已恢复 "+recovered.rolledBack+" 个未完成的删除事务";if(recovered.retained>0)notice="有 "+recovered.retained+" 个删除事务需要手动检查，原文件已保留";}catch(IOException recoveryFailure){notice="删除事务自动恢复未完成，暂存文件已保留";}final String message=notice;final LibraryStore.State ready=LibraryStore.loadFresh(app);runOnUiThread(()->{if(!dead){applyLibraryState(ready);finishStartup(state,message);}});});
     }
     private void finishStartup(Bundle state,String deleteRecoveryNotice){
         initialized=true;
         pendingStartupState=null;
-        load(); showLibrary();if(!deleteRecoveryNotice.isEmpty())toast(deleteRecoveryNotice);boolean internalJump=handleInternalJump(getIntent());
+        if(state!=null){libraryAnchorId=state.getString("libraryAnchorId","");libraryAnchorScope=state.getString("libraryAnchorScope","");libraryAnchorPosition=state.getInt("libraryAnchorPosition",0);libraryAnchorTop=state.getInt("libraryAnchorTop",0);
+            pendingReaderViewportId=state.getString("readerViewportId","");if(!pendingReaderViewportId.isEmpty())pendingReaderViewport=new PdfReaderView.ViewportSnapshot(state.getInt("readerViewportPage",0),state.getFloat("readerViewportZoom",1),state.getFloat("readerViewportX",.5f),state.getFloat("readerViewportY",.5f),state.getBoolean("readerViewportHorizontal",false));}
+        showLibrary();if(!deleteRecoveryNotice.isEmpty())toast(deleteRecoveryNotice);boolean internalJump=handleInternalJump(getIntent());
         if(state!=null&&!internalJump) {
             filter=state.getString("libraryFilter","");selectedFolder=state.getString("libraryFolder","");selectedTag=state.getString("libraryTag","");
             if(!selectedFolder.isEmpty()&&!LibrarySidebar.UNFILED.equals(selectedFolder)&&libraryFolder(selectedFolder)==null){
@@ -170,6 +182,10 @@ public class MainActivity extends ThemedActivity {
         b.setTextColor(primary?AppColors.ON_ACCENT:ACCENT);b.setBackground(shape(primary?AppColors.ACCENT:AppColors.isClassic()?AppColors.SOFT:AppColors.SURFACE,14));
         b.setMinHeight(dp(48));b.setMinimumHeight(dp(48)); b.setPadding(dp(16),0,dp(16),0);return b;
     }
+    private void animateScreenChrome() {
+        View screen = root;
+        screen.post(() -> { if (root == screen) NoteMotion.enter(screen); });
+    }
     private LinearLayout column() {LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
     private LinearLayout row() {LinearLayout l=new LinearLayout(this);l.setGravity(Gravity.CENTER_VERTICAL);return l;}
     private void space(LinearLayout l,int height) {View v=new View(this);l.addView(v,new LinearLayout.LayoutParams(1,dp(height)));}
@@ -189,17 +205,19 @@ public class MainActivity extends ThemedActivity {
         if(inserting!=null&&!inserting.finished){toast("正在插入页面，请稍候");return;}
         CrashDiagnostics.markStage(afterDelete?"删除刷新":"资料库");
         if(libraryAdapter!=null){libraryAdapter.dispose();libraryAdapter=null;}
-        if(current!=null)refreshModified(current);
+        if(!flushPageSave())return;if(current!=null)scheduleModifiedRefresh(current);
         View focused=getCurrentFocus();if(focused!=null)focused.clearFocus();
-        generation++;releaseView();pdfOpening=false;current=null;load();setupRoot();
+        captureLibraryAnchor();generation++;releaseView();pdfOpening=false;current=null;setupRoot();
         boolean wideLibrary=getResources().getConfiguration().smallestScreenWidthDp>=600;
         LinearLayout content=column();content.setPadding(0,dp(6),0,dp(12));
         boolean stackedHeader=getResources().getConfiguration().screenWidthDp-(wideLibrary?278:0)<360||getResources().getConfiguration().fontScale>1.3f;
         LinearLayout header=stackedHeader?column():row();LinearLayout titles=column();LinearLayout brand=row();
-        TextView name=text("晴阅",31,AppColors.isClassic()?INK:ACCENT);name.setTypeface(AppColors.isClassic()?Typeface.DEFAULT:Typeface.SERIF,Typeface.BOLD);brand.addView(name);
+        TextView name=text("晴阅",AppColors.isClassic()?31:24,INK);name.setTypeface(Typeface.DEFAULT,Typeface.BOLD);brand.addView(name);
         if(AppColors.isClassic()){TextView pdfTag=text("阅读 · 笔记",12,ACCENT);pdfTag.setTypeface(null,1);pdfTag.setPadding(dp(9),dp(4),dp(9),dp(4));pdfTag.setBackground(shape(AppColors.SOFT,8));LinearLayout.LayoutParams tag=new LinearLayout.LayoutParams(-2,-2);tag.leftMargin=dp(10);brand.addView(pdfTag,tag);}
-        titles.addView(brand);if(!wideLibrary||!AppColors.isClassic()){space(titles,4);titles.addView(text("把阅读，留给自己",13,MUTED));}header.addView(titles,stackedHeader?new LinearLayout.LayoutParams(-1,-2):new LinearLayout.LayoutParams(0,-2,1));
-        TextView local=text("本地 · 离线",11,ACCENT);local.setPadding(dp(13),dp(8),dp(13),dp(8));local.setBackground(shape(AppColors.SOFT,18));LinearLayout.LayoutParams localParams=new LinearLayout.LayoutParams(-2,-2);if(stackedHeader)localParams.topMargin=dp(10);header.addView(local,localParams);content.addView(header);space(content,wideLibrary?10:trashMode?12:18);
+        titles.addView(brand);if(AppColors.isClassic()&&!wideLibrary){space(titles,4);titles.addView(text("文档与笔记",13,MUTED));}header.addView(titles,stackedHeader?new LinearLayout.LayoutParams(-1,-2):new LinearLayout.LayoutParams(0,-2,1));
+        if(!AppColors.isClassic()&&!trashMode){LinearLayout actions=libraryHeaderActions();LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-2,-2);if(stackedHeader)ap.topMargin=dp(8);header.addView(actions,ap);}
+        else{TextView local=text("本地 · 离线",11,ACCENT);local.setPadding(dp(13),dp(8),dp(13),dp(8));local.setBackground(shape(AppColors.SOFT,18));LinearLayout.LayoutParams localParams=new LinearLayout.LayoutParams(-2,-2);if(stackedHeader)localParams.topMargin=dp(10);header.addView(local,localParams);}
+        content.addView(header);space(content,wideLibrary?8:trashMode?10:12);
         if(!libraryWarning.isEmpty()){
             LinearLayout warning=row();warning.setPadding(dp(13),dp(10),dp(9),dp(10));warning.setBackground(shape(0xffffeadf,14));TextView message=text(libraryWarning,12,0xff9b463c);message.setMaxLines(3);warning.addView(message,new LinearLayout.LayoutParams(0,-2,1));
             Button repair=button("扫描修复",false);repair.setMinHeight(dp(40));repair.setMinimumHeight(dp(40));repair.setOnClickListener(v->rebuildLibrary());warning.addView(repair,new LinearLayout.LayoutParams(-2,-2));content.addView(warning);space(content,12);
@@ -207,14 +225,14 @@ public class MainActivity extends ThemedActivity {
         int activeCount=0;LibraryItem recent=null;for(LibraryItem d:docs)if(!d.isTrashed()){activeCount++;if(recent==null||d.opened>recent.opened)recent=d;}
         if(trashMode){TextView title=text("最近删除",18,INK);title.setTypeface(null,1);content.addView(title);space(content,12);}
         else if(!AppColors.isClassic()){
-            content.addView(readingHero(recent,wideLibrary));space(content,14);
+            content.addView(activeCount==0?readingHero(null,wideLibrary):compactContinue(recent));space(content,10);
         }else if(activeCount==0){
             LinearLayout hero=column();hero.setPadding(dp(18),dp(15),dp(18),dp(17));hero.setBackground(new WarmBackdrop(true));LinearLayout heroRow=row();FolderArtView art=new FolderArtView(this);heroRow.addView(art,new LinearLayout.LayoutParams(dp(76),dp(82)));
             LinearLayout copy=column();copy.setPadding(dp(14),0,0,0);TextView welcome=text("你的随身文档库",21,INK);welcome.setTypeface(null,1);copy.addView(welcome);space(copy,7);copy.addView(text("读一份文档，记下一点灵感。",13,MUTED));heroRow.addView(copy,new LinearLayout.LayoutParams(0,-2,1));hero.addView(heroRow);space(hero,8);hero.addView(text("文档、笔记与批注默认只保存在本机",11,MUTED));content.addView(hero);space(content,12);
         } else if(recent!=null&&!wideLibrary){
             final LibraryItem resume=recent;LinearLayout continueCard=row();continueCard.setPadding(dp(14),dp(10),dp(10),dp(10));continueCard.setBackground(shape(AppColors.SOFT,16));
             LinearLayout copy=column();TextView caption=text("继续上次",11,ACCENT);caption.setTypeface(null,1);copy.addView(caption);TextView resumeName=text(resume.name,15,INK);resumeName.setTypeface(null,1);resumeName.setSingleLine(true);resumeName.setEllipsize(TextUtils.TruncateAt.END);copy.addView(resumeName);continueCard.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-            IconButton go=icon("right","打开 "+resume.name,v->open(resume));continueCard.addView(go,new LinearLayout.LayoutParams(dp(42),dp(44)));continueCard.setOnClickListener(v->open(resume));content.addView(continueCard);space(content,11);
+            IconButton go=icon("right","打开 "+resume.name,v->open(resume));continueCard.addView(go,new LinearLayout.LayoutParams(dp(48),dp(48)));continueCard.setOnClickListener(v->open(resume));content.addView(continueCard);space(content,11);
         }
         if(!trashMode&&AppColors.isClassic()){LinearLayout createRow=row();Button note=button("＋ 新建笔记",true);note.setOnClickListener(v->createNote());createRow.addView(note,new LinearLayout.LayoutParams(0,-2,1));
             Button add=button("导入",false);add.setBackground(shape(AppColors.SURFACE,15));add.setOnClickListener(v->pick());LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(0,-2,1);ap.leftMargin=dp(8);createRow.addView(add,ap);
@@ -222,6 +240,9 @@ public class MainActivity extends ThemedActivity {
         folderRows=column();
         LinearLayout searchBox=row();searchBox.setPadding(dp(9),0,dp(14),0);searchBox.setBackground(shape(AppColors.SURFACE,17));IconButton searchIcon=new IconButton(this,"search","搜索文档");searchIcon.setClickable(false);searchIcon.setFocusable(false);searchBox.addView(searchIcon,new LinearLayout.LayoutParams(dp(38),dp(46)));
         EditText search=new EditText(this);search.setSingleLine(true);search.setTextSize(14);search.setTextColor(INK);search.setHint(trashMode?"搜索最近删除":"搜索名称、文件夹或标签");search.setHintTextColor(MUTED);search.setBackgroundColor(Color.TRANSPARENT);search.setPadding(dp(3),0,0,0);search.setText(filter);search.setSelection(search.length());searchBox.addView(search,new LinearLayout.LayoutParams(0,dp(50),1));content.addView(searchBox);space(content,10);
+        if(!trashMode){Button exportCenter=button("导出中心  ·  查看 EPUB 任务",false);exportCenter.setTextSize(13);
+            exportCenter.setOnClickListener(v->startActivity(new Intent(this,ExportCenterActivity.class)));
+            content.addView(exportCenter);space(content,10);}
         if(!trashMode){HorizontalScrollView chips=new HorizontalScrollView(this);chips.setHorizontalScrollBarEnabled(false);LinearLayout chipRow=row();chipRow.setPadding(0,0,dp(8),0);
             if(!AppColors.isClassic()){Button all=chip("全部资料",selectedFolder.isEmpty()&&!favoritesOnly&&selectedTag.isEmpty()&&filter.isEmpty(),v->{favoritesOnly=false;filter="";selectedTag="";selectedFolder="";showLibrary();});LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-2,dp(40));ap.rightMargin=dp(7);chipRow.addView(all,ap);}
             chipRow.addView(chip(favoritesOnly?"★ 已收藏":"☆ 收藏",favoritesOnly,v->{favoritesOnly=!favoritesOnly;showLibrary();}));
@@ -248,17 +269,35 @@ public class MainActivity extends ThemedActivity {
         settingsDock.addView(settings,new LinearLayout.LayoutParams(dp(54),dp(54)));
         root.addView(settingsDock,new LinearLayout.LayoutParams(-1,dp(64)));
         }else root.addView(libraryDock(),new LinearLayout.LayoutParams(-1,dp(70)));
-        populate();root.requestFocus();attachImport(importSession);
+        populate();restoreLibraryAnchor();renderedLibraryScope=libraryScope();root.requestFocus();attachImport(importSession);animateScreenChrome();
+    }
+
+    private LinearLayout libraryHeaderActions(){
+        LinearLayout actions=row();actions.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        addIcon(actions,icon("search","搜索所有资料正文",v->openGlobalSearch()));
+        addIcon(actions,icon("plus","新建笔记",v->createNote()));
+        addIcon(actions,icon("import","导入文档",v->pick()));
+        addIcon(actions,icon("more","资料库工具与设置",v->showLibraryTools()));
+        return actions;
+    }
+
+    private View compactContinue(LibraryItem recent){
+        LinearLayout card=row();card.setPadding(dp(12),dp(9),dp(8),dp(9));card.setBackground(shape(AppColors.SURFACE,14));
+        LinearLayout copy=column();TextView eyebrow=text("继续阅读",11,ACCENT);eyebrow.setTypeface(null,Typeface.BOLD);copy.addView(eyebrow);
+        TextView title=text(recent.name,16,INK);title.setTypeface(null,Typeface.BOLD);title.setSingleLine(true);title.setEllipsize(TextUtils.TruncateAt.END);copy.addView(title);
+        copy.addView(text(recent.isNote()?"继续记录 · "+Math.max(1,recent.page+1)+" 页":"第 "+Math.max(1,recent.page+1)+" / "+Math.max(1,recent.pages)+" 页",13,MUTED));
+        card.addView(copy,new LinearLayout.LayoutParams(0,-2,1));IconButton go=icon("right","打开 "+recent.name,v->open(recent));card.addView(go,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        card.setContentDescription("继续阅读，"+recent.name);card.setOnClickListener(v->open(recent));return card;
     }
 
     private View readingHero(LibraryItem recent,boolean wide){
-        LinearLayout hero=column();hero.setPadding(dp(16),dp(16),dp(16),dp(13));hero.setBackground(new WarmBackdrop(true));
-        LinearLayout top=row(),copy=column();TextView title=text("你的随身文档库",wide?24:21,INK);title.setTypeface(Typeface.SERIF,Typeface.BOLD);copy.addView(title);space(copy,6);
-        copy.addView(text("读一份文档，记下一点灵感。",13,INK));space(copy,10);
-        TextView detail=text("文档、笔记与批注保存在本机\n随时阅读，安心记录。",11,MUTED);detail.setLineSpacing(dp(3),1f);copy.addView(detail);
+        LinearLayout hero=column();hero.setPadding(dp(18),dp(18),dp(18),dp(16));hero.setBackground(new WarmBackdrop(true));
+        LinearLayout top=row(),copy=column();TextView title=text("你的文档与笔记",wide?23:20,INK);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);copy.addView(title);space(copy,6);
+        copy.addView(text("打开资料，继续阅读。",13,INK));space(copy,10);
+        TextView detail=text("文档、笔记与批注保存在本机。",11,MUTED);detail.setLineSpacing(dp(3),1f);copy.addView(detail);
         top.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-        int width=getResources().getConfiguration().screenWidthDp;boolean largeText=getResources().getConfiguration().fontScale>1.3f;
-        if(width>=350&&!largeText){ReadingArtView art=new ReadingArtView(this);top.addView(art,new LinearLayout.LayoutParams(dp(wide?122:90),dp(wide?135:119)));}
+        boolean largeText=getResources().getConfiguration().fontScale>1.3f;
+        // Keep this panel typographic so it matches the rest of the workspace.
         hero.addView(top);space(hero,12);LinearLayout actions=largeText?column():row();
         Button resume=button(recent==null?"导入第一份文档":"继续阅读  ›",true);resume.setTextSize(13);resume.setPadding(dp(8),0,dp(8),0);resume.setOnClickListener(v->{if(recent==null)pick();else open(recent);});
         if(recent!=null)resume.setContentDescription("继续打开 "+recent.name);
@@ -327,7 +366,7 @@ public class MainActivity extends ThemedActivity {
         for(LibraryFolder folder:children){
             LinearLayout card=row();card.setPadding(dp(14),dp(7),dp(7),dp(7));card.setBackground(shape(AppColors.SURFACE,15));
             TextView name=text("📁  "+folder.name,15,INK);name.setTypeface(null,1);name.setSingleLine(true);name.setEllipsize(TextUtils.TruncateAt.END);card.addView(name,new LinearLayout.LayoutParams(0,dp(43),1));name.setGravity(Gravity.CENTER_VERTICAL);
-            IconButton more=icon("more","管理文件夹",v->manageLibraryFolder(folder));card.addView(more,new LinearLayout.LayoutParams(dp(44),dp(44)));
+            IconButton more=icon("more","管理文件夹",v->manageLibraryFolder(folder));card.addView(more,new LinearLayout.LayoutParams(dp(48),dp(48)));
             card.setOnClickListener(v->{selectedFolder=folder.id;showLibrary();});folderRows.addView(card);space(folderRows,7);
         }
     }
@@ -359,8 +398,13 @@ public class MainActivity extends ThemedActivity {
             if(index==0)renameLibraryFolder(folder);
             else if(index==1)moveLibraryFolder(folder);
             else if(ensureWritable()){
-                try{LibraryStore.deleteEmptyFolder(this,folder.id,libraryRevision);load();showLibrary();toast("文件夹已删除，最近删除中的资料仍可恢复到"+(folder.parentId.isEmpty()?"未分类":"上一级"));}
-                catch(IOException|RuntimeException failure){load();showLibrary();toast(safeMessage(failure));}
+                final String expected=libraryRevision,parent=folder.parentId,id=folder.id;final int viewGeneration=generation;final Context app=getApplicationContext();
+                worker.execute(()->{LibraryStore.State ready;String error=null;
+                    try{ready=LibraryStore.deleteEmptyFolder(app,id,expected);}catch(IOException|RuntimeException failure){error=safeMessage(failure);ready=LibraryStore.loadFresh(app);}
+                    final LibraryStore.State result=ready;final String problem=error;
+                    runOnUiThread(()->{if(dead||viewGeneration!=generation)return;applyLibraryState(result);showLibrary();
+                        toast(problem==null?"文件夹已删除，最近删除中的资料仍可恢复到"+(parent.isEmpty()?"未分类":"上一级"):problem);});
+                });
             }
         }).setNegativeButton("取消",null).show();
     }
@@ -405,10 +449,34 @@ public class MainActivity extends ThemedActivity {
     }
     private String size(long bytes) {return bytes<1048576?String.format(Locale.CHINA,"%.0f KB",bytes/1024.0):String.format(Locale.CHINA,"%.1f MB",bytes/1048576.0);}
     private File file(LibraryItem d) {return new File(getFilesDir(),d.id+".pdf");}
-    private void load() {
+    private void load() {applyLibraryState(LibraryStore.load(this));}
+    private void applyLibraryState(LibraryStore.State state){
         String activeId=current==null?null:current.id;
-        LibraryStore.State state=LibraryStore.load(this);docs.clear();docs.addAll(state.items);libraryFolders.clear();libraryFolders.addAll(state.folders);librarySaveAllowed=state.allowSave;libraryWarning=state.warning;libraryRevision=state.revision;
+        docs.clear();docs.addAll(state.items);libraryFolders.clear();libraryFolders.addAll(state.folders);librarySaveAllowed=state.allowSave;libraryWarning=state.warning;libraryRevision=state.revision;
         if(activeId!=null){current=null;for(LibraryItem item:docs)if(activeId.equals(item.id)&&!item.isTrashed()){current=item;break;}}
+    }
+    private String libraryScope(){return selectedFolder+"\u0001"+selectedTag+"\u0001"+filter+"\u0001"+favoritesOnly+"\u0001"+trashMode+"\u0001"+librarySort.name();}
+    private void captureLibraryAnchor(){
+        if(list==null||list.getWindowToken()==null||current!=null||!renderedLibraryScope.equals(libraryScope()))return;
+        int first=list.getFirstVisiblePosition(),headers=list.getHeaderViewsCount();
+        libraryAnchorPosition=first;libraryAnchorTop=list.getChildCount()==0?0:list.getChildAt(0).getTop();
+        int index=first-headers;libraryAnchorId=index>=0&&index<visibleDocs.size()?visibleDocs.get(index).id:"";
+        libraryAnchorScope=libraryScope();
+    }
+    private void restoreLibraryAnchor(){
+        if(list==null||!libraryScope().equals(libraryAnchorScope))return;
+        final ListView target=list;int position=libraryAnchorPosition;
+        if(!libraryAnchorId.isEmpty())for(int i=0;i<visibleDocs.size();i++)if(libraryAnchorId.equals(visibleDocs.get(i).id)){position=target.getHeaderViewsCount()+i;break;}
+        final int row=Math.max(0,Math.min(position,target.getCount()-1)),top=libraryAnchorTop;
+        target.post(()->{if(list==target&&current==null)target.setSelectionFromTop(row,top);});
+    }
+    private void schedulePageSave(){pageSavePending=true;pageSaveHandler.removeCallbacks(pendingPageSave);pageSaveHandler.postDelayed(pendingPageSave,450);}
+    private boolean flushPageSave(){if(current==null||!pageSavePending)return true;pageSaveHandler.removeCallbacks(pendingPageSave);return persistPage();}
+    private boolean persistPage(){
+        if(current==null||!pageSavePending)return true;
+        try{LibraryStore.State updated=LibraryStore.updatePage(this,current.id,requestedPage);
+            applyLibraryState(updated);pageSavePending=false;return true;
+        }catch(IOException|RuntimeException failure){toast("阅读位置未保存："+safeMessage(failure));return false;}
     }
     private boolean save() {
         if(!librarySaveAllowed){load();refreshAfterReload();return false;}try{libraryRevision=LibraryStore.saveIfRevision(this,libraryRevision,docs,libraryFolders);return true;}catch(LibraryStore.StaleIndexException stale){load();refreshAfterReload();toast("资料库已在后台更新，本次改动未保存");return false;}catch(IOException|RuntimeException e){load();refreshAfterReload();toast("资料库保存失败，请检查本机空间");return false;}
@@ -465,9 +533,8 @@ public class MainActivity extends ThemedActivity {
     private Button chip(String label,boolean active,View.OnClickListener listener){Button b=new Button(this);b.setAllCaps(false);b.setText(label);b.setTextSize(12);b.setTextColor(active?AppColors.ON_ACCENT:ACCENT);b.setMinHeight(dp(38));b.setMinimumHeight(dp(38));b.setMinWidth(0);b.setMinimumWidth(0);b.setPadding(dp(12),0,dp(12),0);b.setBackground(shape(active?AppColors.ACCENT:AppColors.SURFACE,18));b.setOnClickListener(listener);return b;}
     private String sortLabel(){switch(librarySort){case OPENED:return "最近打开";case NAME:return "名称";case CREATED:return "导入时间";default:return "最近修改";}}
     private void chooseSort(){String[] labels={"最近修改","最近打开","名称","导入时间"};LibraryQuery.Sort[] values={LibraryQuery.Sort.MODIFIED,LibraryQuery.Sort.OPENED,LibraryQuery.Sort.NAME,LibraryQuery.Sort.CREATED};new AlertDialog.Builder(this).setTitle("排序方式").setItems(labels,(d,which)->{librarySort=values[which];showLibrary();}).setNegativeButton("取消",null).show();}
-    private void chooseFolder(){TreeSet<String> values=new TreeSet<>(String.CASE_INSENSITIVE_ORDER);for(LibraryItem item:docs)if(!item.isTrashed()&&!item.folder.trim().isEmpty())values.add(item.folder.trim());chooseMetadata("选择文件夹",new ArrayList<>(values),true);}
-    private void chooseTag(){TreeSet<String> values=new TreeSet<>(String.CASE_INSENSITIVE_ORDER);for(LibraryItem item:docs)if(!item.isTrashed())values.addAll(item.tags);chooseMetadata("选择标签",new ArrayList<>(values),false);}
-    private void chooseMetadata(String title,List<String> values,boolean folder){ArrayList<String> choices=new ArrayList<>();choices.add("全部");choices.addAll(values);new AlertDialog.Builder(this).setTitle(title).setItems(choices.toArray(new String[0]),(d,which)->{String selected=which==0?"":choices.get(which);if(folder)selectedFolder=selected;else selectedTag=selected;showLibrary();}).setNegativeButton("取消",null).show();}
+    private void chooseTag(){TreeSet<String> values=new TreeSet<>(String.CASE_INSENSITIVE_ORDER);for(LibraryItem item:docs)if(!item.isTrashed())values.addAll(item.tags);chooseMetadata("选择标签",new ArrayList<>(values));}
+    private void chooseMetadata(String title,List<String> values){ArrayList<String> choices=new ArrayList<>();choices.add("全部");choices.addAll(values);new AlertDialog.Builder(this).setTitle(title).setItems(choices.toArray(new String[0]),(d,which)->{selectedTag=which==0?"":choices.get(which);showLibrary();}).setNegativeButton("取消",null).show();}
     private Set<String> idsOf(Collection<LibraryItem> items){HashSet<String> ids=new HashSet<>();for(LibraryItem item:items)ids.add(item.id);return ids;}
     private boolean ensureWritable(){if(!initialized){toast("资料库正在检查，请稍候");return false;}if(librarySaveAllowed)return true;trackDocumentDialog(ReaderDialogs.message(this,"资料库需要修复","索引原文已保留。请先使用“扫描修复”，确认本机文件后再新增或修改资料。",true));return false;}
     private void showBatchActions(){if(!ensureWritable())return;if(selectedIds.isEmpty()){toast("请先选择文档");return;}trackDocumentDialog(DocumentDialogs.batchActions(this,selectedIds.size(),()->{long now=System.currentTimeMillis();for(LibraryItem item:docs)if(selectedIds.contains(item.id)){item.favorite=true;item.modified=now;}finishBatch();},()->{ArrayList<LibraryItem> chosen=new ArrayList<>();for(LibraryItem item:docs)if(selectedIds.contains(item.id))chosen.add(item);chooseDocumentFolder(chosen);},()->{long now=System.currentTimeMillis();for(LibraryItem item:docs)if(selectedIds.contains(item.id)){thumbnails.invalidate(item.id);TrashManager.moveToTrash(item,now);}finishBatch();}));}
@@ -495,16 +562,13 @@ public class MainActivity extends ThemedActivity {
                     if(clipboard!=null){clipboard.setPrimaryClip(ClipData.newPlainText("晴阅故障记录",copy));toast("已复制故障记录");}
                 }).show();
     }
-    private void launchOptional(String simpleName,String unavailable){try{reloadLibraryOnResume=true;startActivity(new Intent().setClassName(getPackageName(),getPackageName()+"."+simpleName));}catch(ActivityNotFoundException e){reloadLibraryOnResume=false;toast(unavailable);}}
     private void chooseBackupDestination(){if(!ensureWritable())return;Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("application/zip");intent.putExtra(Intent.EXTRA_TITLE,"晴阅整库备份-"+new java.text.SimpleDateFormat("yyyyMMdd-HHmm",Locale.CHINA).format(new Date())+".qyb");try{startActivityForResult(intent,CREATE_BACKUP);}catch(ActivityNotFoundException e){toast("没有可用的系统文件选择器");}}
     private void chooseBackupSource(){Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("*/*");intent.putExtra(Intent.EXTRA_MIME_TYPES,new String[]{"application/zip","application/octet-stream","application/vnd.qingyue.backup+zip"});try{startActivityForResult(intent,OPEN_BACKUP);}catch(ActivityNotFoundException e){toast("没有可用的系统文件选择器");}}
     private void startBackupExport(Uri destination){
         final Context app=getApplicationContext();
-        try{attachBackup(BackupCoordinator.start(BackupCoordinator.Kind.BACKUP,(progress,cancel)->{
-            LibraryStore.State state=LibraryStore.load(app);
-            if(!state.allowSave)throw new IOException("资料库索引需要修复，无法建立完整备份");
-            return BackupManager.exportTo(app,destination,state.items,progress,cancel);
-        }));}catch(IllegalStateException busy){attachBackup(BackupCoordinator.latest());toast("已有备份任务正在运行");}
+        try{attachBackup(BackupCoordinator.start(BackupCoordinator.Kind.BACKUP,(progress,cancel)->
+                BackupManager.exportTo(app,destination,progress,cancel)));
+        }catch(IllegalStateException busy){attachBackup(BackupCoordinator.latest());toast("已有备份任务正在运行");}
     }
     private void startBackupRestore(Uri source){if(!ensureWritable())return;
         new AlertDialog.Builder(this).setTitle("从备份恢复？").setMessage("恢复前会在应用私有目录建立安全副本。遇到编号冲突时保留当前资料，并新增“恢复副本”。").setNegativeButton("取消",null).setPositiveButton("校验并恢复",(d,w)->{
@@ -533,13 +597,13 @@ public class MainActivity extends ThemedActivity {
         dismissBackupDialog();backupSession=null;session.detach(backupListener);BackupCoordinator.forget(session.id());
         if(snapshot.state==BackupCoordinator.State.COMPLETED){
             BackupManager.Result result=snapshot.result;
-            if(snapshot.kind==BackupCoordinator.Kind.RESTORE){load();showLibrary();toast("已恢复 "+result.itemCount+" 项资料"+(result.conflictCopies>0?"，保留 "+result.conflictCopies+" 个冲突副本":""));}
+            if(snapshot.kind==BackupCoordinator.Kind.RESTORE){requestLibraryReload("");toast("已恢复 "+result.itemCount+" 项资料"+(result.conflictCopies>0?"，保留 "+result.conflictCopies+" 个冲突副本":""));}
             else toast("备份已保存 · "+result.itemCount+" 项资料");
         }else if(snapshot.state==BackupCoordinator.State.CANCELED)toast("已取消"+(snapshot.kind==BackupCoordinator.Kind.BACKUP?"备份":"恢复"));
         else trackDocumentDialog(ReaderDialogs.message(this,snapshot.kind==BackupCoordinator.Kind.BACKUP?"备份失败":"恢复失败",safeMessage(snapshot.error),true));
     }
     private void dismissBackupDialog(){if(backupDialog!=null){backupDialog.dismiss();backupDialog=null;}}
-    private void rebuildLibrary(){new AlertDialog.Builder(this).setTitle("扫描并修复资料库？").setMessage("将保留损坏索引副本，并根据本机 PDF 与笔记重建可打开项目。无法识别的原文件不会被删除。").setNegativeButton("取消",null).setPositiveButton("开始扫描",(d,w)->{final ArrayList<LibraryItem> hints=new ArrayList<>();for(LibraryItem item:docs)hints.add(item.copy());final DocumentDialogs.TaskDialog progress=DocumentDialogs.task(this,"扫描资料库","正在检查本机文件…",null);worker.execute(()->{try{LibraryStore.State state=LibraryStore.rebuild(getApplicationContext(),hints);runOnUiThread(()->{if(dead)return;progress.dismiss();load();showLibrary();toast("已重建 "+state.items.size()+" 个项目");});}catch(Exception e){runOnUiThread(()->{if(dead)return;progress.dismiss();trackDocumentDialog(ReaderDialogs.message(this,"修复失败",safeMessage(e),true));});}});}).show();}
+    private void rebuildLibrary(){new AlertDialog.Builder(this).setTitle("扫描并修复资料库？").setMessage("将保留损坏索引副本，并根据本机 PDF 与笔记重建可打开项目。无法识别的原文件不会被删除。").setNegativeButton("取消",null).setPositiveButton("开始扫描",(d,w)->{final ArrayList<LibraryItem> hints=new ArrayList<>();for(LibraryItem item:docs)hints.add(item.copy());final DocumentDialogs.TaskDialog progress=DocumentDialogs.task(this,"扫描资料库","正在检查本机文件…",null);worker.execute(()->{try{LibraryStore.State state=LibraryStore.rebuild(getApplicationContext(),hints);runOnUiThread(()->{if(dead)return;progress.dismiss();applyLibraryState(state);showLibrary();toast("已重建 "+state.items.size()+" 个项目");});}catch(Exception e){runOnUiThread(()->{if(dead)return;progress.dismiss();trackDocumentDialog(ReaderDialogs.message(this,"修复失败",safeMessage(e),true));});}});}).show();}
     private void permanentDelete(LibraryItem item){
         final String id=item.id;if(!deletingIds.add(id)){toast("这项资料正在删除，请稍候");return;}
         CrashDiagnostics.markStage("删除准备");
@@ -549,18 +613,23 @@ public class MainActivity extends ThemedActivity {
             LibraryStore.mutate(app,items->{boolean removed=false;for(Iterator<LibraryItem> iterator=items.iterator();iterator.hasNext();)if(id.equals(iterator.next().id)){iterator.remove();removed=true;break;}if(!removed)throw new IOException("资料记录已被其他操作移除");});
             indexCommitted=true;if(item.isNote())NoteStore.delete(app,id);else InkStore.deleteDocument(app.getFilesDir(),id);
             TrashManager.Deletion.CommitResult cleanup=tx.commit();final String notice=cleanup.cleanupComplete?"已彻底删除":"已删除；清理将在稍后重试";
-            runOnUiThread(()->{try{if(dead)return;CrashDiagnostics.markStage("删除刷新");load();showLibrary(true);toast(notice);}finally{deletingIds.remove(id);}});
+            final LibraryStore.State ready=LibraryStore.loadFresh(app);
+            runOnUiThread(()->{try{if(dead)return;CrashDiagnostics.markStage("删除刷新");applyLibraryState(ready);showLibrary(true);toast(notice);}finally{deletingIds.remove(id);}});
         }catch(Exception e){
             CrashDiagnostics.record(getApplicationContext(),"文档删除失败",e);
             String problem=safeMessage(e);if(tx!=null)if(indexCommitted){TrashManager.Deletion.CommitResult cleanup=tx.commit();problem="资料已从索引删除，但收尾未完成"+(cleanup.cleanupComplete?"":"；暂存目录已保留");}else try{tx.rollback();}catch(IOException rollback){problem+="；删除事务保留在 "+tx.recoveryDirectory().getAbsolutePath();}
-            final String message=problem;final boolean committedForUi=indexCommitted;runOnUiThread(()->{try{if(dead)return;CrashDiagnostics.markStage("删除刷新");load();showLibrary(true);trackDocumentDialog(ReaderDialogs.message(this,committedForUi?"删除已提交":"删除失败",message,true));}finally{deletingIds.remove(id);}});
+            final String message=problem;final boolean committedForUi=indexCommitted;final LibraryStore.State ready=LibraryStore.loadFresh(getApplicationContext());runOnUiThread(()->{try{if(dead)return;CrashDiagnostics.markStage("删除刷新");applyLibraryState(ready);showLibrary(true);trackDocumentDialog(ReaderDialogs.message(this,committedForUi?"删除已提交":"删除失败",message,true));}finally{deletingIds.remove(id);}});
         }});
     }
     private String safeMessage(Throwable failure){String message=failure==null?null:failure.getMessage();return message==null||message.trim().isEmpty()?"操作未完成，请检查本机存储后重试。":message;}
 
     private boolean handleInternalJump(Intent intent){if(intent==null||!intent.hasExtra("docId"))return false;String id=intent.getStringExtra("docId");int page=(int)Math.max(0,Math.min(Integer.MAX_VALUE,longExtra(intent,"page",0)));long notePageId=longExtra(intent,"notePageId",0);LibraryItem target=null;for(LibraryItem item:docs)if(item.id.equals(id)){target=item;break;}setIntent(new Intent(this,MainActivity.class));if(target==null||target.isTrashed()){toast(target==null?"来源文档已不存在":"来源文档位于最近删除，请先恢复");return true;}if(target.isNote()){target.opened=System.currentTimeMillis();if(!save())return true;lastOpenedNoteId=target.id;Intent note=new Intent(this,NoteActivity.class).putExtra("id",target.id).putExtra("name",target.name).putExtra("page",Math.max(0,page));if(notePageId>0)note.putExtra("notePageId",notePageId);startActivity(note);NoteMotion.applyActivityTransition(this,true);}else{target.page=Math.max(0,Math.min(page,target.pages-1));open(target);if(pdfView!=null)pdfView.jumpTo(target.page);}return true;}
     private long longExtra(Intent intent,String key,long fallback){if(intent==null||intent.getExtras()==null)return fallback;Object value=intent.getExtras().get(key);if(value instanceof Number)return ((Number)value).longValue();if(value instanceof String)try{return Long.parseLong(((String)value).trim());}catch(NumberFormatException ignored){}return fallback;}
-    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(!initialized||inserting!=null&&!inserting.finished)return;load();showLibrary();if(!handleInternalJump(intent)&&!openSourceIntent(intent))handleIncomingIntent(intent);}
+    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(!initialized||inserting!=null&&!inserting.finished)return;
+        final int viewGeneration=generation;final Context app=getApplicationContext();worker.execute(()->{LibraryStore.State ready=LibraryStore.loadFresh(app);runOnUiThread(()->{
+            if(dead||viewGeneration!=generation||getIntent()!=intent)return;applyLibraryState(ready);showLibrary();
+            if(!handleInternalJump(intent)&&!openSourceIntent(intent))handleIncomingIntent(intent);
+        });});}
     private boolean openSourceIntent(Intent intent){
         if(intent==null||!Intent.ACTION_VIEW.equals(intent.getAction())||intent.getData()==null||!"qingyue".equals(intent.getData().getScheme()))return false;
         setIntent(new Intent(this,MainActivity.class));
@@ -574,13 +643,13 @@ public class MainActivity extends ThemedActivity {
     private void handleIncomingIntent(Intent intent){if(intent==null)return;Uri uri=null;CharSequence shared=null;if(Intent.ACTION_VIEW.equals(intent.getAction()))uri=intent.getData();else if(Intent.ACTION_SEND.equals(intent.getAction())){uri=intent.getParcelableExtra(Intent.EXTRA_STREAM);if(uri==null)shared=intent.getCharSequenceExtra(Intent.EXTRA_TEXT);}if(uri!=null)offerImport(uri);else if(shared!=null&&canStartImport()){String name="分享文字-"+new java.text.SimpleDateFormat("yyyyMMdd-HHmm",Locale.CHINA).format(new Date())+".txt";beginImportOffer(new PendingImportOffer(null,shared.toString(),name,true));}setIntent(new Intent(this,MainActivity.class));}
     private boolean canStartImport(){if(!ensureWritable())return false;if(importSession!=null){toast("已有文档正在导入或写入资料库");return false;}if(!pendingImportOfferId.isEmpty()){toast("请先处理当前导入请求");return false;}return true;}
     private void beginImportOffer(PendingImportOffer offer){String id=UUID.randomUUID().toString();pendingImportOffers.put(id,offer);pendingImportOfferId=id;showPendingImportOffer();}
-    private void showPendingImportOffer(){final String id=pendingImportOfferId;final PendingImportOffer offer=pendingImportOffers.get(id);if(offer==null){pendingImportOfferId="";return;}final boolean[] accepted={false};Dialog dialog=DocumentDialogs.importOptions(this,offer.name,offer.convertible,keep->{accepted[0]=true;pendingImportOffers.remove(id);if(id.equals(pendingImportOfferId))pendingImportOfferId="";if(!canStartImport())return;if(offer.uri!=null)attachImport(ImportCoordinator.startUri(getApplicationContext(),offer.uri,keep));else attachImport(ImportCoordinator.startText(getApplicationContext(),offer.text,offer.name,keep));});documentDialog=dialog;dialog.setOnDismissListener(v->{if(documentDialog==dialog)documentDialog=null;if(!accepted[0]&&!dead){pendingImportOffers.remove(id);if(id.equals(pendingImportOfferId))pendingImportOfferId="";}});}
+    private void showPendingImportOffer(){final String id=pendingImportOfferId;final PendingImportOffer offer=pendingImportOffers.get(id);if(offer==null){pendingImportOfferId="";return;}final boolean[] accepted={false};Dialog dialog=DocumentDialogs.importOptions(this,offer.name,offer.convertible,(keep,options)->{accepted[0]=true;pendingImportOffers.remove(id);if(id.equals(pendingImportOfferId))pendingImportOfferId="";if(!canStartImport())return;if(offer.uri!=null)attachImport(ImportCoordinator.startUri(getApplicationContext(),offer.uri,keep,options));else attachImport(ImportCoordinator.startText(getApplicationContext(),offer.text,offer.name,keep,options));});documentDialog=dialog;dialog.setOnDismissListener(v->{if(documentDialog==dialog)documentDialog=null;if(!accepted[0]&&!dead){pendingImportOffers.remove(id);if(id.equals(pendingImportOfferId))pendingImportOfferId="";}});}
     private void resumeNewestImport(){for(ImportSession session:ImportCoordinator.sessions()){attachImport(session);return;}}
     private void attachImport(ImportSession session){if(importSession==session){if(session!=null)session.attach(importListener);return;}if(importSession!=null)importSession.detach(importListener);dismissImportDialog();importSession=session;if(session!=null)session.attach(importListener);}
-    private void importChanged(ImportSession session,ImportSession.Snapshot snapshot){if(dead||session!=importSession)return;if(snapshot.phase==ImportSession.Phase.READY){ImportSession.Claim claim=session.claim();if(claim!=null)commitImport(claim);return;}if(snapshot.phase==ImportSession.Phase.COMPLETED){dismissImportDialog();ImportCoordinator.forget(session.id());importSession=null;load();if(current==null)showLibrary();toast(snapshot.completionMessage.isEmpty()?"导入成功":snapshot.completionMessage);return;}if(snapshot.phase==ImportSession.Phase.FAILED||snapshot.phase==ImportSession.Phase.CANCELED){dismissImportDialog();ImportCoordinator.forget(session.id());importSession=null;if(snapshot.phase==ImportSession.Phase.FAILED)trackDocumentDialog(ReaderDialogs.message(this,"导入失败",snapshot.error.isEmpty()?snapshot.message:snapshot.error,true));else toast("已取消导入");return;}showImportProgress(session,snapshot);}
+    private void importChanged(ImportSession session,ImportSession.Snapshot snapshot){if(dead||session!=importSession)return;if(snapshot.phase==ImportSession.Phase.READY){ImportSession.Claim claim=session.claim();if(claim!=null)commitImport(claim);return;}if(snapshot.phase==ImportSession.Phase.COMPLETED){dismissImportDialog();ImportCoordinator.forget(session.id());importSession=null;requestLibraryReload("");toast(snapshot.completionMessage.isEmpty()?"导入成功":snapshot.completionMessage);return;}if(snapshot.phase==ImportSession.Phase.FAILED||snapshot.phase==ImportSession.Phase.CANCELED){dismissImportDialog();ImportCoordinator.forget(session.id());importSession=null;if(snapshot.phase==ImportSession.Phase.FAILED)trackDocumentDialog(ReaderDialogs.message(this,"导入失败",snapshot.error.isEmpty()?snapshot.message:snapshot.error,true));else toast("已取消导入");return;}showImportProgress(session,snapshot);}
     private void showImportProgress(ImportSession session,ImportSession.Snapshot snapshot){if(importDialog==null)importDialog=DocumentDialogs.task(this,"正在导入",snapshot.message,session::cancel);String stage;switch(snapshot.phase){case COPYING:stage="复制到本机";break;case EXTRACTING:stage="提取文字";break;case CONVERTING:stage="生成阅读页面";break;case VALIDATING:stage="校验文档";break;case CLAIMED:stage="写入资料库";break;default:stage="准备导入";}String detail=snapshot.message;if(snapshot.unit==ImportSession.Unit.BYTES&&snapshot.completed>0)detail+=" · "+size(snapshot.completed);else if(snapshot.unit==ImportSession.Unit.PAGES&&snapshot.completed>0)detail+=" · "+snapshot.completed+" 页";importDialog.setCancellationEnabled(snapshot.phase!=ImportSession.Phase.CLAIMED);importDialog.update(stage,detail,snapshot.percent());}
     private void dismissImportDialog(){if(importDialog!=null){importDialog.dismiss();importDialog=null;}}
-    private void commitImport(ImportSession.Claim claim){showImportProgress(importSession,importSession.snapshot());final Context app=getApplicationContext();worker.execute(()->{final ArrayList<File> created=new ArrayList<>();final String[] completion={"导入成功"};try{ImportSession.Result result=claim.result;LibraryStore.mutate(app,items->{LibraryItem duplicate=null;for(LibraryItem old:items)if(!old.isNote()&&!result.hash.isEmpty()&&result.hash.equalsIgnoreCase(old.hash)){File oldPdf=new File(app.getFilesDir(),old.id+".pdf");if(!oldPdf.exists()||readablePdf(oldPdf)){duplicate=old;break;}}long now=System.currentTimeMillis();if(duplicate!=null){File existing=new File(app.getFilesDir(),duplicate.id+".pdf");boolean repaired=!existing.isFile();if(repaired){copyFile(result.pdf,existing);created.add(existing);duplicate.pages=result.pages;duplicate.page=Math.max(0,Math.min(duplicate.page,result.pages-1));duplicate.size=result.size;duplicate.format=result.format;duplicate.modified=now;}if(result.originalAttachment!=null&&duplicate.attachment.isEmpty()){String safe=safeAttachmentName(result.originalAttachmentName);File dir=new File(LibraryStore.attachmentsDirectory(app),duplicate.id);if(dir.exists()||!dir.mkdirs())throw new IOException("无法保存原文件附件");created.add(dir);File original=new File(dir,safe);copyFile(result.originalAttachment,original);duplicate.attachment=duplicate.id+"/"+safe;duplicate.originalName=result.originalAttachmentName;}boolean restored=duplicate.isTrashed();if(restored)TrashManager.restore(duplicate,now);completion[0]=restored?"文档已存在，已从最近删除恢复":repaired?"已修复缺失的文档原文":"文档已存在";return;}String id=result.id;File finalPdf=new File(app.getFilesDir(),id+".pdf");if(finalPdf.exists())throw new IOException("导入编号冲突，请重试");copyFile(result.pdf,finalPdf);created.add(finalPdf);String attachment="";if(result.originalAttachment!=null){String safe=safeAttachmentName(result.originalAttachmentName);File dir=new File(LibraryStore.attachmentsDirectory(app),id);if(dir.exists()||!dir.mkdirs())throw new IOException("无法保存原文件附件");created.add(dir);File original=new File(dir,safe);copyFile(result.originalAttachment,original);attachment=id+"/"+safe;}LibraryItem item=new LibraryItem();item.id=id;item.name=result.name;item.originalName=result.originalAttachmentName.isEmpty()?result.name:result.originalAttachmentName;item.hash=result.hash;item.pages=result.pages;item.page=0;item.size=result.size;item.format=result.format;item.created=item.modified=item.opened=now;item.attachment=attachment;items.add(item);});claim.complete(completion[0]);}catch(Exception failure){boolean rolledBack=true;for(int i=created.size()-1;i>=0;i--)rolledBack&=deleteTreeQuietly(created.get(i));String message=safeMessage(failure)+(rolledBack?"":"；部分新文件未能清理，请使用扫描修复检查");claim.fail(message);}});}
+    private void commitImport(ImportSession.Claim claim){showImportProgress(importSession,importSession.snapshot());final Context app=getApplicationContext();worker.execute(()->{synchronized(BackupManager.TRANSACTION_LOCK){final ArrayList<File> created=new ArrayList<>();final String[] completion={"导入成功"};try{ImportSession.Result result=claim.result;LibraryStore.mutate(app,items->{LibraryItem duplicate=null;for(LibraryItem old:items)if(!old.isNote()&&!result.hash.isEmpty()&&result.hash.equalsIgnoreCase(old.hash)){File oldPdf=new File(app.getFilesDir(),old.id+".pdf");if(!oldPdf.exists()||readablePdf(oldPdf)){duplicate=old;break;}}long now=System.currentTimeMillis();if(duplicate!=null){File existing=new File(app.getFilesDir(),duplicate.id+".pdf");boolean repaired=!existing.isFile();if(repaired){copyFile(result.pdf,existing);created.add(existing);duplicate.pages=result.pages;duplicate.page=Math.max(0,Math.min(duplicate.page,result.pages-1));duplicate.size=result.size;duplicate.format=result.format;duplicate.modified=now;}if(result.originalAttachment!=null&&duplicate.attachment.isEmpty()){String safe=safeAttachmentName(result.originalAttachmentName);File dir=new File(LibraryStore.attachmentsDirectory(app),duplicate.id);if(dir.exists()||!dir.mkdirs())throw new IOException("无法保存原文件附件");created.add(dir);File original=new File(dir,safe);copyFile(result.originalAttachment,original);duplicate.attachment=duplicate.id+"/"+safe;duplicate.originalName=result.originalAttachmentName;}boolean restored=duplicate.isTrashed();if(restored)TrashManager.restore(duplicate,now);completion[0]=restored?"文档已存在，已从最近删除恢复":repaired?"已修复缺失的文档原文":"文档已存在";return;}String id=result.id;File finalPdf=new File(app.getFilesDir(),id+".pdf");if(finalPdf.exists())throw new IOException("导入编号冲突，请重试");copyFile(result.pdf,finalPdf);created.add(finalPdf);String attachment="";if(result.originalAttachment!=null){String safe=safeAttachmentName(result.originalAttachmentName);File dir=new File(LibraryStore.attachmentsDirectory(app),id);if(dir.exists()||!dir.mkdirs())throw new IOException("无法保存原文件附件");created.add(dir);File original=new File(dir,safe);copyFile(result.originalAttachment,original);attachment=id+"/"+safe;}LibraryItem item=new LibraryItem();item.id=id;item.name=result.name;item.originalName=result.originalAttachmentName.isEmpty()?result.name:result.originalAttachmentName;item.hash=result.hash;item.pages=result.pages;item.page=0;item.size=result.size;item.format=result.format;item.created=item.modified=item.opened=now;item.attachment=attachment;items.add(item);});claim.complete(completion[0]);}catch(Exception failure){boolean rolledBack=true;for(int i=created.size()-1;i>=0;i--)rolledBack&=deleteTreeQuietly(created.get(i));String message=safeMessage(failure)+(rolledBack?"":"；部分新文件未能清理，请使用扫描修复检查");claim.fail(message);}}});}
     private boolean readablePdf(File value){try(ParcelFileDescriptor descriptor=ParcelFileDescriptor.open(value,ParcelFileDescriptor.MODE_READ_ONLY);PdfRenderer renderer=new PdfRenderer(descriptor)){return renderer.getPageCount()>0;}catch(Exception|LinkageError ignored){return false;}}
     private void copyFile(File source,File target)throws IOException{
         if(!source.isFile()||source.length()>200L*1024*1024)throw new IOException("导入暂存文件无效或超过 200 MB");
@@ -625,10 +694,10 @@ public class MainActivity extends ThemedActivity {
             bindRow(holder,item);return recycled;
         }
         private View emptyRow(){LinearLayout empty=column();empty.setGravity(Gravity.CENTER);empty.setPadding(dp(16),dp(28),dp(16),dp(34));FolderArtView art=new FolderArtView(MainActivity.this);empty.addView(art,new LinearLayout.LayoutParams(dp(82),dp(82)));space(empty,9);TextView title=text(showingTrash?"最近删除是空的":!hasLibraryItems?"从一份文档或一本笔记开始":"没有匹配的资料",17,INK);title.setGravity(Gravity.CENTER);empty.addView(title);space(empty,6);TextView hint=text(showingTrash?"移入最近删除的资料会显示在这里":!hasLibraryItems?"点击上方“新建笔记”或“导入”":"试试清除筛选或更换关键词",12,MUTED);hint.setGravity(Gravity.CENTER);empty.addView(hint);return empty;}
-        private RowHolder createRow(){RowHolder h=new RowHolder();rows.add(h);h.card=row();h.card.setPadding(dp(11),dp(11),dp(7),dp(11));
+        private RowHolder createRow(){RowHolder h=new RowHolder();rows.add(h);h.card=row();h.card.setPadding(dp(11),dp(AppColors.isClassic()?11:8),dp(7),dp(AppColors.isClassic()?11:8));
             h.coverFrame=new FrameLayout(MainActivity.this);h.image=new ImageView(MainActivity.this);h.image.setScaleType(ImageView.ScaleType.CENTER_CROP);h.image.setVisibility(View.GONE);h.coverFrame.addView(h.image,new FrameLayout.LayoutParams(-1,-1));h.fallback=text("PDF",13,ACCENT);h.fallback.setGravity(Gravity.CENTER);h.fallback.setTypeface(null,1);h.fallback.setBackground(AppColors.isClassic()?new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xffffeddd,0xffffd0aa}):shape(AppColors.SOFT,10));h.coverFrame.addView(h.fallback,new FrameLayout.LayoutParams(-1,-1));h.card.addView(h.coverFrame,new LinearLayout.LayoutParams(dp(AppColors.isClassic()?64:48),dp(AppColors.isClassic()?84:66)));
-            LinearLayout copy=column();copy.setPadding(dp(13),dp(1),dp(8),0);h.title=text("",16,INK);h.title.setTypeface(null,1);h.title.setMaxLines(2);h.title.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.title);space(copy,4);h.meta=text("",11,MUTED);h.meta.setSingleLine(true);h.meta.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.meta);space(copy,5);h.detail=text("",12,ACCENT);h.detail.setSingleLine(true);h.detail.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.detail);space(copy,5);h.tags=text("",11,MUTED);h.tags.setSingleLine(true);h.tags.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.tags);h.card.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-            h.more=icon("more","管理文档",v->{});h.more.setBackground(shape(AppColors.isClassic()?AppColors.SOFT:Color.TRANSPARENT,12));h.card.addView(h.more,new LinearLayout.LayoutParams(dp(40),dp(44)));return h;}
+            LinearLayout copy=column();copy.setPadding(dp(13),dp(1),dp(8),0);h.title=text("",16,INK);h.title.setTypeface(null,1);h.title.setMaxLines(2);h.title.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.title);space(copy,2);h.meta=text("",13,MUTED);h.meta.setSingleLine(true);h.meta.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.meta);space(copy,2);h.detail=text("",13,ACCENT);h.detail.setSingleLine(true);h.detail.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.detail);space(copy,2);h.tags=text("",12,MUTED);h.tags.setSingleLine(true);h.tags.setEllipsize(TextUtils.TruncateAt.END);copy.addView(h.tags);h.card.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
+            h.more=icon("more","管理文档",v->{});h.more.setBackground(shape(AppColors.isClassic()?AppColors.SOFT:Color.TRANSPARENT,12));h.card.addView(h.more,new LinearLayout.LayoutParams(dp(48),dp(48)));return h;}
         private void bindRow(RowHolder h,LibraryItem item){if(h.token!=null)h.token.cancel();h.boundId=item.id;h.image.setImageDrawable(null);h.image.setVisibility(View.GONE);h.fallback.setVisibility(View.VISIBLE);h.fallback.setText(item.isNote()?"笔记":item.format);
             boolean selected=selectedIds.contains(item.id);GradientDrawable background=shape(selected?(AppColors.isClassic()?0xffffead8:AppColors.SOFT):AppColors.SURFACE,AppColors.isClassic()?19:15);background.setStroke(dp(selected?2:1),selected?AppColors.ACCENT:AppColors.isClassic()?0x60efdcc9:AppColors.BORDER);h.card.setBackground(background);h.card.setContentDescription((selected?"已选择，":"")+item.name+"，"+metadata(item));
             h.title.setText((item.favorite?"★ ":"")+item.name);h.meta.setText(metadata(item));
@@ -658,9 +727,11 @@ public class MainActivity extends ThemedActivity {
     private IconButton icon(String kind,String label,View.OnClickListener action){
         IconButton b=new IconButton(this,kind,label);b.setOnClickListener(action);return b;
     }
-    private void addIcon(LinearLayout row,IconButton button){row.addView(button,new LinearLayout.LayoutParams(dp(44),dp(44)));}
+    private void addIcon(LinearLayout row,IconButton button){row.addView(button,new LinearLayout.LayoutParams(UiMetrics.touch(this),UiMetrics.touch(this)));}
     private void open(LibraryItem d) {
         if(d==null||d.isTrashed())return;
+        captureLibraryAnchor();
+        if(current!=null&&!flushPageSave())return;
         if(d.isNote()){d.opened=System.currentTimeMillis();if(!save())return;lastOpenedNoteId=d.id;startActivity(new Intent(this,NoteActivity.class).putExtra("id",d.id).putExtra("name",d.name));NoteMotion.applyActivityTransition(this,true);return;}
         if(inserting!=null&&!inserting.finished){toast("正在插入页面，请稍候");return;}
         generation++;releaseView();current=d;readerQuery="";headerCollapsed=false;requestedPage=d.page;
@@ -694,23 +765,25 @@ public class MainActivity extends ThemedActivity {
         annotationTools();
         FrameLayout canvas=new FrameLayout(this);
         pdfView=new PdfReaderView(this,file(d),getFilesDir(),d.id,d.pages,d.page,worker,new PdfReaderView.Host(){
-            @Override public void changed(int page){if(dead||generation!=openGeneration||current==null||!openId.equals(current.id))return;requestedPage=page;if(pdfPageSidebar!=null)pdfPageSidebar.setCurrentPage(page);if(current.page!=page){current.page=page;save();}updateInkTools();if(pendingSource!=null&&pendingSource.documentId.equals(openId)&&pendingSource.page==page){ReaderSourceLink source=pendingSource;pendingSource=null;pdfView.jumpTo(source.page,source.y);}}
+            @Override public void changed(int page){if(dead||generation!=openGeneration||current==null||!openId.equals(current.id))return;requestedPage=page;if(pdfPageSidebar!=null)pdfPageSidebar.setCurrentPage(page);if(current.page!=page){current.page=page;schedulePageSave();}updateInkTools();if(pendingSource!=null&&pendingSource.documentId.equals(openId)&&pendingSource.page==page){ReaderSourceLink source=pendingSource;pendingSource=null;pdfView.jumpTo(source.page,source.y);}}
             @Override public void error(String message){if(!dead)toast(message);}
             @Override public void colorPicked(int picked){if(dead||current==null||!openId.equals(current.id))return;if(ToolPreferences.pdfToolName(inkMode)==null)selectInkMode(1);inkColor=picked;rememberColor();applyTool();toast("已提取 "+hex(inkColor));}
             @Override public void readingScrolled(){if(!dead&&current!=null&&openId.equals(current.id))setHeaderCollapsed(true);}
             @Override public void inkSaved(String documentId,long modifiedAtMillis){try{if(!LibraryStore.touchModified(getApplicationContext(),documentId,modifiedAtMillis))return;runOnUiThread(()->{if(dead)return;for(LibraryItem item:docs)if(item.id.equals(documentId)){item.modified=Math.max(item.modified,modifiedAtMillis);break;}if(thumbnails!=null)thumbnails.invalidate(documentId);});}catch(IOException failure){runOnUiThread(()->{if(!dead)toast("批注已保存，但资料库修改时间暂未更新");});}}
         });
+        pdfView.setNightPageDisplay(UiDisplayMode.nightPage(this));
         readerActions=new ReaderActions(this,pdfView,file(d),getFilesDir(),d.id,d.name,d.pages);
         readerActions.setPageInsertion(this::showPdfInsertionOptions);
         readerActions.setSourceConsumer(source->{reloadLibraryOnResume=true;NoteSourceActions.show(this,source);});
         readerActions.setAdvancedToolSelection(tool->{if(pdfView!=null&&current!=null&&current.id.equals(openId)){selectInkMode(tool);if(tool==4)penSettings(tool,colorButton);}});
         pdfView.setTwoFingerUndoEnabled(twoFingerUndo);
         pdfView.setHorizontalPaging(horizontalPaging);
+        if(pendingReaderViewport!=null&&d.id.equals(pendingReaderViewportId)){pdfView.restoreViewport(pendingReaderViewport);pendingReaderViewport=null;pendingReaderViewportId="";}
         canvas.addView(pdfView,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout pager=row();pager.setPadding(dp(4),dp(AppColors.isClassic()?0:5),dp(4),dp(AppColors.isClassic()?0:5));pager.setBackground(shape(AppColors.SURFACE,AppColors.isClassic()?24:16));pager.setElevation(dp(AppColors.isClassic()?4:1));
         prev=icon("up","上一页，也可向右滑动",v->render(requestedPage-1));next=icon("down","下一页，也可向左滑动",v->render(requestedPage+1));addIcon(pager,prev);
-        pageLabel=text((d.page+1)+" / "+d.pages,12,INK);pageLabel.setGravity(Gravity.CENTER);pageLabel.setMinWidth(dp(60));pageLabel.setPadding(dp(8),0,dp(8),0);pageLabel.setContentDescription("当前页码，点击跳页");pageLabel.setOnClickListener(v->jump());pager.addView(pageLabel,new LinearLayout.LayoutParams(-2,dp(44)));addIcon(pager,next);
-        if(AppColors.isClassic()){FrameLayout.LayoutParams overlay=new FrameLayout.LayoutParams(-2,dp(44),Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);overlay.bottomMargin=dp(12);canvas.addView(pager,overlay);}
+        pageLabel=text((d.page+1)+" / "+d.pages,12,INK);pageLabel.setGravity(Gravity.CENTER);pageLabel.setMinWidth(dp(60));pageLabel.setPadding(dp(8),0,dp(8),0);pageLabel.setContentDescription("当前页码，点击跳页");pageLabel.setOnClickListener(v->jump());pager.addView(pageLabel,new LinearLayout.LayoutParams(-2,dp(48)));addIcon(pager,next);
+        if(AppColors.isClassic()){FrameLayout.LayoutParams overlay=new FrameLayout.LayoutParams(-2,dp(48),Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);overlay.bottomMargin=dp(12);canvas.addView(pager,overlay);}
         else{pageLabel.setTextColor(ACCENT);pageLabel.setTextSize(14);pageLabel.setMinWidth(dp(112));pageLabel.setBackground(shape(AppColors.SOFT,12));prev.setRotation(-90);next.setRotation(-90);pager.setGravity(Gravity.CENTER);}
         pdfPagesExpanded=getPreferences(0).getBoolean("pdfPagesExpanded",true);
         pdfReadingBody=row();pdfReadingBody.setGravity(Gravity.TOP);
@@ -721,7 +794,7 @@ public class MainActivity extends ThemedActivity {
             LinearLayout footerRow=row();footerRow.addView(pager,new LinearLayout.LayoutParams(0,-1,1));
             LinearLayout.LayoutParams footer=new LinearLayout.LayoutParams(-1,dp(60));footer.setMargins(dp(12),dp(5),dp(12),dp(8));root.addView(footerRow,footer);
         }
-        applyTool();updatePagingControls();updateInkTools();setHeaderCollapsed(headerCollapsed);
+        applyTool();updatePagingControls();updateInkTools();setHeaderCollapsed(headerCollapsed);animateScreenChrome();
     }
     private void showReaderWait(String title,String detail){
         setupRoot();LinearLayout waiting=column();waiting.setGravity(Gravity.CENTER);waiting.setPadding(dp(28),dp(24),dp(28),dp(24));
@@ -766,16 +839,19 @@ public class MainActivity extends ThemedActivity {
         if(dead||!job.finished||inserting!=job||current==null||!job.documentId.equals(current.id))return;
         inserting=null;INSERTIONS.remove(job.documentId,job);job.owner=new java.lang.ref.WeakReference<>(null);
         if(thumbnails!=null)thumbnails.invalidate(job.documentId);
-        load();LibraryItem updated=null;String id=job.result==null?job.documentId:job.result.documentId;
-        for(LibraryItem item:docs)if(id.equals(item.id)&&!item.isTrashed()){updated=item;break;}
-        if(updated==null){current=null;showLibrary();toast("文档状态已变化，请在资料库重新打开");return;}
-        updated.page=Math.max(0,Math.min(updated.pages-1,job.result==null?job.oldPage:job.result.insertedPage));
-        open(updated);
-        toast(job.failure==null?"已插入第 "+(updated.page+1)+" 页":safeMessage(job.failure));
+        pageSavePending=false;pageSaveHandler.removeCallbacks(pendingPageSave);
+        final int viewGeneration=generation;final String id=job.result==null?job.documentId:job.result.documentId;
+        worker.execute(()->{LibraryStore.State ready=LibraryStore.loadFresh(getApplicationContext());runOnUiThread(()->{
+            if(dead||generation!=viewGeneration||current==null||!job.documentId.equals(current.id))return;
+            applyLibraryState(ready);LibraryItem updated=null;
+            for(LibraryItem item:docs)if(id.equals(item.id)&&!item.isTrashed()){updated=item;break;}
+            if(updated==null){current=null;showLibrary();toast("文档状态已变化，请在资料库重新打开");return;}
+            updated.page=Math.max(0,Math.min(updated.pages-1,job.result==null?job.oldPage:job.result.insertedPage));
+            open(updated);toast(job.failure==null?"已插入第 "+(updated.page+1)+" 页":safeMessage(job.failure));
+        });});
     }
     private void annotationTools(){
         LinearLayout strip=row();strip.setPadding(dp(4),0,dp(4),0);strip.setBackgroundColor(AppColors.SURFACE);
-        pdfSidebarToggle=icon("sidebar","展开页面缩略图",v->togglePdfSidebar());if(!AppColors.isClassic())pdfSidebarToggle.setVisualLabel("页面");strip.addView(pdfSidebarToggle,new LinearLayout.LayoutParams(dp(50),dp(AppColors.isClassic()?48:66)));
         HorizontalScrollView scroll=new HorizontalScrollView(this);scroll.setHorizontalScrollBarEnabled(false);scroll.setFillViewport(false);
         LinearLayout toolbar=row();toolbar.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);toolbar.setPadding(dp(2),dp(2),dp(2),dp(2));
         inkButtons.clear();String[] kinds={"hand","pen","ballpoint","pencil","marker","eraser"},labels={"浏览 / 手指滚动","钢笔；长按或再次点击调节","圆珠笔；长按或再次点击调节","铅笔；长按或再次点击调节","荧光笔；长按或再次点击调节","局部橡皮；长按或再次点击调节"};int[] quickModes={0,1,10,11,2,4};
@@ -786,15 +862,33 @@ public class MainActivity extends ThemedActivity {
         View divider=new View(this);divider.setBackgroundColor(AppColors.BORDER);LinearLayout.LayoutParams gap=new LinearLayout.LayoutParams(dp(1),dp(22));gap.setMargins(dp(5),0,dp(5),0);toolbar.addView(divider,gap);
         addIcon(toolbar,icon("text","添加或管理 PDF 文字框",v->showPdfTextTools()));
         undoButton=icon("undo",twoFingerUndo?"撤销本页笔迹；也可双指轻点页面":"撤销本页笔迹",v->{if(pdfView!=null)pdfView.undo();});redoButton=icon("redo","重做本页笔迹",v->{if(pdfView!=null)pdfView.redo();});addIcon(toolbar,undoButton);addIcon(toolbar,redoButton);
-        colorButton=new ColorSwatch(this,inkColor,"笔迹颜色与调色盘");colorButton.setOnClickListener(v->{if(ToolPreferences.pdfToolName(inkMode)==null)selectInkMode(1);penSettings(inkMode,v);});colorButton.setOnLongClickListener(v->{if(ToolPreferences.pdfToolName(inkMode)==null)selectInkMode(1);penSettings(inkMode,v);return true;});toolbar.addView(colorButton,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        colorButton=new ColorSwatch(this,inkColor,"笔迹颜色与调色盘");colorButton.setOnClickListener(v->{if(ToolPreferences.pdfToolName(inkMode)==null)selectInkMode(1);penSettings(inkMode,v);});colorButton.setOnLongClickListener(v->{if(ToolPreferences.pdfToolName(inkMode)==null)selectInkMode(1);penSettings(inkMode,v);return true;});toolbar.addView(colorButton,new LinearLayout.LayoutParams(dp(48),dp(48)));
         stylusButton=icon("stylus","切换仅手写笔绘制",v->{stylusOnly=!stylusOnly;getPreferences(0).edit().putBoolean("stylusOnly",stylusOnly).apply();applyTool();toast(stylusOnly?"仅手写笔绘制；手指滚动与翻页":"已允许手指绘制；双指可以移动页面");});addIcon(toolbar,stylusButton);
-        scroll.addView(toolbar);strip.addView(scroll,new LinearLayout.LayoutParams(0,dp(AppColors.isClassic()?48:66),1));
-        LinearLayout.LayoutParams toolsParams=new LinearLayout.LayoutParams(-1,dp(AppColors.isClassic()?48:68));if(!AppColors.isClassic()){toolsParams.setMargins(dp(10),0,dp(10),dp(3));strip.setBackground(shape(AppColors.SURFACE,16));}root.addView(strip,toolsParams);strip=row();strip.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);strip.setPadding(dp(12),0,dp(12),0);TextView toolHint=text("批注工具",11,MUTED);strip.addView(toolHint,new LinearLayout.LayoutParams(0,-2,1));
+        scroll.addView(toolbar);strip.addView(scroll,new LinearLayout.LayoutParams(0,dp(AppColors.isClassic()?52:66),1));
+        LinearLayout.LayoutParams toolsParams=new LinearLayout.LayoutParams(-1,dp(AppColors.isClassic()?52:68));if(!AppColors.isClassic()){toolsParams.setMargins(dp(10),0,dp(10),dp(3));strip.setBackground(shape(AppColors.SURFACE,16));}root.addView(strip,toolsParams);pdfEditStrip=strip;
+        strip=row();strip.setGravity(Gravity.CENTER_VERTICAL);strip.setPadding(dp(8),0,dp(8),0);
+        pdfSidebarToggle=icon("sidebar","展开页面缩略图",v->togglePdfSidebar());addIcon(strip,pdfSidebarToggle);
+        pdfEditToggle=icon("pen","展开批注工具",v->setPdfToolsExpanded(!pdfToolsExpanded));addIcon(strip,pdfEditToggle);
+        TextView toolHint=text("阅读 / 批注",11,MUTED);strip.addView(toolHint,new LinearLayout.LayoutParams(0,-2,1));
         View edge=new View(this);edge.setBackgroundColor(AppColors.BORDER);strip.addView(edge,new LinearLayout.LayoutParams(dp(1),dp(22)));
         addIcon(strip,icon("fit","设置 PDF 缩放比例",v->showZoomControls()));
         addIcon(strip,icon("search","搜索 PDF 内容",v->searchPdf()));
         addIcon(strip,icon("select","选择当前页文字",v->{if(readerActions!=null)readerActions.beginTextSelection();}));
         headerToggle=icon("down","收起标题栏",v->setHeaderCollapsed(!headerCollapsed));headerToggle.setRotation(180);addIcon(strip,headerToggle);root.addView(strip,new LinearLayout.LayoutParams(-1,dp(48)));
+        pdfToolsExpanded=getPreferences(0).getBoolean("pdfToolsExpanded",false);
+        if(!pdfToolsExpanded)inkMode=0;
+        updatePdfEditStrip();
+    }
+    private void setPdfToolsExpanded(boolean expanded){
+        if(pdfToolsExpanded==expanded)return;
+        pdfToolsExpanded=expanded;
+        if(!expanded){if(pdfView!=null)selectInkMode(0);else inkMode=0;}
+        getPreferences(0).edit().putBoolean("pdfToolsExpanded",expanded).apply();
+        updatePdfEditStrip();
+    }
+    private void updatePdfEditStrip(){
+        if(pdfEditStrip!=null)pdfEditStrip.setVisibility(pdfToolsExpanded?View.VISIBLE:View.GONE);
+        if(pdfEditToggle!=null){pdfEditToggle.setActive(pdfToolsExpanded);pdfEditToggle.setContentDescription(pdfToolsExpanded?"收起批注工具并切换手指浏览":"展开批注工具");}
     }
     private void updatePdfSidebar(){
         if(pdfPageSidebar==null||pdfReadingBody==null)return;int width=pdfReadingBody.getWidth()>0?Math.round(pdfReadingBody.getWidth()/getResources().getDisplayMetrics().density):getResources().getConfiguration().screenWidthDp;
@@ -834,10 +928,16 @@ public class MainActivity extends ThemedActivity {
             getPreferences(0).edit().putBoolean("horizontalPaging",horizontal).putBoolean("twoFingerUndo",undo).apply();
             target.setHorizontalPaging(horizontal);target.setTwoFingerUndoEnabled(undo);updatePagingControls();
             if(undoButton!=null)undoButton.setContentDescription(undo?"撤销本页编辑；也可双指轻点页面":"撤销本页编辑");
+        },this::showNightPageOptions));
+    }
+    private void showNightPageOptions(){
+        trackReaderDialog(UiDisplayMode.chooser(this,()->{
+            if(pdfView!=null)pdfView.setNightPageDisplay(UiDisplayMode.nightPage(this));
         }));
     }
     private void selectInkMode(int mode){
         dismissToolPopup();
+        if(mode!=0)setPdfToolsExpanded(true);
         inkMode=mode;
         String name=ToolPreferences.pdfToolName(mode);
         if(name!=null)inkColor=ToolPreferences.color(getPreferences(0),name,"inkColor",ToolPreferences.BLACK);
@@ -947,11 +1047,12 @@ public class MainActivity extends ThemedActivity {
     }
     private void showExportOptions(){
         final LibraryItem doc=current;if(doc==null||readerActions==null)return;
-        if(!readerActions.metadataReady()){toast("正在读取书签与高亮，请稍后导出");return;}
-        if(!readerActions.metadataWritable()){toast("书签与高亮读取失败，本次无法完整导出");return;}
         new AlertDialog.Builder(this).setTitle("导出与分享")
-                .setItems(new String[]{"带批注 PDF · 全部页面","带批注 PDF · 指定页码","当前页 PNG 图片"},(dialog,which)->{
+                .setItems(new String[]{"带批注 PDF · 全部页面","带批注 PDF · 指定页码","当前页 PNG 图片","转换为 EPUB 电子书"},(dialog,which)->{
                     if(current!=doc||pdfView==null)return;
+                    if(which==3){Intent intent=new Intent(this,PdfEpubActivity.class);intent.putExtra(PdfEpubActivity.EXTRA_DOC_ID,doc.id);startActivity(intent);return;}
+                    if(!readerActions.metadataReady()){toast("正在读取书签与高亮，请稍后导出");return;}
+                    if(!readerActions.metadataWritable()){toast("书签与高亮读取失败，本次无法完整导出");return;}
                     if(which==0)prepareExport(EXPORT_PDF,0,doc.pages);
                     else if(which==1)showExportRange();
                     else prepareExport(EXPORT_PNG,pdfView.page(),pdfView.page()+1);
@@ -1018,15 +1119,44 @@ public class MainActivity extends ThemedActivity {
         final ReaderActions closingActions=readerActions;readerActions=null;if(closingActions!=null)closingActions.close();
         if(exportProgress!=null){exportProgress.dismiss();exportProgress=null;}if(documentDialog!=null){documentDialog.dismiss();documentDialog=null;}
         if(pdfView!=null){pdfView.dispose();pdfView=null;}readerHeader=null;headerToggle=null;
+        pdfEditStrip=null;pdfEditToggle=null;
         final DocumentEditLease closingLease=editLease;editLease=null;
         if(closingLease!=null)worker.execute(()->{if(closingActions!=null)closingActions.awaitClosed();closingLease.close();});
     }
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
-    @Override public void onBackPressed(){if(inserting!=null&&!inserting.finished){toast("正在插入页面，请稍候");return;}if(toolPopup!=null&&toolPopup.isShowing()){dismissToolPopup();return;}if(pdfView!=null&&pdfView.isPickingColor()){pdfView.cancelColorPick();return;}if(readerActions!=null&&readerActions.handleBack())return;if(current!=null){refreshModified(current);showLibrary();return;}if(trashMode||batchMode){trashMode=false;batchMode=false;selectedIds.clear();showLibrary();return;}if(!selectedFolder.isEmpty()){LibraryFolder folder=libraryFolder(selectedFolder);selectedFolder=folder==null?"":folder.parentId;showLibrary();return;}super.onBackPressed();}
-    @Override protected void onSaveInstanceState(Bundle out){super.onSaveInstanceState(out);if(!initialized){if(pendingStartupState!=null)out.putAll(pendingStartupState);out.putParcelable("pendingPickerDestination",pendingPickerDestination);out.putInt("pendingPickerKind",pendingPickerKind);return;}out.putString("libraryFilter",filter);out.putString("libraryFolder",selectedFolder);out.putString("libraryTag",selectedTag);out.putBoolean("libraryFavorites",favoritesOnly);out.putBoolean("libraryTrash",trashMode);out.putBoolean("libraryBatch",batchMode);out.putString("librarySort",librarySort.name());out.putStringArrayList("librarySelection",new ArrayList<>(selectedIds));if(importSession!=null)out.putString("importSession",importSession.id());if(backupSession!=null)out.putString("backupSession",backupSession.id());if(!pendingImportOfferId.isEmpty())out.putString("pendingImportOffer",pendingImportOfferId);if(current!=null){out.putString("doc",current.id);out.putBoolean("headerCollapsed",headerCollapsed);out.putString("readerQuery",searchDialog==null?readerQuery:searchDialog.getQuery());}out.putString("exportDocumentId",exportDocumentId);out.putInt("exportFrom",exportFrom);out.putInt("exportTo",exportTo);out.putBoolean("exportSigned",exportSigned);out.putParcelable("pendingPickerDestination",pendingPickerDestination);out.putInt("pendingPickerKind",pendingPickerKind);}
-    @Override protected void onPause(){dismissToolPopup();closeReaderDialog();closeSearch();if(readerActions!=null)readerActions.pauseDialogs();if(pdfView!=null)pdfView.pause();if(initialized&&!pdfOpening&&inserting==null){if(current!=null)refreshModified(current);save();}super.onPause();}
-    @Override protected void onResume(){super.onResume();stylusOnly=getPreferences(0).getBoolean("stylusOnly",true);twoFingerUndo=getPreferences(0).getBoolean("twoFingerUndo",true);if(!initialized||pdfOpening||inserting!=null)return;if(reloadLibraryOnResume){reloadLibraryOnResume=false;load();if(current==null){showLibrary();return;}}if(!lastOpenedNoteId.isEmpty()){load();for(LibraryItem item:docs)if(item.id.equals(lastOpenedNoteId)){refreshModified(item);if(thumbnails!=null)thumbnails.invalidate(item.id);break;}lastOpenedNoteId="";save();}if(current==null)populate();}
-    @Override protected void onDestroy(){dead=true;generation++;if(importSession!=null)importSession.detach(importListener);if(backupSession!=null)backupSession.detach(backupListener);dismissImportDialog();dismissBackupDialog();releaseView();if(libraryAdapter!=null){libraryAdapter.dispose();libraryAdapter=null;}if(isFinishing()&&!pendingImportOfferId.isEmpty())pendingImportOffers.remove(pendingImportOfferId);if(thumbnails!=null){thumbnails.close();thumbnails=null;}super.onDestroy();}
-    private void refreshModified(LibraryItem item){if(item==null)return;long latest=item.modified;if(item.isNote())latest=Math.max(latest,newestModified(new File(new File(getFilesDir(),"notes"),item.id),0));else{File[] files=getFilesDir().listFiles();if(files!=null)for(File value:files)if(value.isFile()&&(value.getName().equals(item.id+".pdf")||value.getName().startsWith(item.id+"-")&&value.getName().contains(".ink")||value.getName().equals(item.id+".reader")||value.getName().equals(item.id+".reader.bak")||value.getName().equals(item.id+".reader.new")))latest=Math.max(latest,value.lastModified());if(ReaderStore.hasPending(getFilesDir(),item.id))latest=Math.max(latest,System.currentTimeMillis());if(latest>item.modified)try{LibraryStore.touchModified(getApplicationContext(),item.id,latest);}catch(IOException ignored){}}item.modified=Math.max(1,latest);}
-    private long newestModified(File file,int depth){if(file==null||!file.exists()||depth>6)return 0;long newest=file.lastModified();if(file.isDirectory()){File[] children=file.listFiles();if(children!=null)for(File child:children)newest=Math.max(newest,newestModified(child,depth+1));}return newest;}
+    @Override public void onBackPressed(){if(inserting!=null&&!inserting.finished){toast("正在插入页面，请稍候");return;}if(toolPopup!=null&&toolPopup.isShowing()){dismissToolPopup();return;}if(pdfView!=null&&pdfView.isPickingColor()){pdfView.cancelColorPick();return;}if(readerActions!=null&&readerActions.handleBack())return;if(current!=null){showLibrary();return;}if(trashMode||batchMode){trashMode=false;batchMode=false;selectedIds.clear();showLibrary();return;}if(!selectedFolder.isEmpty()){LibraryFolder folder=libraryFolder(selectedFolder);selectedFolder=folder==null?"":folder.parentId;showLibrary();return;}super.onBackPressed();}
+    @Override protected void onSaveInstanceState(Bundle out){super.onSaveInstanceState(out);if(!initialized){if(pendingStartupState!=null)out.putAll(pendingStartupState);out.putParcelable("pendingPickerDestination",pendingPickerDestination);out.putInt("pendingPickerKind",pendingPickerKind);return;}
+        captureLibraryAnchor();out.putString("libraryAnchorId",libraryAnchorId);out.putString("libraryAnchorScope",libraryAnchorScope);out.putInt("libraryAnchorPosition",libraryAnchorPosition);out.putInt("libraryAnchorTop",libraryAnchorTop);
+        out.putString("libraryFilter",filter);out.putString("libraryFolder",selectedFolder);out.putString("libraryTag",selectedTag);out.putBoolean("libraryFavorites",favoritesOnly);out.putBoolean("libraryTrash",trashMode);out.putBoolean("libraryBatch",batchMode);out.putString("librarySort",librarySort.name());out.putStringArrayList("librarySelection",new ArrayList<>(selectedIds));if(importSession!=null)out.putString("importSession",importSession.id());if(backupSession!=null)out.putString("backupSession",backupSession.id());if(!pendingImportOfferId.isEmpty())out.putString("pendingImportOffer",pendingImportOfferId);
+        if(current!=null){out.putString("doc",current.id);out.putBoolean("headerCollapsed",headerCollapsed);out.putString("readerQuery",searchDialog==null?readerQuery:searchDialog.getQuery());PdfReaderView.ViewportSnapshot view=pdfView==null?pendingReaderViewport:pdfView.captureViewport();if(view!=null){out.putString("readerViewportId",current.id);out.putInt("readerViewportPage",view.page);out.putFloat("readerViewportZoom",view.zoom);out.putFloat("readerViewportX",view.anchorX);out.putFloat("readerViewportY",view.anchorY);out.putBoolean("readerViewportHorizontal",view.horizontalPaging);}}
+        out.putString("exportDocumentId",exportDocumentId);out.putInt("exportFrom",exportFrom);out.putInt("exportTo",exportTo);out.putBoolean("exportSigned",exportSigned);out.putParcelable("pendingPickerDestination",pendingPickerDestination);out.putInt("pendingPickerKind",pendingPickerKind);}
+    @Override protected void onPause(){dismissToolPopup();closeReaderDialog();closeSearch();if(readerActions!=null)readerActions.pauseDialogs();if(pdfView!=null)pdfView.pause();boolean pageSaved=flushPageSave();if(initialized&&!pdfOpening&&inserting==null&&pageSaved){save();if(current!=null)scheduleModifiedRefresh(current);}super.onPause();}
+    @Override protected void onResume(){super.onResume();stylusOnly=getPreferences(0).getBoolean("stylusOnly",true);twoFingerUndo=getPreferences(0).getBoolean("twoFingerUndo",true);if(!initialized||pdfOpening||inserting!=null)return;
+        String openedNote=lastOpenedNoteId;boolean reload=reloadLibraryOnResume||!openedNote.isEmpty();lastOpenedNoteId="";reloadLibraryOnResume=false;
+        if(reload){requestLibraryReload(openedNote);return;}if(current==null)populate();}
+    @Override protected void onDestroy(){dead=true;generation++;pageSaveHandler.removeCallbacks(pendingPageSave);if(importSession!=null)importSession.detach(importListener);if(backupSession!=null)backupSession.detach(backupListener);dismissImportDialog();dismissBackupDialog();releaseView();if(libraryAdapter!=null){libraryAdapter.dispose();libraryAdapter=null;}if(isFinishing()&&!pendingImportOfferId.isEmpty())pendingImportOffers.remove(pendingImportOfferId);if(thumbnails!=null){thumbnails.close();thumbnails=null;}super.onDestroy();}
+    private void requestLibraryReload(String noteId){
+        final int viewGeneration=generation;final String expectedRevision=libraryRevision;final Context app=getApplicationContext();
+        worker.execute(()->{if(!noteId.isEmpty())refreshModifiedInBackground(app,noteId,true);LibraryStore.State ready=LibraryStore.loadFresh(app);
+            runOnUiThread(()->{if(dead||viewGeneration!=generation||!expectedRevision.equals(libraryRevision))return;applyLibraryState(ready);
+                if(!noteId.isEmpty()&&thumbnails!=null)thumbnails.invalidate(noteId);
+                if(current==null)showLibrary();});});
+    }
+    private void scheduleModifiedRefresh(LibraryItem item){
+        if(item==null)return;final String id=item.id;final boolean note=item.isNote();final Context app=getApplicationContext();final String expected=libraryRevision;
+        worker.execute(()->{refreshModifiedInBackground(app,id,note);LibraryStore.State latest=LibraryStore.load(app);runOnUiThread(()->{if(dead)return;
+            if(thumbnails!=null)thumbnails.invalidate(id);
+            if(current!=null){reloadLibraryOnResume=true;return;}
+            if(!expected.equals(libraryRevision))return;
+            applyLibraryState(latest);populate();
+        });});
+    }
+    private static long refreshModifiedInBackground(Context app,String id,boolean note){
+        long latest=0;File base=app.getFilesDir();
+        if(note)latest=newestModified(new File(new File(base,"notes"),id),0);
+        else{File[] files=base.listFiles();if(files!=null)for(File value:files)if(value.isFile()&&(value.getName().equals(id+".pdf")||value.getName().startsWith(id+"-")&&value.getName().contains(".ink")||value.getName().equals(id+".reader")||value.getName().equals(id+".reader.bak")||value.getName().equals(id+".reader.new")))latest=Math.max(latest,value.lastModified());if(ReaderStore.hasPending(base,id))latest=Math.max(latest,System.currentTimeMillis());}
+        if(latest>0)try{LibraryStore.touchModified(app,id,latest);}catch(IOException ignored){}
+        return latest;
+    }
+    private static long newestModified(File file,int depth){if(file==null||!file.exists()||depth>6)return 0;long newest=file.lastModified();if(file.isDirectory()){File[] children=file.listFiles();if(children!=null)for(File child:children)newest=Math.max(newest,newestModified(child,depth+1));}return newest;}
 }

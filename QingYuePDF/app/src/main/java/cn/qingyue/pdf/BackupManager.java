@@ -115,6 +115,13 @@ public final class BackupManager {
         if (context == null) throw new NullPointerException("context");
         if (items == null) throw new NullPointerException("items");
         Context app = context.getApplicationContext();
+        LibraryStore.State library = LibraryStore.load(app);
+        if (!library.allowSave) throw new IOException("资料库索引损坏，不能备份文件夹结构");
+        return buildSources(app, items, library.folders);
+    }
+
+    private static SourceSet buildSources(Context app, Collection<LibraryItem> items,
+                                          Collection<LibraryFolder> folders) throws IOException {
         ArrayList<LibraryItem> snapshot = new ArrayList<>();
         HashSet<String> ids = new HashSet<>();
         for (LibraryItem source : items) {
@@ -190,11 +197,39 @@ public final class BackupManager {
             }
         }
 
-        LibraryStore.State library = LibraryStore.load(app);
-        if (!library.allowSave) throw new IOException("资料库索引损坏，不能备份文件夹结构");
-        String index = LibraryIndex.encodeV2(snapshot, library.folders, System.currentTimeMillis());
+        String index = LibraryIndex.encodeV2(snapshot, folders, System.currentTimeMillis());
         String metadata = "{\"backupSchema\":1,\"libraryIndex\":" + jsonQuote(index) + "}";
         return new SourceSet(entries, metadata, snapshot.size());
+    }
+
+    /** Resolve legacy item selections against the committed index while holding the transaction. */
+    private static ArrayList<LibraryItem> selectCurrentItems(Collection<LibraryItem> requested,
+                                                               LibraryStore.State library)
+            throws IOException {
+        if (!library.allowSave) throw new IOException("资料库索引损坏，不能备份");
+        if (requested == null) {
+            ArrayList<LibraryItem> selected = new ArrayList<>();
+            for (LibraryItem item : library.items) selected.add(item.copy());
+            return selected;
+        }
+        HashMap<String, LibraryItem> current = new HashMap<>();
+        for (LibraryItem item : library.items) current.put(item.id, item);
+        ArrayList<LibraryItem> selected = new ArrayList<>();
+        HashSet<String> seen = new HashSet<>();
+        for (LibraryItem item : requested) {
+            if (item == null) throw new IOException("备份中存在空的资料记录");
+            if (!seen.add(item.id)) throw new IOException("备份中存在重复的资料编号");
+            LibraryItem live = current.get(item.id);
+            if (live == null) throw new IOException("资料已变化，请重新备份：" + item.id);
+            selected.add(live.copy());
+        }
+        return selected;
+    }
+
+    private static ArrayList<LibraryFolder> copyFolders(LibraryStore.State library) {
+        ArrayList<LibraryFolder> folders = new ArrayList<>();
+        for (LibraryFolder folder : library.folders) folders.add(folder.copy());
+        return folders;
     }
 
     /**
@@ -224,9 +259,16 @@ public final class BackupManager {
             synchronized (TRANSACTION_LOCK) {
                 synchronized (NoteStore.class) { synchronized (ReaderStore.class) { synchronized (InkStore.class) {
                     checkCancelled(cancellation);
-                    settlePendingNotes(app, items, cancellation);
-                    settlePendingReader(app, items, cancellation);
-                    sources = buildSources(app, items);
+                    ArrayList<LibraryItem> selected;
+                    ArrayList<LibraryFolder> folders;
+                    synchronized (LibraryStore.transactionLock()) {
+                        LibraryStore.State library = LibraryStore.load(app);
+                        selected = selectCurrentItems(items, library);
+                        folders = copyFolders(library);
+                    }
+                    settlePendingNotes(app, selected, cancellation);
+                    settlePendingReader(app, selected, cancellation);
+                    sources = buildSources(app, selected, folders);
                     try (FileOutputStream output = new FileOutputStream(partial)) {
                         BackupArchive.write(output, sources.entries, sources.metadataJson, limits,
                                 archiveProgress(progress), archiveCancellation(cancellation));
@@ -250,6 +292,14 @@ public final class BackupManager {
                                                   File target, Cancellation cancellation,
                                                   Progress progress) throws IOException {
         return createSnapshot(context, items, target, BackupArchive.Limits.defaults(),
+                cancellation, progress);
+    }
+
+    /** Complete library snapshot; resolves the index inside the same transaction as payloads. */
+    public static PreparedSnapshot createSnapshot(Context context, File target,
+                                                  Cancellation cancellation, Progress progress)
+            throws IOException {
+        return createSnapshot(context, null, target, BackupArchive.Limits.defaults(),
                 cancellation, progress);
     }
 
@@ -311,9 +361,16 @@ public final class BackupManager {
         try {
             synchronized (TRANSACTION_LOCK) {
                 synchronized (NoteStore.class) { synchronized (ReaderStore.class) { synchronized (InkStore.class) {
-                    settlePendingNotes(app, items, cancellation);
-                    settlePendingReader(app, items, cancellation);
-                    sources = buildSources(app, items);
+                    ArrayList<LibraryItem> selected;
+                    ArrayList<LibraryFolder> folders;
+                    synchronized (LibraryStore.transactionLock()) {
+                        LibraryStore.State library = LibraryStore.load(app);
+                        selected = selectCurrentItems(items, library);
+                        folders = copyFolders(library);
+                    }
+                    settlePendingNotes(app, selected, cancellation);
+                    settlePendingReader(app, selected, cancellation);
+                    sources = buildSources(app, selected, folders);
                     progress.onProgress("prepare", "正在整理本机资料", 0, -1, 0,
                             sources.entries.size());
                     try (FileOutputStream output = new FileOutputStream(archive)) {
@@ -356,6 +413,13 @@ public final class BackupManager {
     public static Result exportTo(Context context, Uri destination, Collection<LibraryItem> items,
                                   Progress progress, Cancellation cancellation) throws IOException {
         return exportTo(context, destination, items, BackupArchive.Limits.defaults(), progress,
+                cancellation);
+    }
+
+    /** Complete library export; resolves the index inside the same transaction as payloads. */
+    public static Result exportTo(Context context, Uri destination, Progress progress,
+                                  Cancellation cancellation) throws IOException {
+        return exportTo(context, destination, null, BackupArchive.Limits.defaults(), progress,
                 cancellation);
     }
 

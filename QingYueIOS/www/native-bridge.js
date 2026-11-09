@@ -14,10 +14,10 @@
       __defProp(target, name, { get: all[name], enumerable: true });
   };
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+core@8.5.2/node_modules/@capacitor/core/dist/index.js
+  // node_modules/.pnpm/@capacitor+core@8.5.2/node_modules/@capacitor/core/dist/index.js
   var ExceptionCode, CapacitorException, getPlatformId, createCapacitor, initCapacitorGlobal, Capacitor, registerPlugin, WebPlugin, encode, decode, CapacitorCookiesPluginWeb, CapacitorCookies, readBlobAsBase64, normalizeHttpHeaders, buildUrlParams, buildRequestInit, CapacitorHttpPluginWeb, CapacitorHttp, SystemBarsStyle, SystemBarType, SystemBarsPluginWeb, SystemBars;
   var init_dist = __esm({
-    "QingYueIOS/node_modules/.pnpm/@capacitor+core@8.5.2/node_modules/@capacitor/core/dist/index.js"() {
+    "node_modules/.pnpm/@capacitor+core@8.5.2/node_modules/@capacitor/core/dist/index.js"() {
       (function(ExceptionCode2) {
         ExceptionCode2["Unimplemented"] = "UNIMPLEMENTED";
         ExceptionCode2["Unavailable"] = "UNAVAILABLE";
@@ -525,10 +525,10 @@
     }
   });
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/definitions.js
+  // node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/definitions.js
   var Directory, Encoding;
   var init_definitions = __esm({
-    "QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/definitions.js"() {
+    "node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/definitions.js"() {
       (function(Directory2) {
         Directory2["Documents"] = "DOCUMENTS";
         Directory2["Data"] = "DATA";
@@ -548,7 +548,7 @@
     }
   });
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/web.js
+  // node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/web.js
   var web_exports = {};
   __export(web_exports, {
     FilesystemWeb: () => FilesystemWeb
@@ -574,7 +574,7 @@
   }
   var FilesystemWeb;
   var init_web = __esm({
-    "QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/web.js"() {
+    "node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/web.js"() {
       init_dist();
       init_definitions();
       FilesystemWeb = class _FilesystemWeb extends WebPlugin {
@@ -1121,14 +1121,14 @@
     }
   });
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/web.js
+  // node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/web.js
   var web_exports2 = {};
   __export(web_exports2, {
     ShareWeb: () => ShareWeb
   });
   var ShareWeb;
   var init_web2 = __esm({
-    "QingYueIOS/node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/web.js"() {
+    "node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/web.js"() {
       init_dist();
       ShareWeb = class extends WebPlugin {
         async canShare() {
@@ -1153,13 +1153,13 @@
     }
   });
 
-  // QingYueIOS/src/native-bridge.mjs
+  // src/native-bridge.mjs
   init_dist();
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/index.js
+  // node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/index.js
   init_dist();
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+synapse@1.0.4/node_modules/@capacitor/synapse/dist/synapse.mjs
+  // node_modules/.pnpm/@capacitor+synapse@1.0.4/node_modules/@capacitor/synapse/dist/synapse.mjs
   function s(t) {
     t.CapacitorUtils.Synapse = new Proxy(
       {},
@@ -1206,20 +1206,20 @@
     typeof window > "u" || (window.CapacitorUtils = window.CapacitorUtils || {}, window.Capacitor !== void 0 && !t ? s(window) : window.cordova !== void 0 && u(window));
   }
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/index.js
+  // node_modules/.pnpm/@capacitor+filesystem@8.1.3_@capacitor+core@8.5.2/node_modules/@capacitor/filesystem/dist/esm/index.js
   init_definitions();
   var Filesystem = registerPlugin("Filesystem", {
     web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m) => new m.FilesystemWeb())
   });
   f();
 
-  // QingYueIOS/node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/index.js
+  // node_modules/.pnpm/@capacitor+share@8.0.2_@capacitor+core@8.5.2/node_modules/@capacitor/share/dist/esm/index.js
   init_dist();
   var Share = registerPlugin("Share", {
     web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.ShareWeb())
   });
 
-  // QingYueIOS/src/export-file.mjs
+  // src/export-file.mjs
   var CHUNK_BYTES = 256 * 1024;
   var MAX_BYTES = 105 * 1024 * 1024;
   var ROOT = "QingYueExports";
@@ -1290,7 +1290,7 @@
     return { saveBlob, shareFile };
   }
 
-  // QingYueIOS/src/native-bridge.mjs
+  // src/native-bridge.mjs
   var exporter = createExporter({ filesystem: Filesystem, share: Share, directory: Directory.Documents });
   window.QYNative = Object.freeze({
     isNative: Capacitor.isNativePlatform(),

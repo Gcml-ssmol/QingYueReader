@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 
 /** Test-only filesystem shim with the AtomicFile operations used by LibraryStore. */
 public final class AtomicFile {
+    public static volatile int finishedWrites;
     private final File base;
     private final File fresh;
 
@@ -38,6 +39,7 @@ public final class AtomicFile {
         } catch (java.nio.file.AtomicMoveNotSupportedException unsupported) {
             Files.move(fresh.toPath(), base.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
+        finishedWrites++;
     }
 
     public void failWrite(FileOutputStream output) {

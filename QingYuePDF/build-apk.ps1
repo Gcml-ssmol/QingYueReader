@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$SdkRoot,
     [string]$BuildDirectory = (Join-Path $PSScriptRoot 'build-local'),
-    [string]$OutputApk = (Join-Path $PSScriptRoot 'qingyue-pdf-1.14.0.apk')
+    [string]$OutputApk = (Join-Path $PSScriptRoot 'qingyue-pdf-1.17.0.apk')
 )
 $ErrorActionPreference='Stop'
 $SdkRoot=(Resolve-Path -LiteralPath $SdkRoot).Path

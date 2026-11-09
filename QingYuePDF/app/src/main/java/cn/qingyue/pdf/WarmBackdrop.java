@@ -13,7 +13,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 
-/** Quiet, scalable cream-and-apricot backgrounds for the library and import card. */
+/** Display backdrop for the library and its compact welcome panel. */
 public final class WarmBackdrop extends Drawable {
     private final boolean hero;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -79,32 +79,21 @@ public final class WarmBackdrop extends Drawable {
     private void drawCream(Canvas canvas, Rect bounds) {
         area.set(bounds);
         int save = canvas.saveLayerAlpha(area, opacity);
-        canvas.clipRect(bounds);
-        float w = area.width(), h = area.height();
-        boolean dark = AppColors.isDark();
-        if (hero) {
-            android.graphics.Path clip = new android.graphics.Path();
-            clip.addRoundRect(area, 22 * density, 22 * density, android.graphics.Path.Direction.CW);
-            canvas.clipPath(clip);
-            paint.setShader(new LinearGradient(area.left, area.top, area.right, area.bottom,
-                    dark ? 0xff403025 : 0xffffead5, dark ? 0xff4b3425 : 0xffffdfbf, Shader.TileMode.CLAMP));
-            canvas.drawRect(area, paint);
-            paint.setShader(null);
-            paint.setColor(dark ? 0x155e3b25 : 0x55fffaf1);
-            canvas.drawCircle(area.right + h * .06f, area.top - h * .1f, h * .9f, paint);
-        } else {
-            paint.setShader(new LinearGradient(area.left, area.top, area.left, area.bottom,
-                    AppColors.BACKGROUND, dark ? 0xff2e261f : 0xfffff4e7, Shader.TileMode.CLAMP));
-            canvas.drawRect(area, paint);
-            float radius = Math.max(1, Math.min(w * .7f, h * .48f));
-            paint.setShader(new RadialGradient(area.right, area.bottom, radius,
-                    new int[]{dark ? 0x144d3427 : 0x30ffcc9c, 0x00ffcc9c}, null, Shader.TileMode.CLAMP));
-            canvas.drawRect(area, paint);
-            paint.setShader(null);
-            paint.setColor(dark ? 0x124d3427 : 0x14edc79c);
-            canvas.drawCircle(area.left - radius * .54f, area.top + h * .78f, radius * .7f, paint);
-        }
         paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        if (hero) {
+            paint.setColor(AppColors.SURFACE);
+            canvas.drawRoundRect(area, 14 * density, 14 * density, paint);
+            paint.setColor(AppColors.BORDER);
+            paint.setStrokeWidth(density);
+            paint.setStyle(Paint.Style.STROKE);
+            area.inset(density / 2f, density / 2f);
+            canvas.drawRoundRect(area, 14 * density, 14 * density, paint);
+            paint.setStyle(Paint.Style.FILL);
+        } else {
+            paint.setColor(AppColors.BACKGROUND);
+            canvas.drawRect(area, paint);
+        }
         canvas.restoreToCount(save);
     }
 

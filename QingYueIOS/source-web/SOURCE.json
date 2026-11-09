@@ -3,18 +3,18 @@
   "commit": null,
   "basedOnCommit": "cdce83dab14e260336ee8318cff882a1d9f145dd",
   "version": "0.2.1",
-  "snapshot": "2026-09-24 reference UI refresh; local workspace, not published",
+  "snapshot": "2026-09-30 Codex-inspired UI refresh; local workspace, not published",
   "files": {
-    "app.mjs": "fa5297248ac5e43fdfffb6f3953b57ff03a5fa74d168a994bb704275acc51e3f",
+    "app.mjs": "2bf91e40e994be1ae2f690fc97da0a40fb43614d91952821184f15195f94e702",
     "appearance.css": "a36954ba4114d7416688ac6e840118f52fb11a73bc27863fc7c82e86adc1f974",
-    "appearance.mjs": "18de835f2e96bca80c82a04f5124fab9dedb0817547e5c048fa16011a09d3e33",
+    "appearance.mjs": "62c76135916c19f47d95adc4529ee1c856f9ceef34828a254091c0edf86e7aa9",
     "assets/library-scene.svg": "caaede98d34bf086ccd247b27f4af1fa15f4a0d205dfc96f3c4ec2dd95f06ad1",
     "assets/ocr-font.ttf": "004cd725a5f3836d6397dc1a632a32b13a3428443522daf3d1c59a0c844b9a0c",
     "backup.mjs": "d0fc5b74df3f3dae6af543dfd284ed4093fbe8583956aa7d87a0ca2b16d2d64a",
     "geometry.mjs": "73d0af12f60b1cb8f6039407b1a0471b9db1c6a37b5ac9a1736019e0bb914653",
     "icons/icon-192.png": "a924349f7d04c34a010bb65f9eb5108ae6280a4fa11baffe98d0eab3905023f5",
     "icons/icon-512.png": "6b2b3054c1f37f3995e78f39391fa79eb892d9d011137998860709adb4110d6d",
-    "index.html": "12f347eb745a2e65ff9790809fb35a3bfb517474d6ff7ca5670fa10c985e1f62",
+    "index.html": "2c0630dbef1ee76f6ee00fa5841f1e5f069af43f389f8236a86cf81e5c428a98",
     "licenses/DroidSansFallback-AOSP-MODIFICATIONS.txt": "62289f6d16ffc614c95dfaa4f4e0e5f00f1ea2ba32d7009348c44e957051c99f",
     "licenses/DroidSansFallback-AOSP-NOTICE.txt": "399b84568260d812d5728335d913e470ea7fe092a1f07d7cf4adad64ba2ded07",
     "licenses/FONT-PROVENANCE-ANDROID.md": "75ee85582401a161512de097729513dd1a8e6ab7c0c0c73d026c7b44c71af2b1",
@@ -232,6 +232,7 @@
     "vendor/pdfjs/wasm/LICENSE_QCMS": "36d847ae882f6574ebc72f56a4f354e4f104fde4a584373496482e97d52d31bc",
     "vendor/pdfjs/wasm/openjpeg.wasm": "67b8e2b162da472e98cb48d3d32e3e38fff481b9b32ff4818e78bb248af88ab2",
     "vendor/pdfjs/wasm/openjpeg_nowasm_fallback.js": "07c3c3361827308741bc31c561b59e705ebb4d1e8efb84e4d24884e230dbb894",
-    "vendor/pdfjs/wasm/qcms_bg.wasm": "6017eca5939cde1836e88e6d8cd27ae039246f206515ea4487bdfd0e3fb16e26"
+    "vendor/pdfjs/wasm/qcms_bg.wasm": "6017eca5939cde1836e88e6d8cd27ae039246f206515ea4487bdfd0e3fb16e26",
+    "codex.css": "427028686362624f1154f4b8d3510c169efa2ff906dc7e745da824fd307832f1"
   }
 }

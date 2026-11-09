@@ -31,6 +31,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -47,6 +49,9 @@ public final class DocumentDialogs {
     public interface Rename { void changed(String name); }
     public interface Organization { void changed(String folder, List<String> tags); }
     public interface ImportOption { void chosen(boolean keepOriginal); }
+    public interface ImportOptionWithLayout {
+        void chosen(boolean keepOriginal,DocumentImport.LayoutOptions options);
+    }
 
     /** A lifecycle-replaceable task card. The worker is owned outside the Activity. */
     public static final class TaskDialog {
@@ -184,6 +189,34 @@ public final class DocumentDialogs {
         TextView explanation=text(activity,convertible?"EPUB / Word / TXT 会按正文重排为可批注 PDF。EPUB 按章节顺序阅读，图片仅保留说明文字，暂不还原原字体和 CSS；不支持受 DRM 保护的正文。":"PDF 将复制到晴阅本地资料库。",13,AppColors.MUTED);explanation.setLineSpacing(dp(activity,4),1f);dialog.body.addView(explanation);
         CheckBox keep=new CheckBox(activity);keep.setText("同时保留原始文件附件");keep.setTextColor(AppColors.INK);keep.setTextSize(13);keep.setChecked(convertible);keep.setEnabled(convertible);keep.setPadding(0,dp(activity,12),0,dp(activity,8));dialog.body.addView(keep);
         gap(dialog.body,15);addButtons(dialog,"开始导入",AppColors.ACCENT,AppColors.ON_ACCENT,()->dialog.complete(callback==null?null:()->callback.chosen(keep.isChecked())));dialog.show();return dialog;
+    }
+
+    /** New inputs only: a fixed PDF is copied without reflow regardless of these controls. */
+    public static Dialog importOptions(Activity activity,String name,boolean convertible,
+            ImportOptionWithLayout callback){
+        CardDialog dialog=new CardDialog(activity);addTitle(dialog,"导入文档","book",AppColors.ACCENT_DARK);gap(dialog.body,12);
+        TextView filename=text(activity,safe(name),15,AppColors.INK);filename.setTypeface(null,1);filename.setMaxLines(2);filename.setEllipsize(TextUtils.TruncateAt.END);dialog.body.addView(filename);gap(dialog.body,10);
+        TextView explanation=text(activity,convertible?"EPUB / Word / TXT 将生成新的可批注 PDF；此选项不修改已有 PDF 或批注。原字体、CSS 与图片版式不保证还原。":"PDF 会按原页复制到本地资料库，不重排正文。",13,AppColors.MUTED);
+        explanation.setLineSpacing(dp(activity,4),1f);dialog.body.addView(explanation);
+        DocumentImport.LayoutOptions defaults=DocumentImport.LayoutOptions.defaultFor(activity);
+        RadioGroup pages=new RadioGroup(activity);pages.setOrientation(RadioGroup.HORIZONTAL);
+        RadioButton phone=radio(activity,"手机阅读",10101),a4=radio(activity,"标准 A4",10102);
+        pages.addView(phone,new RadioGroup.LayoutParams(0,-2,1));pages.addView(a4,new RadioGroup.LayoutParams(0,-2,1));
+        pages.check(defaults.page==DocumentImport.PagePreset.PHONE?phone.getId():a4.getId());
+        RadioGroup sizes=new RadioGroup(activity);sizes.setOrientation(RadioGroup.HORIZONTAL);
+        RadioButton small=radio(activity,"小",10201),medium=radio(activity,"中",10202),large=radio(activity,"大",10203);
+        sizes.addView(small,new RadioGroup.LayoutParams(0,-2,1));sizes.addView(medium,new RadioGroup.LayoutParams(0,-2,1));sizes.addView(large,new RadioGroup.LayoutParams(0,-2,1));sizes.check(medium.getId());
+        if(convertible){gap(dialog.body,12);dialog.body.addView(text(activity,"新文档页面",13,AppColors.INK));dialog.body.addView(pages);gap(dialog.body,8);dialog.body.addView(text(activity,"正文字号",13,AppColors.INK));dialog.body.addView(sizes);}
+        CheckBox keep=new CheckBox(activity);keep.setText("同时保留原始文件附件");keep.setTextColor(AppColors.INK);keep.setTextSize(13);keep.setChecked(convertible);keep.setEnabled(convertible);keep.setPadding(0,dp(activity,12),0,dp(activity,8));dialog.body.addView(keep);
+        gap(dialog.body,15);addButtons(dialog,"开始导入",AppColors.ACCENT,AppColors.ON_ACCENT,()->{
+            DocumentImport.PagePreset page=pages.getCheckedRadioButtonId()==a4.getId()?DocumentImport.PagePreset.A4:DocumentImport.PagePreset.PHONE;
+            DocumentImport.FontSize font=sizes.getCheckedRadioButtonId()==small.getId()?DocumentImport.FontSize.SMALL:sizes.getCheckedRadioButtonId()==large.getId()?DocumentImport.FontSize.LARGE:DocumentImport.FontSize.MEDIUM;
+            DocumentImport.LayoutOptions chosen=convertible?new DocumentImport.LayoutOptions(page,font):defaults;
+            dialog.complete(callback==null?null:()->callback.chosen(keep.isChecked(),chosen));
+        });dialog.show();return dialog;
+    }
+    private static RadioButton radio(Activity owner,String label,int id){
+        RadioButton button=new RadioButton(owner);button.setId(id);button.setText(label);button.setTextColor(AppColors.INK);button.setTextSize(13);button.setMinHeight(dp(owner,48));return button;
     }
 
     public static TaskDialog task(Activity activity,String title,String message,Runnable cancel){

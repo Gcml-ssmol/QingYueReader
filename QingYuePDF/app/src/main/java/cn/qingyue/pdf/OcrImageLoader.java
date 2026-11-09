@@ -86,6 +86,12 @@ public final class OcrImageLoader {
         return renderPdfPage(pdf, requestedPage, MAX_EDGE, MAX_PIXELS, cancellation);
     }
 
+    /** OCR source for optional deskew. Baseline and rotated candidate use the same bounded raster. */
+    public static Loaded renderPdfPageForDeskew(File pdf, int requestedPage,
+            OcrCancellation cancellation) throws IOException {
+        return renderPdfPage(pdf, requestedPage, 2500, 4000000L, cancellation);
+    }
+
     /** A bounded display bitmap. Never use its coordinates for the OCR text layer. */
     public static Loaded renderPdfPreview(File pdf, int requestedPage,
             OcrCancellation cancellation) throws IOException {

@@ -186,8 +186,8 @@ public final class NoteDialogs {
         Switch toggle = new Switch(card.owner);
         toggle.setContentDescription(title);
         toggle.setChecked(checked);
-        toggle.setThumbTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}}, new int[]{AppColors.ACCENT, 0xffbaa694}));
-        toggle.setTrackTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}}, new int[]{0xffffcc9f, AppColors.BORDER}));
+        toggle.setThumbTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}}, new int[]{AppColors.ACCENT, AppColors.MUTED}));
+        toggle.setTrackTintList(new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}}, new int[]{AppColors.SOFT, AppColors.BORDER}));
         toggle.setOnCheckedChangeListener((button, value) -> callback.changed(value));
         group.addView(toggle, new LinearLayout.LayoutParams(-2, dp(card.owner, 48)));
         group.setOnClickListener(v -> toggle.setChecked(!toggle.isChecked()));

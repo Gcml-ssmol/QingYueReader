@@ -23,6 +23,8 @@ public final class ManagerRegressionTest {
 
     public static void main(String[] arguments) throws Exception {
         staleSnapshotCannotOverwriteMutation();
+        cachedReadsAreIsolatedAndFreshReloadSeesExternalRestore();
+        pageCommitPreservesConcurrentMetadata();
         emptyFoldersSurviveOldItemWrites();
         deletingTrashOnlyFolderPreservesRecovery();
         deletingFolderProtectsActiveChildrenAndStaleState();
@@ -39,6 +41,43 @@ public final class ManagerRegressionTest {
         startupRecoversOrCleansDurableTrashTransactions();
         deletingLastPdfLeavesReadableEmptyLibrary();
         System.out.println("PASS: revision guard, synchronized atomic reads, damaged-index safety, attachment ownership, retryable and durable trash transactions, trash-only folder deletion and restore");
+    }
+
+    private static void pageCommitPreservesConcurrentMetadata() throws Exception {
+        withContext("reader-page",context->{
+            LibraryItem source=item(A,"before");source.pages=8;LibraryStore.save(context,items(source));
+            LibraryStore.State stale=LibraryStore.load(context);
+            LibraryStore.mutate(context,items->{for(LibraryItem item:items)if(A.equals(item.id)){item.name="renamed";return;}throw new IOException("missing fixture");});
+            LibraryStore.State committed=LibraryStore.updatePage(context,A,5);
+            equal("renamed",find(committed,A).name,"page update must preserve concurrently renamed document");
+            equal(5,find(committed,A).page,"latest reading page is committed");
+            expect(LibraryStore.StaleIndexException.class,()->LibraryStore.saveIfRevision(context,stale.revision,stale.items),"old full-list write remains rejected");
+            int writes=android.util.AtomicFile.finishedWrites;
+            LibraryStore.updatePage(context,A,5);
+            equal(writes,android.util.AtomicFile.finishedWrites,"same page does not rewrite index");
+            expect(IOException.class,()->LibraryStore.updatePage(context,A,8),"out-of-range page cannot corrupt index");
+            equal(5,find(LibraryStore.load(context),A).page,"failed page update retains committed page");
+        });
+    }
+
+    private static void cachedReadsAreIsolatedAndFreshReloadSeesExternalRestore() throws Exception {
+        withContext("snapshot-cache", context -> {
+            LibraryStore.save(context, items(item(A, "initial")));
+            LibraryStore.State first=LibraryStore.load(context);
+            first.items.get(0).name="poisoned";
+            equal("initial",find(LibraryStore.load(context),A).name,"cached state must not share mutable items with caller");
+            int writes=android.util.AtomicFile.finishedWrites;
+            LibraryStore.State unchanged=LibraryStore.load(context);
+            equal(unchanged.revision,LibraryStore.saveIfRevision(context,unchanged.revision,unchanged.items),"unchanged CAS keeps revision");
+            equal(writes,android.util.AtomicFile.finishedWrites,"unchanged CAS must not rewrite index");
+            File index=LibraryStore.indexFile(context);
+            String json=new String(Files.readAllBytes(index.toPath()),StandardCharsets.UTF_8);
+            yes(json.contains("initial"),"fixture contains original name");
+            java.nio.file.attribute.FileTime stamp=Files.getLastModifiedTime(index.toPath());
+            Files.write(index.toPath(),json.replace("initial","changed").getBytes(StandardCharsets.UTF_8));
+            Files.setLastModifiedTime(index.toPath(),stamp);
+            equal("changed",find(LibraryStore.loadFresh(context),A).name,"fresh reload sees external restore even with matching file metadata");
+        });
     }
 
     private static void readsShareTheAtomicFileWriteLock() throws Exception {

@@ -15,11 +15,16 @@ public final class NoteDocument {
     private List<Item> items=new ArrayList<>();
     private final ArrayDeque<List<Item>> undo=new ArrayDeque<>(),redo=new ArrayDeque<>();
     private long nextId=1;
+    // Process-local save identity; wire format v3 remains unchanged.
+    private Object saveSession=new Object();
+    private long revision;
     private final ArrayList<Page> pages=new ArrayList<>();
     private int currentPage;
     private static final class Page {
+        final String token;
         List<Item> items; double x,y,zoom; boolean saved;
-        Page(List<Item> items,double x,double y,double zoom,boolean saved){this.items=items;this.x=x;this.y=y;this.zoom=zoom;this.saved=saved;}
+        Page(List<Item> items,double x,double y,double zoom,boolean saved){this(UUID.randomUUID().toString(),items,x,y,zoom,saved);}
+        Page(String token,List<Item> items,double x,double y,double zoom,boolean saved){this.token=token;this.items=items;this.x=x;this.y=y;this.zoom=zoom;this.saved=saved;}
     }
 
     public static final class Item {
@@ -82,9 +87,22 @@ public final class NoteDocument {
     public List<Item> items(){return Collections.unmodifiableList(items);}
     public int pageCount(){return pages.size();}
     public int currentPage(){return currentPage;}
+    /** Process-local page identity. A disk reload gives each page a new token. */
+    public String pageToken(int index){return pages.get(index).token;}
+    /** Returns -1 if the captured page was deleted or belongs to another load. */
+    public int pageIndex(String token){if(token==null)return -1;for(int i=0;i<pages.size();i++)if(pages.get(i).token.equals(token))return i;return -1;}
     public List<Item> pageItems(int index){if(index<0||index>=pages.size())throw new IndexOutOfBoundsException();return Collections.unmodifiableList(index==currentPage?items:pages.get(index).items);}
     private void storePage(){Page p=pages.get(currentPage);p.items=items;p.x=centerX;p.y=centerY;p.zoom=zoom;p.saved=viewportSaved;}
-    public void selectPage(int index){if(index<0||index>=pages.size())throw new IndexOutOfBoundsException();if(index==currentPage)return;storePage();currentPage=index;Page p=pages.get(index);items=p.items;centerX=p.x;centerY=p.y;zoom=p.zoom;viewportSaved=p.saved;undo.clear();redo.clear();}
+    public void selectPage(int index){if(index<0||index>=pages.size())throw new IndexOutOfBoundsException();if(index==currentPage)return;storePage();currentPage=index;Page p=pages.get(index);items=p.items;centerX=p.x;centerY=p.y;zoom=p.zoom;viewportSaved=p.saved;undo.clear();redo.clear();touch();}
+    Object saveSession(){return saveSession;}
+    public long revision(){return revision;}
+    private void touch(){if(revision==Long.MAX_VALUE){saveSession=new Object();revision=0;}else revision++;}
+    public void setViewport(double x,double y,double scale,boolean saved){
+        if(Double.doubleToLongBits(centerX)==Double.doubleToLongBits(x)&&Double.doubleToLongBits(centerY)==Double.doubleToLongBits(y)
+                &&Double.doubleToLongBits(zoom)==Double.doubleToLongBits(scale)&&viewportSaved==saved)return;
+        centerX=x;centerY=y;zoom=scale;viewportSaved=saved;touch();
+    }
+    public void clearViewport(){if(viewportSaved){viewportSaved=false;touch();}}
     public int addPage(){return insertPage(pages.size());}
     /** Copies the active paper after itself. Image items keep this note's image filename. */
     public int duplicatePage(){
@@ -94,20 +112,20 @@ public final class NoteDocument {
         for(Item item:source.items)copied.add(new Item(newId(),item.type,item.color,item.width,item.points,item.image,item.text));
         int inserted=currentPage+1;
         pages.add(inserted,new Page(copied,source.x,source.y,source.zoom,source.saved));
-        selectPage(inserted);return inserted;
+        selectPage(inserted);touch();return inserted;
     }
     /** Clearing an active page is one undoable edit. */
     public void clearPage(){if(!items.isEmpty())commit(new ArrayList<>());}
     /** Deletes the active page, keeping at least one sheet in the note. */
     public int deletePage(){
         if(pages.size()==1)throw new IllegalStateException("至少保留一页纸张");
-        pages.remove(currentPage);currentPage=Math.min(currentPage,pages.size()-1);
+        pages.remove(currentPage);currentPage=Math.min(currentPage,pages.size()-1);touch();
         Page page=pages.get(currentPage);items=page.items;centerX=page.x;centerY=page.y;zoom=page.zoom;viewportSaved=page.saved;
         undo.clear();redo.clear();return currentPage;
     }
     /** Inserts an empty page before index (0..pageCount), selecting the new page. */
-    public int insertPage(int index){if(index<0||index>pages.size())throw new IndexOutOfBoundsException();if(pages.size()>=MAX_PAGES)throw new IllegalStateException("页数已达上限");storePage();pages.add(index,new Page(new ArrayList<>(),width/2,height/2,1,false));if(currentPage>=index)currentPage++;selectPage(index);return currentPage;}
-    public void movePage(int from,int to){if(from<0||to<0||from>=pages.size()||to>=pages.size())throw new IndexOutOfBoundsException();if(from==to)return;storePage();Page active=pages.get(currentPage);Page moved=pages.remove(from);pages.add(to,moved);currentPage=pages.indexOf(active);undo.clear();redo.clear();}
+    public int insertPage(int index){if(index<0||index>pages.size())throw new IndexOutOfBoundsException();if(pages.size()>=MAX_PAGES)throw new IllegalStateException("页数已达上限");storePage();pages.add(index,new Page(new ArrayList<>(),width/2,height/2,1,false));if(currentPage>=index)currentPage++;selectPage(index);touch();return currentPage;}
+    public void movePage(int from,int to){if(from<0||to<0||from>=pages.size()||to>=pages.size())throw new IndexOutOfBoundsException();if(from==to)return;storePage();Page active=pages.get(currentPage);Page moved=pages.remove(from);pages.add(to,moved);currentPage=pages.indexOf(active);undo.clear();redo.clear();touch();}
     public long newId(){if(nextId==Long.MAX_VALUE)throw new IllegalStateException("笔记项目已达上限");return nextId++;}
     public Item find(long id){for(Item item:items)if(item.id==id)return item;return null;}
     public void add(Item item){List<Item> next=new ArrayList<>(items);next.add(item);commit(next);}
@@ -212,12 +230,12 @@ public final class NoteDocument {
         double u=den==0?0:Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/den));
         double ex=x-ax-u*dx,ey=y-ay-u*dy;return ex*ex+ey*ey;
     }
-    private void commit(List<Item> next){validateItems(next);undo.addLast(items);if(undo.size()>30)undo.removeFirst();items=next;redo.clear();}
+    private void commit(List<Item> next){validateItems(next);undo.addLast(items);if(undo.size()>30)undo.removeFirst();items=next;redo.clear();touch();}
     public boolean canUndo(){return !undo.isEmpty();}
     public boolean canRedo(){return !redo.isEmpty();}
-    public boolean undo(){if(undo.isEmpty())return false;redo.addLast(items);items=undo.removeLast();return true;}
-    public boolean redo(){if(redo.isEmpty())return false;undo.addLast(items);items=redo.removeLast();return true;}
-    public NoteDocument copy(){storePage();NoteDocument d=new NoteDocument(template,size);d.pages.clear();for(Page p:pages)d.pages.add(new Page(new ArrayList<>(p.items),p.x,p.y,p.zoom,p.saved));d.currentPage=currentPage;d.items=d.pages.get(currentPage).items;d.nextId=nextId;d.centerX=centerX;d.centerY=centerY;d.zoom=zoom;d.viewportSaved=viewportSaved;return d;}
+    public boolean undo(){if(undo.isEmpty())return false;redo.addLast(items);items=undo.removeLast();touch();return true;}
+    public boolean redo(){if(redo.isEmpty())return false;undo.addLast(items);items=redo.removeLast();touch();return true;}
+    public NoteDocument copy(){storePage();NoteDocument d=new NoteDocument(template,size);d.pages.clear();for(Page p:pages)d.pages.add(new Page(p.token,new ArrayList<>(p.items),p.x,p.y,p.zoom,p.saved));d.currentPage=currentPage;d.items=d.pages.get(currentPage).items;d.nextId=nextId;d.centerX=centerX;d.centerY=centerY;d.zoom=zoom;d.viewportSaved=viewportSaved;d.saveSession=saveSession;d.revision=revision;return d;}
     private static void validateItems(List<Item> items){
         if(items.size()>MAX_ITEMS)throw new IllegalArgumentException("这份笔记的图形过多，请新建一份笔记");
         int count=0;Set<Long> ids=new HashSet<>();

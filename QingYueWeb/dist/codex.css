@@ -1,0 +1,90 @@
+/* Codex-inspired chrome. Document pages and saved ink retain their own colors. */
+html[data-ui=warm]{
+  --paper:#f8f8f7;--surface:#fff;--ink:#20201f;--muted:#747471;
+  --accent:#20201f;--soft:#ececeb;--line:#e5e5e3;--danger:#ad342b;
+  color-scheme:light;background:var(--paper);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+html[data-ui=warm] body{background:var(--paper)}
+html[data-ui=warm] button{box-shadow:none;transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;}
+html[data-ui=warm] button:not(:disabled):active{transform:scale(.975)}
+html[data-ui=warm] button:focus-visible,html[data-ui=warm] input:focus-visible,html[data-ui=warm] textarea:focus-visible,html[data-ui=warm] select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+html[data-ui=warm] .primary{background:var(--accent);border-color:var(--accent);color:var(--surface);box-shadow:none}
+html[data-ui=warm] .primary:not(:disabled):hover{background:#414140;border-color:#414140}
+html[data-ui=warm] .brand h1{font-family:inherit;font-size:30px;letter-spacing:-.045em;font-weight:720;line-height:1.15;color:var(--ink)}
+html[data-ui=warm] .brand p{letter-spacing:0;color:var(--muted)}
+html[data-ui=warm] .local-badge{background:var(--soft);color:var(--muted);font-weight:600;letter-spacing:0}
+html[data-ui=warm] .library-welcome{min-height:190px;border-color:var(--line);border-radius:16px;background:var(--surface);box-shadow:none}
+html[data-ui=warm] .eyebrow{color:var(--muted);letter-spacing:.14em}
+html[data-ui=warm] .welcome-copy h2{font-family:inherit;font-weight:660;letter-spacing:-.025em;color:var(--ink)}
+html[data-ui=warm] .welcome-subtitle,html[data-ui=warm] .welcome-detail{color:var(--muted);letter-spacing:0}
+html[data-ui=warm] .welcome-art{display:none}
+html[data-ui=warm] #new-note,html[data-ui=warm] #import-button{background:var(--surface);border-color:var(--line);color:var(--ink)}
+html[data-ui=warm] #new-note:hover,html[data-ui=warm] #import-button:hover,html[data-ui=warm] .item:hover,html[data-ui=warm] .tree-row:hover{background:var(--soft)}
+html[data-ui=warm] .search-box{box-shadow:none;border-radius:11px}
+html[data-ui=warm] .search-box input{font-size:14px}
+html[data-ui=warm] .tabs button,html[data-ui=warm] #search-kinds button{border-radius:9px}
+html[data-ui=warm] .selected{background:var(--soft)!important;border-color:var(--line)!important;color:var(--ink)!important}
+html[data-ui=warm] .tabs .selected,html[data-ui=warm] #search-kinds .selected{background:var(--ink)!important;color:var(--surface)!important;border-color:var(--ink)!important}
+html[data-ui=warm] .item{min-height:79px;border-radius:12px;background:var(--surface);transition:background-color .16s ease,border-color .16s ease}
+html[data-ui=warm] .library-welcome,html[data-ui=warm] #items,html[data-ui=warm] #search-kinds,html[data-ui=warm] #reader:not([hidden]) .reader-controls{animation:codex-panel-in .18s cubic-bezier(.2,.7,.2,1)}
+html[data-ui=warm] .item-open{min-height:77px}
+html[data-ui=warm] .file-icon{height:54px;width:43px;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px}
+html[data-ui=warm] .file-icon.note,html[data-ui=warm] .file-icon.folder{background:var(--soft);color:var(--ink)}
+html[data-ui=warm] .item>.icon-button{color:var(--muted)}
+html[data-ui=warm] #bottom-nav{border-radius:14px 14px 0 0;box-shadow:none}
+html[data-ui=warm] #bottom-nav button[aria-current=page]{color:var(--ink)}
+html[data-ui=warm] #reader{background:var(--paper)}
+html[data-ui=warm] .reader-header{border-bottom:1px solid var(--line);background:var(--surface)}
+html[data-ui=warm] .reader-controls{background:var(--surface);border-radius:12px;box-shadow:none}
+html[data-ui=warm] .toolbar button{border-radius:8px}
+html[data-ui=warm] .toolbar button:hover,html[data-ui=warm] .reader-footer button:hover{background:var(--soft)}
+html[data-ui=warm] .toolbar .selected{background:var(--soft)!important;color:var(--ink)!important}
+html[data-ui=warm] #page-stage{border-radius:3px;outline:1px solid var(--line);box-shadow:0 6px 30px #0000000c}
+html[data-ui=warm] .reader-footer{border-radius:12px;box-shadow:0 2px 12px #00000008}
+html[data-ui=warm] .reader-footer .page-label{background:var(--soft);color:var(--ink);border-radius:8px}
+html[data-ui=warm] .reader-footer .page-label input{color:var(--ink)}
+html[data-ui=warm] dialog{border-radius:16px;background:var(--surface);box-shadow:0 22px 70px #00000025;animation:codex-dialog-in .2s cubic-bezier(.2,.7,.2,1)}
+html[data-ui=warm] dialog::backdrop{background:#0007;backdrop-filter:blur(2px)}
+html[data-ui=warm] #modal-body .menu-action{border-radius:9px}
+html[data-ui=warm] #modal-body .menu-action:hover{background:var(--soft)}
+html[data-ui=warm] .appearance-choice{border-radius:11px}
+html[data-ui=warm] .appearance-choice[aria-pressed=true]{box-shadow:0 0 0 1px var(--ink)}
+html[data-ui=warm] .appearance-choice[aria-pressed=true]::after{background:var(--ink);color:var(--surface)}
+html[data-ui=warm] .style-sample.warm{background:var(--paper);border-color:var(--line)}
+html[data-ui=warm] .style-sample.warm i{background:var(--surface);border:1px solid var(--line)}
+html[data-ui=warm] .style-sample.warm i:first-child{background:var(--soft)}
+html[data-ui=warm] .theme-sample.light{background:#ececeb;color:#222}
+html[data-ui=warm] .theme-sample.dark{background:#30302f;color:#f5f5f4}
+html[data-ui=warm] #toast{background:#20201f;border-radius:9px}
+html[data-ui=warm] #busy{background:#f8f8f7ed}
+html[data-ui=warm] .spinner{border-top-color:var(--ink)}
+@keyframes codex-dialog-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes codex-panel-in{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:760px){
+ html[data-ui=warm] #library{grid-template-columns:228px minmax(0,1fr);gap:22px}
+ html[data-ui=warm] #library-sidebar{background:#f1f1f0;border:1px solid var(--line);border-radius:13px;box-shadow:none;padding:21px 10px 96px}
+ html[data-ui=warm] #library-sidebar h2{font-family:inherit;font-size:16px;font-weight:700;margin-bottom:17px}
+ html[data-ui=warm] .tree-row{border-radius:8px}
+ html[data-ui=warm] #bottom-nav{background:#f1f1f0;border-top:1px solid var(--line)}
+ html[data-ui=warm] .brand h1{font-size:35px}
+ html[data-ui=warm] .library-welcome{min-height:206px;border-radius:14px}
+ html[data-ui=warm] .reader-header{padding-left:12px}
+ html[data-ui=warm] #page-sidebar{background:#f1f1f0;border-radius:11px}
+}
+@media(min-width:1100px){html[data-ui=warm] #library{grid-template-columns:238px minmax(0,1fr);gap:26px}html[data-ui=warm] #bottom-nav{left:max(44px,calc((100vw - 1320px)/2 + 44px));width:214px}}
+html[data-ui=warm][data-theme=dark]{--paper:#191919;--surface:#222222;--ink:#f2f2f1;--muted:#aaa9a6;--accent:#f2f2f1;--soft:#323232;--line:#393939;--danger:#ff9b94;color-scheme:dark}
+html[data-ui=warm][data-theme=dark] body,html[data-ui=warm][data-theme=dark] #reader{background:var(--paper)}
+html[data-ui=warm][data-theme=dark] .primary{color:#191919}
+html[data-ui=warm][data-theme=dark] .primary:not(:disabled):hover{background:#d8d8d6;border-color:#d8d8d6}
+html[data-ui=warm][data-theme=dark] .library-welcome{background:var(--surface);border-color:var(--line)}
+html[data-ui=warm][data-theme=dark] .welcome-copy h2,html[data-ui=warm][data-theme=dark] .brand h1{color:var(--ink)}
+html[data-ui=warm][data-theme=dark] .welcome-subtitle,html[data-ui=warm][data-theme=dark] .welcome-detail,html[data-ui=warm][data-theme=dark] .eyebrow{color:var(--muted)}
+html[data-ui=warm][data-theme=dark] .local-badge{background:var(--soft);color:var(--muted)}
+html[data-ui=warm][data-theme=dark] #new-note,html[data-ui=warm][data-theme=dark] #import-button{background:var(--surface);border-color:var(--line);color:var(--ink)}
+html[data-ui=warm][data-theme=dark] .file-icon,html[data-ui=warm][data-theme=dark] .file-icon.note{background:var(--soft);color:var(--ink);border-color:var(--line)}
+html[data-ui=warm][data-theme=dark] .tabs .selected,html[data-ui=warm][data-theme=dark] #search-kinds .selected{color:#191919!important}
+html[data-ui=warm][data-theme=dark] #library-sidebar,html[data-ui=warm][data-theme=dark] #bottom-nav,html[data-ui=warm][data-theme=dark] #page-sidebar{background:#202020}
+html[data-ui=warm][data-theme=dark] #busy{background:#191919ed}
+html[data-ui=warm][data-theme=dark] #toast{background:#f2f2f1;color:#191919}
+@media(prefers-reduced-motion:reduce){html[data-ui=warm] dialog,html[data-ui=warm] .library-welcome,html[data-ui=warm] #items,html[data-ui=warm] #search-kinds,html[data-ui=warm] #reader:not([hidden]) .reader-controls{animation:none}html[data-ui=warm] button,html[data-ui=warm] .item{transition:none}}

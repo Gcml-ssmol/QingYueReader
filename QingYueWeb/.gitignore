@@ -1,0 +1,4 @@
+.sites-runtime/
+artifacts/
+test-results/
+*.log

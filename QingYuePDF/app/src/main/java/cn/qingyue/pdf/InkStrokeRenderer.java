@@ -32,9 +32,12 @@ public final class InkStrokeRenderer {
             return geometry;
         }
         public void draw(Canvas canvas,Paint paint,InkPage.Stroke stroke){
+            draw(canvas,paint,stroke,stroke.color);
+        }
+        public void draw(Canvas canvas,Paint paint,InkPage.Stroke stroke,int displayColor){
             Geometry geometry=entries.get(stroke);if(geometry==null)geometry=remember(stroke,build(stroke));
             geometry.frame=frame;
-            drawGeometry(canvas,paint,geometry,stroke.color,stroke.width);
+            drawGeometry(canvas,paint,geometry,displayColor,stroke.width);
         }
         /** Caller translates to the first point using double subtraction before scaling. */
         public void drawNote(Canvas canvas,Paint paint,Object owner,double[] points,int color,float width){
@@ -51,14 +54,18 @@ public final class InkStrokeRenderer {
     public static final class Page {
         private List<InkPage.Stroke> snapshot;private float[] bounds;
         public void draw(Canvas canvas,Paint paint,Cache cache,List<InkPage.Stroke> strokes,float l,float t,float r,float b){
+            draw(canvas,paint,cache,strokes,l,t,r,b,false,0);
+        }
+        public void draw(Canvas canvas,Paint paint,Cache cache,List<InkPage.Stroke> strokes,float l,float t,float r,float b,boolean night,int paper){
             if(snapshot!=strokes||bounds.length!=strokes.size()*4){snapshot=strokes;bounds=new float[strokes.size()*4];
                 for(int n=0;n<strokes.size();n++){InkPage.Stroke s=strokes.get(n);float x=s.points[0],y=s.points[1],right=x,bottom=y;
                     for(int i=2;i<s.points.length;i+=2){x=Math.min(x,s.points[i]);y=Math.min(y,s.points[i+1]);right=Math.max(right,s.points[i]);bottom=Math.max(bottom,s.points[i+1]);}
                     float radius=s.width*(s.pressures==null?.5f:.75f);int at=n*4;bounds[at]=x-radius;bounds[at+1]=y-radius;bounds[at+2]=right+radius;bounds[at+3]=bottom+radius;}}
-            for(int n=0;n<strokes.size();n++){int at=n*4;if(bounds[at]>r||bounds[at+1]>b||bounds[at+2]<l||bounds[at+3]<t)continue;cache.draw(canvas,paint,strokes.get(n));}
+            for(int n=0;n<strokes.size();n++){int at=n*4;if(bounds[at]>r||bounds[at+1]>b||bounds[at+2]<l||bounds[at+3]<t)continue;InkPage.Stroke stroke=strokes.get(n);cache.draw(canvas,paint,stroke,night?NightInk.display(stroke.color,paper):stroke.color);}
         }
     }
     public static void draw(Canvas canvas,Paint paint,InkPage.Stroke stroke){drawGeometry(canvas,paint,build(stroke),stroke.color,stroke.width);}
+    public static void draw(Canvas canvas,Paint paint,InkPage.Stroke stroke,int displayColor){drawGeometry(canvas,paint,build(stroke),displayColor,stroke.width);}
     private static Geometry build(InkPage.Stroke stroke){
         float[] points=stroke.points;final Path path=new Path();
         if(stroke.pressures!=null){

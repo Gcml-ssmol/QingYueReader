@@ -105,8 +105,8 @@ function appearanceSettings(){
     choice.append(el('strong',option.label),el('small',option.detail));choice.setAttribute('aria-label',option.label);grid.append(choice);choices.push(choice);
    }
   };
-  section('界面风格','选择你喜欢的阅读空间。','style',[{value:'warm',label:'晴阅 · 奶油橙',detail:'温暖留白，轻盈卡片'},{value:'classic',label:'经典 · 原版',detail:'保留原有布局与样式'}]);
-  section('界面主题','选择阅读时的界面颜色。','mode',[{value:'system',label:'跟随系统',detail:'自动适应设备外观',icon:'system'},{value:'light',label:'浅色 · 奶油白',detail:'柔和底色与杏橙点缀',icon:'sun'},{value:'dark',label:'深色 · 暖灰',detail:'降低界面亮度',icon:'moon'}]);
+  section('界面风格','选择资料库与阅读器的界面。','style',[{value:'warm',label:'Codex · 极简',detail:'中性色、清晰侧栏与轻量交互'},{value:'classic',label:'经典 · 原版',detail:'保留原有布局与样式'}]);
+  section('界面主题','选择阅读时的界面颜色。','mode',[{value:'system',label:'跟随系统',detail:'自动适应设备外观',icon:'system'},{value:'light',label:'浅色 · 中性',detail:'明亮界面与清晰层级',icon:'sun'},{value:'dark',label:'深色 · 中性',detail:'低亮度阅读界面',icon:'moon'}]);
   body.append(el('p','外观仅保存在这台设备。PDF 与笔记的原页面颜色、批注和导出内容保持不变。'),button('返回设置',()=>{closeModal();settings();},'menu-action'));update();
  });
 }

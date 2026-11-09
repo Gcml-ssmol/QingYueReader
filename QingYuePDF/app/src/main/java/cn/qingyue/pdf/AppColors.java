@@ -9,22 +9,22 @@ public final class AppColors {
 
     public static final int STYLE_CREAM = 0;
     public static final int STYLE_CLASSIC = 1;
-    public static int BACKGROUND = 0xfffff8ef;
-    public static int SURFACE = 0xfffffcf7;
-    public static int INK = 0xff2d241e;
-    public static int MUTED = 0xff887567;
-    public static int ACCENT = 0xffde5c16;
+    public static int BACKGROUND = 0xfff8f8f7;
+    public static int SURFACE = 0xffffffff;
+    public static int INK = 0xff20201f;
+    public static int MUTED = 0xff62625e;
+    public static int ACCENT = 0xffa9490f;
     public static int ON_ACCENT = 0xffffffff;
-    public static int ACCENT_DARK = 0xffaa4210;
-    public static int SOFT = 0xffffe7d1;
-    public static int BORDER = 0xffefdfd0;
-    public static int CANVAS = 0xfff4eade;
+    public static int ACCENT_DARK = 0xffa9490f;
+    public static int SOFT = 0xffececeb;
+    public static int BORDER = 0xffe5e5e3;
+    public static int CANVAS = 0xffeeeeed;
     public static int PAPER = 0xfffffcf6;
     public static final int EXPORT_PAPER = 0xfffffcf6;
     public static final int PAPER_GRID = 0xffe8ded1;
     public static final int PAPER_RULE = 0xffe2d5c5;
     private static boolean dark;
-    private static int appliedMode = -1, appliedPaper = -1, appliedStyle = -1, revision;
+    private static int appliedMode = -1, appliedPaper = -1, appliedStyle = -1, appliedNightPages = -1, revision;
 
     public static synchronized void apply(Context context) {
         android.content.SharedPreferences p = context.getSharedPreferences("appearance", Context.MODE_PRIVATE);
@@ -32,32 +32,35 @@ public final class AppColors {
         // A separate display-only key makes the new look the default for upgrades too.
         // Existing night-mode and paper selections remain untouched.
         int style = p.getInt("style", STYLE_CREAM) == STYLE_CLASSIC ? STYLE_CLASSIC : STYLE_CREAM;
+        int nightPages = p.getInt("nightPages", 0);
         boolean nextDark = mode == 2 || (mode == 0 &&
                 (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES);
-        if (appliedMode == mode && appliedPaper == paper && appliedStyle == style && dark == nextDark) return;
-        appliedMode = mode; appliedPaper = paper; appliedStyle = style; dark = nextDark;
+        if (appliedMode == mode && appliedPaper == paper && appliedStyle == style
+                && appliedNightPages == nightPages && dark == nextDark) return;
+        appliedMode = mode; appliedPaper = paper; appliedStyle = style;
+        appliedNightPages = nightPages; dark = nextDark;
         if (isClassic()) {
             BACKGROUND = dark ? 0xff211d19 : 0xfffff5e9;
             SURFACE = dark ? 0xff2d2722 : 0xfffffcf6;
             INK = dark ? 0xfff4e9dd : 0xff36291f;
-            MUTED = dark ? 0xffc0b09f : 0xff917b68;
-            ACCENT = dark ? 0xffe6a36f : 0xffd8702a;
+            MUTED = dark ? 0xffd2c1b1 : 0xff705b4c;
+            ACCENT = dark ? 0xffffb783 : 0xffa6430c;
             ON_ACCENT = dark ? 0xff211d19 : 0xffffffff;
-            ACCENT_DARK = dark ? 0xffffbd88 : 0xffad4a14;
+            ACCENT_DARK = dark ? 0xffffb783 : 0xffa6430c;
             SOFT = dark ? 0xff473426 : 0xffffe6cf;
             BORDER = dark ? 0xff5c4839 : 0xffefdcc9;
             CANVAS = dark ? 0xff171411 : 0xffefe6db;
         } else {
-            BACKGROUND = dark ? 0xff29231f : 0xfffff8ef;
-            SURFACE = dark ? 0xff332b25 : 0xfffffcf7;
-            INK = dark ? 0xfff8eee4 : 0xff2d241e;
-            MUTED = dark ? 0xffc9b5a4 : 0xff887567;
-            ACCENT = dark ? 0xfff2a16b : 0xffde5c16;
-            ON_ACCENT = dark ? 0xff2d241e : 0xffffffff;
-            ACCENT_DARK = dark ? 0xffffc69e : 0xffaa4210;
-            SOFT = dark ? 0xff4d3427 : 0xffffe7d1;
-            BORDER = dark ? 0xff614b3b : 0xffefdfd0;
-            CANVAS = dark ? 0xff1c1815 : 0xfff4eade;
+            BACKGROUND = dark ? 0xff191919 : 0xfff8f8f7;
+            SURFACE = dark ? 0xff222222 : 0xffffffff;
+            INK = dark ? 0xfff2f2f1 : 0xff20201f;
+            MUTED = dark ? 0xffc3c3bf : 0xff62625e;
+            ACCENT = dark ? 0xffffb783 : 0xffa9490f;
+            ON_ACCENT = dark ? 0xff191919 : 0xffffffff;
+            ACCENT_DARK = dark ? 0xffffb783 : 0xffa9490f;
+            SOFT = dark ? 0xff323232 : 0xffececeb;
+            BORDER = dark ? 0xff393939 : 0xffe5e5e3;
+            CANVAS = dark ? 0xff151515 : 0xffeeeeed;
         }
         PAPER = paper == 1 ? 0xffffffff : EXPORT_PAPER;
         revision++;

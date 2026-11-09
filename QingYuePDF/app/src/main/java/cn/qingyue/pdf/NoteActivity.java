@@ -48,6 +48,7 @@ public final class NoteActivity extends ThemedActivity {
     private static final int EXPORT_PDF = 32, EXPORT_PNG = 33;
     private static final ExecutorService IMAGES = Executors.newSingleThreadExecutor();
     private static final ExecutorService EXPORTS = Executors.newSingleThreadExecutor();
+    private static final ExecutorService LOADS = Executors.newSingleThreadExecutor();
     private static final ConcurrentHashMap<String, ExportJob> EXPORT_JOBS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, ImageJob> IMAGE_JOBS = new ConcurrentHashMap<>();
     private String noteId, name, tool = "pen";
@@ -68,6 +69,7 @@ public final class NoteActivity extends ThemedActivity {
     private boolean horizontalPages;
     private TextView pagesButton, textButton;
     private IconButton readModeButton, selectionButton;
+    private HorizontalScrollView editToolsScroll;
     private boolean readOnly, wholeStrokeEraser, lassoFreeform=true;
     private int lassoFilter=NoteCanvasView.LASSO_ALL;
     private long pendingSourceItemId;
@@ -75,6 +77,14 @@ public final class NoteActivity extends ThemedActivity {
     private Dialog dialog;
     private SharedPreferences common, preferences;
     private String pendingExport;
+    private NoteTextDraft textDraft;
+    private EditText draftContent, draftSize;
+    private android.widget.Spinner draftColors;
+    private int[] draftPalette;
+    private final NoteTextDialogLifecycle textDialogLifecycle=new NoteTextDialogLifecycle();
+    private NoteTextDialogLifecycle.Session textDialogSession;
+    private Dialog textEditorDialog;
+    private String pendingImagePageToken;
     private final android.os.Handler pageSyncHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable pendingPageSync = this::syncLibraryPages;
 
@@ -100,10 +110,10 @@ public final class NoteActivity extends ThemedActivity {
         markerSize = clamp(preferences.getFloat("marker", 18f), 4f, 60f);
         eraserSize = clamp(preferences.getFloat("eraser", 30f), 8f, 100f);
         pendingSourceItemId=state==null?getIntent().getLongExtra("pendingSourceItemId",0):state.getLong("pendingSourceItemId",getIntent().getLongExtra("pendingSourceItemId",0));
-        if (state != null) { tool = state.getString("tool", "pen"); headerCollapsed = state.getBoolean("collapsed", false); pendingExport = state.getString("pendingExport"); sourceConsumed=state.getBoolean("sourceConsumed",false); readOnly=state.getBoolean("readOnly",false); }
+        if (state != null) { tool = state.getString("tool", "pen"); headerCollapsed = state.getBoolean("collapsed", false); pendingExport = state.getString("pendingExport"); sourceConsumed=state.getBoolean("sourceConsumed",false); readOnly=state.getBoolean("readOnly",false);pendingImagePageToken=state.getString("pendingImagePageToken");textDraft=readTextDraft(state); }
         if (colorTool(tool)) color = ToolPreferences.color(preferences, tool, "color", common.getInt("inkColor", ToolPreferences.BLACK));
         root = NoteDialogs.column(this); root.setBackgroundColor(AppColors.BACKGROUND); root.setFitsSystemWindows(true); setContentView(root);
-        try { editLease=DocumentEditLease.acquire(this,noteId); document = NoteStore.load(this, noteId); }
+        try { editLease=DocumentEditLease.acquireExclusive(this,noteId); }
         catch (Exception failure) {
             if(editLease!=null){editLease.close();editLease=null;}
             status = NoteDialogs.label(this, "笔记暂时无法打开", 18, AppColors.INK);
@@ -111,6 +121,21 @@ public final class NoteActivity extends ThemedActivity {
             showDialog(ReaderDialogs.message(this, "无法打开笔记", failure.getMessage()==null?"笔记文件不可用，请返回文档库。":failure.getMessage(), true));
             return;
         }
+        status=NoteDialogs.label(this,"正在加载笔记…",16,AppColors.INK);
+        status.setGravity(Gravity.CENTER);root.addView(status,new LinearLayout.LayoutParams(-1,-1));
+        final String loadingId=noteId;final android.content.Context app=getApplicationContext();
+        LOADS.execute(()->{
+            NoteDocument loaded=null;Exception failure=null;
+            try{loaded=NoteStore.load(app,loadingId);}catch(Exception problem){failure=problem;}
+            final NoteDocument ready=loaded;final Exception error=failure;
+            runOnUiThread(()->{
+                if(destroyed||isFinishing()||editLease==null||!loadingId.equals(noteId))return;
+                if(error!=null){status.setText("笔记暂时无法打开");showDialog(ReaderDialogs.message(this,"无法打开笔记",error.getMessage()==null?"笔记文件不可用，请返回文档库。":error.getMessage(),true));return;}
+                document=ready;root.removeView(status);status=null;finishNoteLoading(state);
+            });
+        });
+    }
+    private void finishNoteLoading(Bundle state){
         int requestedPage=state!=null&&state.containsKey("currentPage")?state.getInt("currentPage"):getIntent().getIntExtra("page",document.currentPage());
         if(requestedPage>=0&&requestedPage<document.pageCount())document.selectPage(requestedPage);
         pagesExpanded=state==null?preferences.getBoolean("pagesExpanded",true):state.getBoolean("pagesExpanded",true);
@@ -122,7 +147,7 @@ public final class NoteActivity extends ThemedActivity {
             @Override public void viewportPageChanged(int page) { refreshCurrentPage(); if(undo!=null){undo.setEnabled(!readOnly&&canvas.canUndo());redo.setEnabled(!readOnly&&canvas.canRedo());} }
             @Override public void viewportSettled() { pageSyncHandler.removeCallbacks(pendingPageSync); syncLibraryPages(); }
             @Override public void readingScrolled() { if (!headerCollapsed) setCollapsed(true); }
-            @Override public void error(String message) { if (!destroyed) { if (status != null) {status.setText("保存或操作失败"); status.setTextColor(0xffb75448);} if (resumed) showDialog(ReaderDialogs.message(NoteActivity.this, "笔记提示", message, true)); else toast(message); } }
+            @Override public void error(String message) { if (!destroyed) { if (status != null) {status.setText("保存或操作失败"); status.setTextColor(0xffb75448);} if(draftContent!=null)toast(message);else if (resumed) showDialog(ReaderDialogs.message(NoteActivity.this, "笔记提示", message, true)); else toast(message); } }
         });
         readingBody=NoteDialogs.row(this);readingBody.setGravity(Gravity.TOP);
         pageSidebar=createPageSidebar(false);readingBody.addView(pageSidebar,new LinearLayout.LayoutParams(dp(112),-1));
@@ -136,6 +161,7 @@ public final class NoteActivity extends ThemedActivity {
         setCollapsed(headerCollapsed); applyTool();
         String incoming=getIntent().getStringExtra(NoteSourceActions.EXTRA_SOURCE);
         if(incoming!=null&&!sourceConsumed)canvas.addOnLayoutChangeListener((view,left,top,right,bottom,oldLeft,oldTop,oldRight,oldBottom)->{if(right>left&&bottom>top&&!sourceConsumed)consumeSource(incoming);});
+        if(resumed){if(textDraft!=null&&draftContent==null)showTextDraft();consumeImage();}
     }
 
     private void makeHeader() {
@@ -167,7 +193,7 @@ public final class NoteActivity extends ThemedActivity {
         pagesButton = NoteDialogs.label(this, "页码", 12, AppColors.ACCENT_DARK);
         pagesButton.setGravity(Gravity.CENTER); pagesButton.setBackground(NoteDialogs.shape(this, AppColors.SOFT, 12));
         pagesButton.setContentDescription("展开页面工作栏"); pagesButton.setOnClickListener(v -> showPages());
-        header.addView(pagesButton, new LinearLayout.LayoutParams(dp(64), dp(36)));
+        header.addView(pagesButton, new LinearLayout.LayoutParams(dp(64), dp(48)));
         addIcon(header, icon("more", "笔记来源、导出、添加页面与设置", this::showActionMenu));
         root.addView(header, new LinearLayout.LayoutParams(-1, dp(64)));
     }
@@ -193,6 +219,7 @@ public final class NoteActivity extends ThemedActivity {
         actions.add(action("PDF","导出 PDF",NoteEditorPresentation.pdfScope(document),()->beginExport(true)));
         actions.add(action("PNG","导出 PNG",document.infinite()?"导出当前画布内容":"导出当前第 "+(document.currentPage()+1)+" 页",()->beginExport(false)));
         actions.add(action("◉",readOnly?"返回编辑":"只读浏览","手指和手写笔都只移动画布",this::toggleReadOnly));
+        actions.add(action("◐","阅读页面显示","跟随界面主题、保持原色或夜间页面",this::showNightPageOptions));
         actions.add(action("%","缩放与定位",document.infinite()?"最高 1000% · 可回到画布原点":"缩放与页面适配",this::showCanvasNavigation));
         if(hasPageNavigation())actions.add(action("▤",document.infinite()?"画布管理":"页面操作",document.infinite()?"切换、复制、清空或删除独立画布":"插入、复制、清空、删除与调序",()->showNotePageActions(document.currentPage())));
         actions.add(action("⚙","笔记设置","笔盒、套索、橡皮与书写选项",this::settings));
@@ -224,7 +251,7 @@ public final class NoteActivity extends ThemedActivity {
         final int toolbarHeight = AppColors.isClassic() ? 48 : 60;
         if (!AppColors.isClassic()) strip.setBackground(NoteDialogs.shape(this, AppColors.SURFACE, 17));
         sidebarToggle=icon(hasPageNavigation()?"sidebar":"fit",hasPageNavigation()?"展开页面或独立画布列表":"画布缩放与定位",v->showPages());if(!AppColors.isClassic())sidebarToggle.setVisualLabel(hasPageNavigation()?(document.infinite()?"画布":"页面"):"定位");strip.addView(sidebarToggle,new LinearLayout.LayoutParams(dp(50),dp(toolbarHeight)));
-        HorizontalScrollView scroll = new HorizontalScrollView(this); scroll.setHorizontalScrollBarEnabled(false); scroll.setFillViewport(false);
+        HorizontalScrollView scroll = new HorizontalScrollView(this); scroll.setHorizontalScrollBarEnabled(false); scroll.setFillViewport(false);editToolsScroll=scroll;
         LinearLayout bar = NoteDialogs.row(this);
         String[] kinds = {"hand", "pen", "ballpoint", "pencil", "marker", "eraser", "lasso", "select", "line", "circle", "rectangle", "arrow"};
         String[] labels = {"移动画布", "钢笔", "圆珠笔", "铅笔", "荧光笔", "橡皮", "套索", "选择与调整图片和文本", "直线", "圆形", "矩形", "箭头"};
@@ -240,28 +267,28 @@ public final class NoteActivity extends ThemedActivity {
             else if (adjustable(kind)) button.setOnLongClickListener(v -> {selectTool(kind); toolSettings(kind, v); return true;});
             if (!AppColors.isClassic()) button.setVisualLabel("hand".equals(kind) ? "手指" : "select".equals(kind) ? "选择" : labels[i]);
             tools.put(kind, button);
-            bar.addView(button, new LinearLayout.LayoutParams(dp(AppColors.isClassic() ? 44 : 50), dp(AppColors.isClassic() ? 44 : toolbarHeight)));
+            bar.addView(button, new LinearLayout.LayoutParams(dp(AppColors.isClassic() ? 48 : 50), dp(toolbarHeight)));
         }
         divider(bar);
         selectionButton=icon("lasso","选区操作：复制、剪切、粘贴、缩放与颜色",v->showSelectionActions());addIcon(bar,selectionButton);
         addIcon(bar,icon("penbox","笔盒与常用笔预设",v->showPenBox()));
-        readModeButton=icon("read","只读浏览",v->toggleReadOnly());addIcon(bar,readModeButton);
         undo = icon("undo", "撤销上一步", v -> {if (canvas != null) canvas.undo();});
         redo = icon("redo", "重做上一步", v -> {if (canvas != null) canvas.redo();}); addIcon(bar, undo); addIcon(bar, redo);
         colorButton = new ColorSwatch(this, color, "颜色与调色盘");
         colorButton.setOnClickListener(v -> {if (!colorTool(tool)) selectTool("pen"); toolSettings(tool, v);});
-        bar.addView(colorButton, new LinearLayout.LayoutParams(dp(44), dp(44)));
+        bar.addView(colorButton, new LinearLayout.LayoutParams(dp(48), dp(48)));
         divider(bar);
         imageButton = icon("image", "插入图片", v -> pickImage()); addIcon(bar, imageButton);
-        textButton = NoteDialogs.label(this, "文本", 14, AppColors.ACCENT_DARK);textButton.setGravity(Gravity.CENTER);textButton.setContentDescription("插入或编辑文本框");textButton.setOnClickListener(v -> editText());bar.addView(textButton,new LinearLayout.LayoutParams(dp(48),dp(44)));
         trash = icon("trash", "删除选中的对象", v -> {if (canvas != null&&!readOnly) {if(canvas.selectionCount()>0)canvas.deleteSelection();else canvas.deleteSelected();}}); addIcon(bar, trash);
         stylus = icon("stylus", "仅手写笔绘制", v -> {
             stylusOnly = !stylusOnly; common.edit().putBoolean("stylusOnly", stylusOnly).apply(); applyTool();
             toast(stylusOnly ? "仅手写笔绘制；手指移动画布" : "已允许手指绘制；双指移动画布");
         }); addIcon(bar, stylus);
         addIcon(bar, icon("fit", "恢复画布位置与缩放", v -> {if (canvas != null) canvas.fit();}));
-        TextView zoomControl=NoteDialogs.label(this,"缩放",12,AppColors.ACCENT_DARK);zoomControl.setGravity(Gravity.CENTER);zoomControl.setContentDescription("调整缩放百分比");zoomControl.setOnClickListener(v -> chooseZoom());bar.addView(zoomControl,new LinearLayout.LayoutParams(dp(48),dp(44)));
+        TextView zoomControl=NoteDialogs.label(this,"缩放",12,AppColors.ACCENT_DARK);zoomControl.setGravity(Gravity.CENTER);zoomControl.setContentDescription("调整缩放百分比");zoomControl.setOnClickListener(v -> chooseZoom());bar.addView(zoomControl,new LinearLayout.LayoutParams(dp(48),dp(48)));
         scroll.addView(bar); strip.addView(scroll, new LinearLayout.LayoutParams(0, dp(toolbarHeight), 1));
+        readModeButton=icon("read","只读浏览，点击进入",v->toggleReadOnly());addIcon(strip,readModeButton);
+        textButton = NoteDialogs.label(this, "文本", 14, AppColors.ACCENT_DARK);textButton.setGravity(Gravity.CENTER);textButton.setContentDescription("插入或编辑文本框");textButton.setOnClickListener(v -> {if(readOnly){toggleReadOnly();if(textDraft!=null)return;}editText();});strip.addView(textButton,new LinearLayout.LayoutParams(dp(48),dp(toolbarHeight)));
         divider(strip); headerToggle = icon("down", "收起标题栏", v -> setCollapsed(!headerCollapsed)); addIcon(strip, headerToggle);
         LinearLayout.LayoutParams toolbarSize = new LinearLayout.LayoutParams(-1, dp(toolbarHeight));
         if (!AppColors.isClassic()) toolbarSize.setMargins(dp(10), dp(2), dp(10), dp(10));
@@ -280,12 +307,76 @@ public final class NoteActivity extends ThemedActivity {
     }
     private void editText(){
         if(canvas==null||readOnly)return;canvas.finishGesture();NoteDocument.Item selected=canvas.selectedText();
+        textDraft=new NoteTextDraft(selected==null?"":selected.text,String.valueOf(selected==null?20:(int)selected.width),
+                selected==null?0xff36302b:selected.color,document.pageToken(document.currentPage()),
+                document.currentPage(),selected==null?0:selected.id,NoteTextDraft.structure(document),false);
+        showTextDraft();
+    }
+    private void showTextDraft(){
+        if(textDraft==null||canvas==null||destroyed||readOnly)return;
+        NoteTextDraft draft=textDraft;
+        final NoteTextDialogLifecycle.Session session=textDialogLifecycle.open();
+        textDialogSession=session;
         LinearLayout body=NoteDialogs.column(this);body.setPadding(dp(20),dp(8),dp(20),0);
-        EditText content=new EditText(this);content.setHint("输入文字，可换行");content.setMinLines(3);content.setMaxLines(12);content.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);content.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16000)});if(selected!=null)content.setText(selected.text);body.addView(content);
-        EditText sizeInput=new EditText(this);sizeInput.setHint("字号 8–72");sizeInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);sizeInput.setText(String.valueOf(selected==null?20:(int)selected.width));body.addView(sizeInput);
-        int[] palette={0xff36302b,0xffb75448,0xff236ba0,0xff318263,0xff7a55a3};String[] names={"深色","红色","蓝色","绿色","紫色"};
-        android.widget.Spinner colors=new android.widget.Spinner(this);android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,names);colors.setAdapter(adapter);if(selected!=null){for(int i=0;i<palette.length;i++)if(palette[i]==selected.color)colors.setSelection(i);}body.addView(colors);
-        android.app.AlertDialog dialog=new android.app.AlertDialog.Builder(this).setTitle(selected==null?"插入文本框":"编辑文本框").setView(body).setNegativeButton("取消",null).setPositiveButton("保存",null).create();dialog.setOnShowListener(v -> dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {int size;try{size=Integer.parseInt(sizeInput.getText().toString().trim());}catch(NumberFormatException e){size=20;}size=Math.max(8,Math.min(72,size));if(content.getText().toString().trim().isEmpty()){content.setError("请输入文字");return;}canvas.putText(content.getText().toString(),size,palette[colors.getSelectedItemPosition()]);tool="select";applyTool();dialog.dismiss();}));dialog.show();showDialog(dialog);
+        EditText content=new EditText(this);content.setHint("输入文字，可换行");content.setMinLines(3);content.setMaxLines(12);content.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);content.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16000)});content.setText(draft.text);body.addView(content);
+        EditText sizeInput=new EditText(this);sizeInput.setHint("字号 8–72");sizeInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);sizeInput.setText(draft.size);body.addView(sizeInput);
+        int[] palette={draft.color,0xff36302b,0xffb75448,0xff236ba0,0xff318263,0xff7a55a3};
+        String[] names={draft.itemId==0?"当前颜色 · "+hex(draft.color):"原色 · "+hex(draft.color),"深色","红色","蓝色","绿色","紫色"};
+        android.widget.Spinner colors=new android.widget.Spinner(this);android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,names);colors.setAdapter(adapter);colors.setSelection(0);body.addView(colors);
+        if(draft.resolvePage(document)<0)body.addView(NoteDialogs.label(this,"原页面或文本框已变化，草稿仍可复制；请取消后重新选择位置。",13,AppColors.MUTED));
+        android.app.AlertDialog editor=new android.app.AlertDialog.Builder(this).setTitle(draft.itemId==0?"插入文本框":"编辑文本框").setView(body).setNegativeButton("取消",(d,which)->{
+            if(textDialogLifecycle.cancel(session)){textDraft=null;if(textDialogSession==session){textDialogSession=null;clearTextUi();}}
+        }).setPositiveButton("保存",null).create();
+        editor.setOnShowListener(v->editor.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(button->{
+            if(!textDialogLifecycle.isActive(session))return;
+            captureTextDraft();if(readOnly){toast("当前为只读浏览，请返回编辑后保存草稿");return;}int size;try{size=Integer.parseInt(draft.size.trim());}catch(NumberFormatException e){size=20;}size=Math.max(8,Math.min(72,size));
+            if(draft.text.trim().isEmpty()){content.setError("请输入文字");return;}
+            int page=draft.resolvePage(document);if(page<0){toast("原页面或文本框已变化，请复制草稿后重新选择位置");return;}
+            if(document.currentPage()!=page)canvas.selectPage(page);
+            if(draft.itemId!=0&&!canvas.selectText(draft.itemId)){toast("原文本框已变化，请复制草稿后重新选择");return;}
+            if(canvas.putText(draft.text,size,draft.color)){
+                NoteDocument.Item saved=canvas.selectedText();
+                if(saved!=null)draft.itemId=saved.id;
+                draft.pageToken=document.pageToken(page);draft.pageIndex=page;draft.pageStructure=NoteTextDraft.structure(document);
+                if(!canvas.save())return;
+                textDraft=null;tool="select";applyTool();editor.dismiss();
+            }
+        }));
+        editor.show();showDialog(editor);
+        textEditorDialog=editor;
+        draftContent=content;draftSize=sizeInput;draftColors=colors;draftPalette=palette;
+        editor.setOnDismissListener(v->{
+            if(dialog==editor)dialog=null;
+            if(textDialogLifecycle.dismissed(session))textDraft=null;
+            if(textDialogSession==session){textDialogSession=null;clearTextUi();}
+        });
+    }
+    private void clearTextUi(){draftContent=null;draftSize=null;draftColors=null;draftPalette=null;textEditorDialog=null;}
+    private void discardClosedTextEditor(){
+        if(textDialogSession==null||textEditorDialog==null||textEditorDialog.isShowing())return;
+        if(textDialogLifecycle.cancel(textDialogSession))textDraft=null;
+        textDialogSession=null;clearTextUi();
+    }
+    private void captureTextDraft(){
+        if(textDraft==null||draftContent==null)return;
+        textDraft.text=draftContent.getText().toString();textDraft.size=draftSize.getText().toString();
+        int selection=draftColors.getSelectedItemPosition();if(selection>=0&&selection<draftPalette.length)textDraft.color=draftPalette[selection];
+    }
+    private static NoteTextDraft readTextDraft(Bundle state){
+        if(!state.getBoolean("textDraft.active",false))return null;
+        return new NoteTextDraft(state.getString("textDraft.text",""),state.getString("textDraft.size","20"),
+                state.getInt("textDraft.color",0xff36302b),state.getString("textDraft.pageToken"),
+                state.getInt("textDraft.pageIndex",-1),state.getLong("textDraft.itemId",0),
+                state.getString("textDraft.structure",""),state.getBoolean("textDraft.rotation",false));
+    }
+    private void writeTextDraft(Bundle state){
+        discardClosedTextEditor();
+        captureTextDraft();if(textDraft==null)return;state.putBoolean("textDraft.active",true);
+        state.putString("textDraft.text",textDraft.text);state.putString("textDraft.size",textDraft.size);
+        state.putInt("textDraft.color",textDraft.color);state.putString("textDraft.pageToken",textDraft.pageToken);
+        state.putInt("textDraft.pageIndex",textDraft.pageIndex);state.putLong("textDraft.itemId",textDraft.itemId);
+        state.putString("textDraft.structure",textDraft.pageStructure);
+        state.putBoolean("textDraft.rotation",isChangingConfigurations());
     }
     private void chooseZoom() {
         if(canvas==null)return;canvas.finishGesture();
@@ -333,17 +424,23 @@ public final class NoteActivity extends ThemedActivity {
         actions.add(action("○","套索设置","自由 / 矩形与四类对象筛选",readOnly?null:this::showLassoOptions));
         actions.add(action("⌫","橡皮设置",wholeStrokeEraser?"当前：整笔擦除":"当前：局部擦除",readOnly?null:()->{selectTool("eraser");toolSettings("eraser",tools.get("eraser"));}));
         actions.add(action("✎","笔迹与操作","手写笔绘制、双指撤销等",this::toolOptions));
+        actions.add(action("◐","阅读页面显示","笔记附图保持原色；可选择夜间纸面",this::showNightPageOptions));
         if(!document.infinite()){
             actions.add(action("▤","页面操作","插入、复制、清空、删除与调序",()->showNotePageActions(document.currentPage())));
             actions.add(action("↕","页面浏览",horizontalPages?"当前：左右翻页":"当前：纵向连续",()->{horizontalPages=!horizontalPages;preferences.edit().putBoolean("horizontalPages",horizontalPages).apply();canvas.setHorizontalPages(horizontalPages);toast("已切换为"+(horizontalPages?"左右翻页":"纵向连续")+"浏览");}));
         }else {if(hasPageNavigation())actions.add(action("▤","独立画布管理","这些历史画布彼此独立，不连续拼接",()->showNotePageActions(document.currentPage())));actions.add(action("⌫","清空画布","删除当前画布的全部对象，可撤销",readOnly?null:()->confirmPageChange(document.currentPage(),false)));}
         showActions(root,"笔记设置",actions);
     }
+    private void showNightPageOptions(){
+        showDialog(UiDisplayMode.chooser(this,()->{
+            if(canvas!=null)canvas.setNightPageDisplay(UiDisplayMode.nightPage(this));
+        }));
+    }
 
     private NoteActionMenu.Action action(String symbol,String title,String detail,Runnable run){return new NoteActionMenu.Action(symbol,title,detail,run);}
     private void showActions(View anchor,String title,ArrayList<NoteActionMenu.Action> actions){dismissPopup();showDialog(NoteActionMenu.showActions(this,anchor,title,actions.toArray(new NoteActionMenu.Action[0])));}
     private void showActions(String title,NoteActionMenu.Action... actions){dismissPopup();showDialog(NoteActionMenu.showActions(this,root,title,actions));}
-    private void toggleReadOnly(){if(canvas==null)return;canvas.finishGesture();readOnly=!readOnly;applyTool();toast(readOnly?"只读浏览：手指和手写笔都不绘制":"已返回编辑");}
+    private void toggleReadOnly(){if(canvas==null)return;canvas.finishGesture();readOnly=!readOnly;applyTool();toast(readOnly?"只读浏览：手指和手写笔都不绘制":"已返回编辑");if(!readOnly&&textDraft!=null&&draftContent==null&&resumed)showTextDraft();}
     private boolean hasPageNavigation(){return NoteEditorPresentation.hasPageNavigation(document);}
     private String pagePosition(){return NoteEditorPresentation.pagePosition(document);}
     private void showCanvasNavigation(){
@@ -414,7 +511,7 @@ public final class NoteActivity extends ThemedActivity {
     private void showNotePageActions(int page){
         if(canvas==null||!hasPageNavigation())return;final int count=document.pageCount();if(page<0||page>=count)return;
         showActions(document.infinite()?"独立画布 "+(page+1):"第 "+(page+1)+" 页",
-                action("+",document.infinite()?"切换画布":"插入空白页",document.infinite()?"这些画布彼此独立，不连续拼接":"在本页之前或之后插入",document.infinite()?this::showPages:readOnly?null:()->showNoteInsertionOptions(page)),
+                action("+",document.infinite()?"切换画布":"插入页面",document.infinite()?"这些画布彼此独立，不连续拼接":"选择在本页之前或之后插入",document.infinite()?this::showPages:readOnly?null:()->showNoteInsertionOptions(page)),
                 action("▣",document.infinite()?"复制本画布":"复制本页","创建独立副本并保留原内容",readOnly?null:()->runPageOperation(page,count,()->canvas.duplicatePage())),
                 action("↑",document.infinite()?"上移画布":"上移一页","调整列表顺序",!readOnly&&page>0?()->runPageOperation(page,count,()->canvas.movePage(page,page-1)):null),
                 action("↓",document.infinite()?"下移画布":"下移一页","调整列表顺序",!readOnly&&page+1<count?()->runPageOperation(page,count,()->canvas.movePage(page,page+1)):null),
@@ -445,7 +542,7 @@ public final class NoteActivity extends ThemedActivity {
             public void move(int from,int to){if(canvas!=null&&!readOnly){canvas.movePage(from,to);refreshPageSidebars(true);}}
             public void insert(int page){showNoteInsertionOptions(page);}
             public void manage(int page){showNotePageActions(page);}
-            public void append(){if(canvas!=null&&!readOnly){canvas.finishGesture();canvas.insertPage(document.pageCount());refreshPageSidebars(true);}}
+            public void append(){appendIndependentCanvas();}
             public void close(){if(modal){if(dialog!=null)dialog.dismiss();}else{pagesExpanded=false;preferences.edit().putBoolean("pagesExpanded",false).apply();updatePageSidebar();}}
         });sidebar.setEditingEnabled(!readOnly);return sidebar;
     }
@@ -457,6 +554,10 @@ public final class NoteActivity extends ThemedActivity {
             if(destroyed||canvas!=target||document.pageCount()!=count){toast("页面已变化，请重新选择");return;}
             target.insertPage(index);refreshPageSidebars(true);
         }));
+    }
+    private void appendIndependentCanvas(){
+        if(canvas==null||destroyed||readOnly||!document.infinite())return;
+        canvas.finishGesture();canvas.insertPage(document.pageCount());refreshPageSidebars(true);
     }
     private void refreshPageSidebars(boolean force){if(force)updatePageSidebar();if(pageSidebar!=null)pageSidebar.refresh(force);if(dialogSidebar!=null)dialogSidebar.refresh(force);}
     private void refreshCurrentPage(){
@@ -492,16 +593,17 @@ public final class NoteActivity extends ThemedActivity {
     }
     private void applyTool() {
         if (!tools.containsKey(tool)) tool = "pen";
-        if (canvas != null) {canvas.setReadOnly(readOnly);canvas.setTool(readOnly?"hand":tool, color, size(tool), stylusOnly); canvas.setTwoFingerUndoEnabled(!readOnly&&twoFingerUndo); canvas.setWholeStrokeEraser(wholeStrokeEraser);canvas.setLassoFreeform(lassoFreeform);canvas.setLassoFilter(lassoFilter);}
+        if (canvas != null) {canvas.setNightPageDisplay(UiDisplayMode.nightPage(this));canvas.setReadOnly(readOnly);canvas.setTool(readOnly?"hand":tool, color, size(tool), stylusOnly); canvas.setTwoFingerUndoEnabled(!readOnly&&twoFingerUndo); canvas.setWholeStrokeEraser(wholeStrokeEraser);canvas.setLassoFreeform(lassoFreeform);canvas.setLassoFilter(lassoFilter);}
         if (colorTool(tool)) ToolPreferences.saveColor(preferences, tool, color);
         preferences.edit().putFloat("pen", penSize).putFloat("marker", markerSize).putFloat("eraser", eraserSize).apply();
         updateTools();
     }
     private void updateTools() {
+        if(editToolsScroll!=null)editToolsScroll.setVisibility(readOnly?View.GONE:View.VISIBLE);
         for (Map.Entry<String, IconButton> entry : tools.entrySet()) {entry.getValue().setActive(!readOnly&&entry.getKey().equals(tool));entry.getValue().setEnabled(!readOnly);}
         if(readModeButton!=null){readModeButton.setActive(readOnly);readModeButton.setContentDescription(readOnly?"只读浏览中，点击返回编辑":"进入只读浏览，手写笔也不绘制");}
         if(selectionButton!=null&&canvas!=null){selectionButton.setActive(canvas.hasSelection());selectionButton.setContentDescription("选区操作，已选 "+selectedObjectCount()+" 项");}
-        if(colorButton!=null)colorButton.setEnabled(!readOnly);if(textButton!=null)textButton.setEnabled(!readOnly);
+        if(colorButton!=null)colorButton.setEnabled(!readOnly);if(textButton!=null)textButton.setContentDescription(readOnly?"返回编辑并插入文本框":"插入或编辑文本框");
         if (colorButton != null) colorButton.setColor(color);
         if (stylus != null) {stylus.setEnabled(!readOnly);stylus.setActive(stylusOnly); stylus.setContentDescription("仅手写笔绘制，" + (stylusOnly ? "已开启" : "已关闭"));}
         if (canvas != null) {undo.setEnabled(!readOnly&&canvas.canUndo()); redo.setEnabled(!readOnly&&canvas.canRedo()); trash.setEnabled(!readOnly&&(canvas.hasSelection()||canvas.selectionCount()>0));}
@@ -615,8 +717,9 @@ public final class NoteActivity extends ThemedActivity {
     private void pickImage() {
         if (canvas == null || readOnly || IMAGE_JOBS.containsKey(noteId)) return;
         dismissPopup(); canvas.finishGesture(); canvas.save();
+        pendingImagePageToken=document.pageToken(document.currentPage());
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*").addCategory(Intent.CATEGORY_OPENABLE);
-        try {startActivityForResult(intent, PICK_IMAGE);} catch (android.content.ActivityNotFoundException exception) {showDialog(ReaderDialogs.message(this, "无法选择图片", "设备没有可用的文件选择器。", true));}
+        try {startActivityForResult(intent, PICK_IMAGE);} catch (android.content.ActivityNotFoundException exception) {pendingImagePageToken=null;showDialog(ReaderDialogs.message(this, "无法选择图片", "设备没有可用的文件选择器。", true));}
     }
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
@@ -637,9 +740,12 @@ public final class NoteActivity extends ThemedActivity {
             });
             return;
         }
-        if (request != PICK_IMAGE || result != RESULT_OK || data == null || data.getData() == null || canvas == null) return;
+        if(request!=PICK_IMAGE)return;
+        String targetPage=pendingImagePageToken;pendingImagePageToken=null;
+        if(result!=RESULT_OK||data==null||data.getData()==null||canvas==null)return;
+        if(targetPage==null||document.pageIndex(targetPage)<0){toast("原页面已变化，图片导入已取消，请重新选择图片");return;}
         final Uri uri = data.getData(); final Context app = getApplicationContext();
-        ImageJob job = new ImageJob(noteId); job.owner = new WeakReference<>(this);
+        ImageJob job = new ImageJob(noteId,targetPage); job.owner = new WeakReference<>(this);
         if (IMAGE_JOBS.putIfAbsent(noteId, job) != null) return;
         updateTools(); toast("正在插入图片…");
         IMAGES.execute(() -> {
@@ -656,10 +762,14 @@ public final class NoteActivity extends ThemedActivity {
         if (canvas.getWidth() <= 0 || canvas.getHeight() <= 0) return;
         if (!IMAGE_JOBS.remove(noteId, job)) return;
         updateTools();
-        if (job.error != null) {showDialog(ReaderDialogs.message(this, "图片未能插入", job.error, true)); return;}
+        if (job.error != null) {discardImage(getApplicationContext(),job);if(textDraft!=null)toast("图片未能插入：" + job.error);else showDialog(ReaderDialogs.message(this, "图片未能插入", job.error, true)); return;}
+        int targetPage=document.pageIndex(job.pageToken);
+        if(targetPage<0){discardImage(getApplicationContext(),job);toast("原页面已变化，图片导入已取消，请重新选择图片");return;}
+        if(readOnly){discardImage(getApplicationContext(),job);toast("已进入只读浏览，图片导入已取消，请返回编辑后重试");return;}
+        if(document.currentPage()!=targetPage)canvas.selectPage(targetPage);
         if (canvas.insertImage(job.filename, job.width, job.height)) {
-            tool = "select"; applyTool(); toast("图片已插入：拖动移动，拖动四角调整大小");
-        } else discardImage(getApplicationContext(), job);
+            tool = "select"; applyTool();refreshPageSidebars(true);toast("图片已插入原页面：拖动移动，拖动四角调整大小");
+        } else {discardImage(getApplicationContext(), job);toast("图片未能插入，请重试");}
     }
     private static void prepareImage(Context context, Uri uri, ImageJob job) throws IOException {
         File input = File.createTempFile("note-image-", ".tmp", context.getCacheDir());
@@ -706,30 +816,30 @@ public final class NoteActivity extends ThemedActivity {
     }
     private static void discardImage(Context context, ImageJob job) {
         synchronized (NoteStore.class) {
-            if (job.filename == null || !NoteStore.exists(context, job.noteId)) return;
-            try {new File(NoteStore.imagesDirectory(context, job.noteId), job.filename).delete();} catch (IOException ignored) { }
+            String filename=job.filename;job.filename=null;
+            if (filename == null || !NoteStore.exists(context, job.noteId)) return;
+            try {new File(NoteStore.imagesDirectory(context, job.noteId), filename).delete();} catch (IOException ignored) { }
         }
     }
     private static final class ImageJob {
-        final String noteId; volatile boolean ready, cancelled; volatile String error, filename; volatile int width, height;
+        final String noteId, pageToken; volatile boolean ready, cancelled; volatile String error, filename; volatile int width, height;
         volatile WeakReference<NoteActivity> owner = new WeakReference<>(null);
-        ImageJob(String noteId) {this.noteId = noteId;}
+        ImageJob(String noteId,String pageToken) {this.noteId = noteId;this.pageToken=pageToken;}
     }
 
     private void showDialog(Dialog next) {if (dialog != null) dialog.dismiss(); dialog = next;if(next.getWindow()!=null)NoteMotion.enter(next.getWindow().getDecorView()); next.setOnDismissListener(v -> {if (dialog == next) dialog = null;});}
     private void dismissPopup() {if (popup != null) popup.dismiss();}
     private IconButton icon(String kind, String title, View.OnClickListener listener) {IconButton view = new IconButton(this, kind, title); view.setOnClickListener(listener); return view;}
-    private void addIcon(LinearLayout parent, View view) {parent.addView(view, new LinearLayout.LayoutParams(dp(44), dp(44)));}
+    private void addIcon(LinearLayout parent, View view) {parent.addView(view, new LinearLayout.LayoutParams(UiMetrics.touch(this), UiMetrics.touch(this)));}
     private void divider(LinearLayout parent) {View view = new View(this); view.setBackgroundColor(AppColors.BORDER); LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(1), dp(23)); params.setMargins(dp(5), 0, dp(5), 0); parent.addView(view, params);}
     private int dp(float value) {return NoteDialogs.dp(this, value);}
     private String hex(int value) {return String.format(Locale.ROOT, "#%06X", value & 0xffffff);}
     private void toast(String text) {Toast.makeText(this, text, Toast.LENGTH_LONG).show();}
     private static float clamp(float value, float minimum, float maximum) {return Float.isNaN(value) || Float.isInfinite(value) ? minimum : Math.max(minimum, Math.min(maximum, value));}
-    @Override protected void onResume() {super.onResume(); resumed = true; consumeImage();}
-    @Override protected void onPause() {resumed = false; pageSyncHandler.removeCallbacks(pendingPageSync); dismissPopup(); if (dialog != null) {dialog.dismiss(); dialog = null;} if (canvas != null) {canvas.finishGesture(); if(canvas.save())syncLibraryPages();} super.onPause();}
-    @Override protected void onSaveInstanceState(Bundle state) {super.onSaveInstanceState(state); state.putString("tool", tool);state.putBoolean("readOnly",readOnly); state.putBoolean("collapsed", headerCollapsed); state.putBoolean("pagesExpanded",pagesExpanded); state.putString("pendingExport", pendingExport);state.putBoolean("sourceConsumed",sourceConsumed);state.putLong("pendingSourceItemId",pendingSourceItemId);if(document!=null)state.putInt("currentPage",document.currentPage());}
+    @Override protected void onResume() {super.onResume(); resumed = true;discardClosedTextEditor();if(textDraft!=null&&draftContent==null)showTextDraft();consumeImage();}
+    @Override protected void onPause() {resumed = false; pageSyncHandler.removeCallbacks(pendingPageSync); dismissPopup();discardClosedTextEditor();captureTextDraft();if(textDialogSession!=null){textDialogLifecycle.pause(textDialogSession);textDialogSession=null;clearTextUi();}if (dialog != null) {Dialog closing=dialog;dialog=null;closing.dismiss();}if (canvas != null) {canvas.finishGesture(); if(canvas.save())syncLibraryPages();} super.onPause();}
+    @Override protected void onSaveInstanceState(Bundle state) {writeTextDraft(state);super.onSaveInstanceState(state); state.putString("tool", tool);state.putBoolean("readOnly",readOnly); state.putBoolean("collapsed", headerCollapsed); state.putBoolean("pagesExpanded",pagesExpanded); state.putString("pendingExport", pendingExport);state.putBoolean("sourceConsumed",sourceConsumed);state.putLong("pendingSourceItemId",pendingSourceItemId);state.putString("pendingImagePageToken",pendingImagePageToken);if(document!=null)state.putInt("currentPage",document.currentPage());}
     @Override protected void onNewIntent(Intent incoming){super.onNewIntent(incoming);setIntent(incoming);if(canvas!=null&&noteId.equals(incoming.getStringExtra("id"))&&incoming.hasExtra("page")){int page=incoming.getIntExtra("page",-1);if(page>=0&&page<document.pageCount())canvas.selectPage(page);}}
-    @Override public void finish(){super.finish();NoteMotion.applyActivityTransition(this,false);}
     @Override protected void onDestroy() {
         destroyed = true; pageSyncHandler.removeCallbacks(pendingPageSync); dismissPopup(); if (dialog != null) {dialog.dismiss(); dialog = null;} if (canvas != null) {canvas.dispose(); canvas = null;}
         if(editLease!=null){editLease.close();editLease=null;}

@@ -83,6 +83,12 @@ public final class ImportCoordinator {
     private ImportCoordinator() { }
 
     public static ImportSession startUri(Context context, Uri uri, boolean keepOriginal) {
+        return startUri(context,uri,keepOriginal,null);
+    }
+
+    /** Layout applies to new convertible input only; a source PDF remains untouched. */
+    public static ImportSession startUri(Context context, Uri uri, boolean keepOriginal,
+            DocumentImport.LayoutOptions layoutOptions) {
         if (context == null) throw new IllegalArgumentException("context == null");
         final Context app = application(context);
         final String id = UUID.randomUUID().toString();
@@ -92,7 +98,7 @@ public final class ImportCoordinator {
             return session;
         }
         try {
-            Future<?> future = WORKER.submit(() -> runUri(app, uri, keepOriginal, session));
+            Future<?> future = WORKER.submit(() -> runUri(app, uri, keepOriginal, layoutOptions, session));
             session.setFuture(future);
         } catch (RejectedExecutionException busy) {
             session.fail("导入任务繁忙，请稍后重试");
@@ -107,6 +113,11 @@ public final class ImportCoordinator {
     /** Starts an EXTRA_TEXT-style import.  The text is copied away from the Intent immediately. */
     public static ImportSession startText(Context context, CharSequence text, String displayName,
             boolean keepOriginal) {
+        return startText(context,text,displayName,keepOriginal,null);
+    }
+
+    public static ImportSession startText(Context context, CharSequence text, String displayName,
+            boolean keepOriginal, DocumentImport.LayoutOptions layoutOptions) {
         if (context == null) throw new IllegalArgumentException("context == null");
         final Context app = application(context);
         final String id = UUID.randomUUID().toString();
@@ -115,7 +126,7 @@ public final class ImportCoordinator {
         final String copiedName = displayName == null ? "" : displayName;
         try {
             Future<?> future = WORKER.submit(() -> runText(app, copiedText, copiedName,
-                    keepOriginal, session));
+                    keepOriginal, layoutOptions, session));
             session.setFuture(future);
         } catch (RejectedExecutionException busy) {
             session.fail("导入任务繁忙，请稍后重试");
@@ -188,6 +199,7 @@ public final class ImportCoordinator {
     }
 
     private static void runUri(Context app, Uri uri, boolean keepOriginal,
+            DocumentImport.LayoutOptions layoutOptions,
             ImportSession session) {
         File directory = DIRECTORIES.get(session.id());
         try {
@@ -204,7 +216,7 @@ public final class ImportCoordinator {
                 session.endResource(raw);
             }
             process(app, session, directory, source, metadata.name, metadata.mime,
-                    copied, keepOriginal, false);
+                    copied, keepOriginal, false, layoutOptions);
         } catch (Exception | LinkageError error) {
             stopped(session, directory, error);
         } catch (OutOfMemoryError memory) {
@@ -213,7 +225,7 @@ public final class ImportCoordinator {
     }
 
     private static void runText(Context app, String text, String displayName,
-            boolean keepOriginal, ImportSession session) {
+            boolean keepOriginal, DocumentImport.LayoutOptions layoutOptions, ImportSession session) {
         File directory = DIRECTORIES.get(session.id());
         try {
             prepare(directory);
@@ -227,7 +239,7 @@ public final class ImportCoordinator {
             CopyResult copied = copy(new java.io.ByteArrayInputStream(bytes), source,
                     bytes.length, session);
             process(app, session, directory, source, name, "text/plain", copied,
-                    keepOriginal, true);
+                    keepOriginal, true, layoutOptions);
         } catch (Exception | LinkageError error) {
             stopped(session, directory, error);
         } catch (OutOfMemoryError memory) {
@@ -237,7 +249,7 @@ public final class ImportCoordinator {
 
     private static void process(Context app, ImportSession session, File directory, File source,
             String displayName, String mime, CopyResult copied, boolean keepOriginal,
-            boolean forceText) throws Exception {
+            boolean forceText, DocumentImport.LayoutOptions layoutOptions) throws Exception {
         check(session);
         boolean pdfInput = !forceText && looksLikePdf(source);
         File pdf = new File(directory, "document.pdf");
@@ -252,7 +264,7 @@ public final class ImportCoordinator {
             File converted = new File(directory, "converted.tmp.pdf");
             session.progress(ImportSession.Phase.EXTRACTING, ImportSession.Unit.BYTES,
                     0, copied.bytes, "正在提取正文");
-            format = DocumentImport.convert(app, source, displayName, mime, converted,
+            DocumentImport.Callback callback =
                     new DocumentImport.Callback() {
                         @Override public boolean isCancelled() {
                             return session.cancellationRequested();
@@ -267,7 +279,10 @@ public final class ImportCoordinator {
                                     ImportSession.Unit.PAGES, completed, total,
                                     "正在生成第 " + completed + " 页");
                         }
-                    });
+                    };
+            format = layoutOptions==null
+                    ?DocumentImport.convert(app,source,displayName,mime,converted,callback)
+                    :DocumentImport.convert(app,source,displayName,mime,converted,callback,layoutOptions);
             check(session);
             move(converted, pdf, session);
             if (keepOriginal) {
@@ -292,8 +307,13 @@ public final class ImportCoordinator {
         if (pages < 1) throw new IOException("这份文档没有可阅读的页面");
         check(session);
 
+        // A domain-separated hash keeps layout variants distinct and repeated imports stable
+        // even if PdfDocument writes non-deterministic metadata into equivalent output files.
+        String libraryHash=pdfInput||layoutOptions==null?copied.hash
+                :ImportVariantKey.hash(copied.hash,
+                        layoutOptions.page.name(),layoutOptions.font.name());
         ImportSession.Result result = new ImportSession.Result(session.id(), displayName,
-                copied.hash, pages, copied.bytes, format, pdf, attachment,
+                libraryHash, pages, copied.bytes, format, pdf, attachment,
                 attachmentName, directory);
         if (!session.ready(result)) deleteTree(directory);
     }

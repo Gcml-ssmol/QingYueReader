@@ -1,5 +1,6 @@
 package cn.qingyue.pdf;
 import android.app.Activity;
+import android.os.Build;
 import android.view.View;
 
 public final class NoteMotionTest {
@@ -29,5 +30,16 @@ public final class NoteMotionTest {
         check(activity.calls==4&&activity.first=="note_enter".hashCode()&&activity.second=="note_exit".hashCode(),"enter resources");
         NoteMotion.applyActivityTransition(activity,false);
         check(activity.calls==5&&activity.first=="note_return_enter".hashCode()&&activity.second=="note_return_exit".hashCode(),"return resources");
+        Build.VERSION.SDK_INT=34;
+        NoteMotion.applyActivityTransition(activity,true);
+        check(activity.modernCalls==1&&activity.transitionType==Activity.OVERRIDE_TRANSITION_OPEN
+                &&activity.first=="note_enter".hashCode(),"API 34 open route");
+        NoteMotion.applyActivityTransition(activity,false);
+        check(activity.modernCalls==2&&activity.transitionType==Activity.OVERRIDE_TRANSITION_CLOSE
+                &&activity.first=="note_return_enter".hashCode(),"API 34 close route");
+        activity.resolver.animator=0;
+        NoteMotion.applyActivityTransition(activity,false);
+        check(activity.modernCalls==3&&activity.first==0&&activity.second==0,
+                "API 34 respects disabled animation scale");
     }
 }

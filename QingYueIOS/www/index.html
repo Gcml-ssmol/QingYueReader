@@ -2,12 +2,12 @@
 <html lang="zh-CN" data-ui="warm" data-theme="light">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#fff7ed"><meta name="description" content="晴阅平板优先网页版：iPad 与 iPhone 的本地 PDF 阅读、文件夹与文字笔记。">
+<meta name="theme-color" content="#f8f8f7"><meta name="description" content="晴阅平板优先网页版：iPad 与 iPhone 的本地 PDF 阅读、文件夹与文字笔记。">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="晴阅">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23d66c23'/%3E%3Cpath d='M16 17h14l4 4h14v29H16z' fill='%23fff7ed'/%3E%3Cpath d='M23 29h18M23 36h18M23 43h12' stroke='%23d66c23' stroke-width='3'/%3E%3C/svg%3E">
 <script>try{var qy=JSON.parse(localStorage.getItem('qingyue-appearance')||'{}');document.documentElement.dataset.ui=qy.style==='classic'?'classic':'warm';document.documentElement.dataset.theme=qy.mode==='dark'||qy.mode!=='light'&&qy.mode!=='dark'&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch{}</script>
-<link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./tablet.css"><link rel="stylesheet" href="./appearance.css"><title>晴阅</title>
+<link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./tablet.css"><link rel="stylesheet" href="./appearance.css"><link rel="stylesheet" href="./codex.css"><title>晴阅</title>
 </head>
 <body>
 <main id="library">
@@ -17,7 +17,7 @@
  <header class="search-header warm-only"><button id="search-back" class="icon-button" aria-label="返回资料库">‹</button><div><h2>资料搜索</h2><p>在本机资料库中，按名称查找</p></div></header>
  <button id="settings-button" class="settings-gear" aria-label="设置与备份"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m10 2-.6 2.5-2 .9L5 4.6 2.6 8.7l1.8 1.8v3l-1.8 1.8L5 19.4l2.4-.8 2 .9L10 22h4l.6-2.5 2-.9 2.4.8 2.4-4.1-1.8-1.8v-3l1.8-1.8L19 4.6l-2.4.8-2-.9L14 2z"/><circle cx="12" cy="12" r="3.4"/></svg></button>
  <section class="library-welcome">
- <div class="welcome-copy warm-only"><p class="eyebrow">READ & REMEMBER</p><h2>你的随身文档库</h2><p class="welcome-subtitle">读一份文档，记下一点灵感。</p><p class="welcome-detail">文档、笔记与批注保存在本机<br>随时阅读，安心记录。</p></div>
+ <div class="welcome-copy warm-only"><p class="eyebrow">QINGYUE WORKSPACE</p><h2>你的文档与笔记</h2><p class="welcome-subtitle">打开资料，继续阅读。</p><p class="welcome-detail">文档、笔记与批注保存在本机<br>从左侧目录快速切换资料。</p></div>
  <img class="welcome-art warm-only" src="./assets/library-scene.svg" alt="" aria-hidden="true">
  <div class="main-actions"><button id="continue-reading" class="primary warm-only">开始阅读</button><button id="import-button" class="primary">＋ 导入 PDF</button><button id="new-note">新建笔记</button></div>
  </section>

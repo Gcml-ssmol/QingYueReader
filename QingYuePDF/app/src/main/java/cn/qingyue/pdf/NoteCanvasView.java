@@ -25,7 +25,7 @@ public final class NoteCanvasView extends View {
     private String tool="pen";
     private int color=0xff36302b;
     private float width=2;
-    private boolean stylusOnly=true,twoFingerEnabled=true,disposed,initialized,readOnly;
+    private boolean stylusOnly=true,twoFingerEnabled=true,disposed,initialized,readOnly,nightPageDisplay;
     private double cx,cy,zoom=1,baseZoom=1;
     private final ZoomBadge zoomBadge=new ZoomBadge();
     private long selected;
@@ -59,6 +59,8 @@ public final class NoteCanvasView extends View {
     private double[] groupBounds;
 
     public NoteCanvasView(Context context,NoteDocument document,String noteId,Host host){super(context);this.document=document;this.noteId=noteId;this.host=host;pageLayout=document.infinite()?null:new NotePageLayout(document.width,document.height,24);twoFinger=new TwoFingerTap(dp(7));pinch=new TouchNavigation.Pinch(getResources().getDisplayMetrics().density);setFocusable(true);setContentDescription("笔记画布，单指拖动画布，双指缩放；选择图片后可拖动与缩放");setLayerType(View.LAYER_TYPE_HARDWARE,null);}
+    public void setNightPageDisplay(boolean enabled){if(nightPageDisplay!=enabled){nightPageDisplay=enabled;invalidate();}}
+    public boolean isNightPageDisplayEnabled(){return nightPageDisplay;}
     public void setTool(String tool,int color,float widthPt,boolean stylusOnly){finishGesture();this.tool=tool;this.color=color;this.width=Math.max(.2f,Math.min(100,widthPt));this.stylusOnly=stylusOnly;if(!"select".equals(tool)){selected=0;imagePreview=null;}if(!"lasso".equals(tool))selection.clear();invalidate();}
     public void setLassoFreeform(boolean freeform){finishGesture();lassoFreeform=freeform;invalidate();}
     public void setLassoFilter(int filter){finishGesture();lassoFilter=filter&LASSO_ALL;selection.clear();invalidate();}
@@ -81,12 +83,29 @@ public final class NoteCanvasView extends View {
     public boolean canRedo(){return !readOnly&&document.canRedo();}
     public boolean hasSelection(){return selected!=0&&document.find(selected)!=null||!selection.isEmpty();}
     public NoteDocument.Item selectedText(){NoteDocument.Item item=document.find(selected);return item!=null&&item.type==NoteDocument.TEXT?item:null;}
-    public void putText(String value,float size,int ink){
-        if(readOnly)return;finishGesture();if(value==null||value.trim().isEmpty()){host.error("请输入文字");return;}
+    public boolean selectText(long itemId){finishGesture();NoteDocument.Item item=document.find(itemId);if(item==null||item.type!=NoteDocument.TEXT)return false;selected=itemId;selection.clear();invalidate();return true;}
+    public boolean putText(String value,float size,int ink){
+        if(readOnly||disposed)return false;finishGesture();if(value==null||value.trim().isEmpty()){host.error("请输入文字");return false;}
         NoteDocument.Item old=selectedText();double w=old==null?Math.min(300,Math.max(120,getWidth()*.55/zoom)):old.right()-old.left();
+        if(!document.infinite())w=Math.min(w,document.width);
         double h=NoteTextLayout.height(value,size,ink,w),x=old==null?cx-w/2:old.left(),y=old==null?localCenterY()-h/2:old.top();
+        if(!document.infinite()&&(w>document.width||h>document.height)){host.error("文本超出当前纸张，请缩短内容、缩小字号或改用无限画布");return false;}
         if(!document.infinite()){x=clamp(x,0,Math.max(0,document.width-w));y=clamp(y,0,Math.max(0,document.height-h));}
-        try{NoteDocument.Item item=new NoteDocument.Item(old==null?document.newId():old.id,NoteDocument.TEXT,ink,size,new double[]{x,y,x+w,y+h},old==null?"":old.image,value);if(old==null)document.add(item);else document.replace(item);selected=item.id;tool="select";changed();}catch(IllegalArgumentException e){host.error(e.getMessage());}
+        try{NoteDocument.Item item=new NoteDocument.Item(old==null?document.newId():old.id,NoteDocument.TEXT,ink,size,new double[]{x,y,x+w,y+h},old==null?"":old.image,value);if(old==null)document.add(item);else document.replace(item);selected=item.id;tool="select";changed();return true;}catch(IllegalArgumentException e){host.error(e.getMessage());return false;}
+    }
+    private boolean fitsFiniteText(NoteDocument.Item item){
+        if(document.infinite()||item.type!=NoteDocument.TEXT)return true;
+        double w=item.right()-item.left();
+        return item.left()>=0&&item.top()>=0&&item.right()<=document.width+1e-6&&item.bottom()<=document.height+1e-6
+                &&item.bottom()-item.top()+1e-6>=NoteTextLayout.height(item.text,item.width,item.color,w);
+    }
+    private NoteDocument.Item scaledItem(NoteDocument.Item item,double x,double y,double factor){
+        NoteDocument.Item scaled=NoteEditorOps.scaled(item,x,y,factor);
+        if(scaled.type!=NoteDocument.TEXT)return scaled;
+        double w=scaled.right()-scaled.left();
+        double h=NoteTextLayout.height(scaled.text,scaled.width,scaled.color,w);
+        return new NoteDocument.Item(scaled.id,scaled.type,scaled.color,scaled.width,
+                new double[]{scaled.left(),scaled.top(),scaled.right(),scaled.top()+h},scaled.image,scaled.text);
     }
     public long insertSource(ReaderSourceLink source){
         if(readOnly)return 0;finishGesture();if(disposed)return 0;
@@ -110,7 +129,7 @@ public final class NoteCanvasView extends View {
         double dx=cx-(l+r)/2,dy=localCenterY()-(t+b)/2;
         if(!document.infinite()){dx=clamp(dx,-l,document.width-r);dy=clamp(dy,-t,document.height-b);}
         ArrayList<NoteDocument.Item> next=new ArrayList<>(document.items());LinkedHashSet<Long> pasted=new LinkedHashSet<>();
-        try{for(NoteDocument.Item item:clipboard){NoteDocument.Item moved=NoteEditorOps.translated(item,dx,dy);long id=document.newId();next.add(new NoteDocument.Item(id,moved.type,moved.color,moved.width,moved.points,moved.image,moved.text));pasted.add(id);}document.applyItems(next);selection.clear();selection.addAll(pasted);selected=0;tool="lasso";changed();}
+        try{for(NoteDocument.Item item:clipboard){NoteDocument.Item moved=NoteEditorOps.translated(item,dx,dy);if(!fitsFiniteText(moved)){host.error("文本超出当前纸张，请先调整文本框");return;}long id=document.newId();next.add(new NoteDocument.Item(id,moved.type,moved.color,moved.width,moved.points,moved.image,moved.text));pasted.add(id);}document.applyItems(next);selection.clear();selection.addAll(pasted);selected=0;tool="lasso";changed();}
         catch(IllegalArgumentException error){host.error(error.getMessage());}
     }
     public void deleteSelection(){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty())return;ArrayList<NoteDocument.Item> next=new ArrayList<>();for(NoteDocument.Item item:document.items())if(!ids.contains(item.id))next.add(item);document.applyItems(next);selection.clear();selected=0;changed();}
@@ -123,7 +142,7 @@ public final class NoteCanvasView extends View {
     public void scaleSelection(float factor){if(readOnly)return;finishGesture();Set<Long> ids=selectedIds();if(ids.isEmpty()||Float.isNaN(factor)||Float.isInfinite(factor)||factor<=0)return;double[] bounds=NoteEditorOps.bounds(document.items(),ids);if(bounds==null)return;double x=(bounds[0]+bounds[2])/2,y=(bounds[1]+bounds[3])/2;applySelectionScale(ids,x,y,Math.max(.25,Math.min(4,factor)));}
     private void applySelectionScale(Set<Long> ids,double x,double y,double factor){
         if(!document.infinite()){double[] box=NoteEditorOps.bounds(document.items(),ids);if(box==null)return;double max=Double.POSITIVE_INFINITY;for(double v:new double[]{box[0],document.width-box[2],box[1],document.height-box[3]})if(v<0)max=Math.min(max,1);if(factor>1){double halfW=Math.max(x-box[0],box[2]-x),halfH=Math.max(y-box[1],box[3]-y);max=Math.min((Math.min(x,document.width-x))/Math.max(.001,halfW),(Math.min(y,document.height-y))/Math.max(.001,halfH));factor=Math.min(factor,max);} }
-        if(factor<=0||Math.abs(factor-1)<.000001)return;ArrayList<NoteDocument.Item> next=new ArrayList<>();try{for(NoteDocument.Item item:document.items())next.add(ids.contains(item.id)?NoteEditorOps.scaled(item,x,y,factor):item);document.applyItems(next);changed();}catch(IllegalArgumentException error){host.error(error.getMessage());}
+        if(factor<=0||Math.abs(factor-1)<.000001)return;ArrayList<NoteDocument.Item> next=new ArrayList<>();try{for(NoteDocument.Item item:document.items()){NoteDocument.Item candidate=ids.contains(item.id)?scaledItem(item,x,y,factor):item;if(ids.contains(item.id)&&!fitsFiniteText(candidate)){host.error("缩放后文本超出当前纸张");return;}next.add(candidate);}document.applyItems(next);changed();}catch(IllegalArgumentException error){host.error(error.getMessage());}
     }
     private Set<Long> selectedIds(){if(!selection.isEmpty())return new LinkedHashSet<>(selection);if(selected!=0&&document.find(selected)!=null)return Collections.singleton(selected);return Collections.emptySet();}
     public void duplicatePage(){if(readOnly)return;finishGesture();syncViewport();try{document.duplicatePage();selected=0;selection.clear();focusNewPage();persistPageChange();host.pageAdded();}catch(IllegalStateException|IllegalArgumentException error){host.error(error.getMessage());}}
@@ -138,7 +157,7 @@ public final class NoteCanvasView extends View {
     public void dispose(){if(disposed)return;save();disposed=true;bitmaps.evictAll();loading.clear();strokeCache.clear();}
     private void changed(){if(disposed)return;syncViewport();NoteStore.saveAsync(getContext(),noteId,document,message->post(()->{if(!disposed)host.error(message);}));host.changed();invalidate();}
     private double localCenterY(){return cy-(continuous()?pageLayout.top(document.currentPage()):0);}
-    private void syncViewport(){if(initialized){document.centerX=cx;document.centerY=continuous()?clamp(localCenterY(),0,document.height):cy;document.zoom=zoom;document.viewportSaved=true;}}
+    private void syncViewport(){if(initialized)document.setViewport(cx,continuous()?clamp(localCenterY(),0,document.height):cy,zoom,true);}
     private double fittedScale(){return ZoomLimits.noteBase(document.infinite()?getWidth()/700.0:continuous()?Math.max(1,getWidth()-dp(24))/document.width:Math.min(Math.max(1,getWidth()-dp(32))/document.width,Math.max(1,getHeight()-dp(32))/document.height));}
     @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){
         super.onSizeChanged(w,h,oldw,oldh);if(w<=0||h<=0)return;
@@ -147,7 +166,7 @@ public final class NoteCanvasView extends View {
         // A sidebar resize retains the absolute ink scale and the viewport anchor.
         constrainViewport();syncViewport();invalidate();
     }
-    public void fit(){finishGesture();if(getWidth()==0||getHeight()==0){document.viewportSaved=false;initialized=false;return;}baseZoom=fittedScale();zoom=baseZoom;cx=document.infinite()?0:document.width/2;cy=document.infinite()?0:(continuous()?pageLayout.top(document.currentPage())+Math.min(document.height/2,getHeight()/(2*zoom)):document.height/2);constrainViewport();syncViewport();invalidate();}
+    public void fit(){finishGesture();if(getWidth()==0||getHeight()==0){document.clearViewport();initialized=false;return;}baseZoom=fittedScale();zoom=baseZoom;cx=document.infinite()?0:document.width/2;cy=document.infinite()?0:(continuous()?pageLayout.top(document.currentPage())+Math.min(document.height/2,getHeight()/(2*zoom)):document.height/2);constrainViewport();syncViewport();invalidate();}
     public boolean insertImage(String name,int pixelWidth,int pixelHeight){if(readOnly)return false;finishGesture();if(disposed||getWidth()<=0||getHeight()<=0||pixelWidth<=0||pixelHeight<=0){host.error("画布尚未准备好，请稍后再插入图片");return false;}double w=Math.min(360,Math.max(80,getWidth()*.65/zoom)),h=w*pixelHeight/(double)pixelWidth;if(h>getHeight()*.7/zoom){h=getHeight()*.7/zoom;w=h*pixelWidth/(double)pixelHeight;}if(!document.infinite()){double scale=Math.min(1,Math.min(document.width*.85/w,document.height*.85/h));w*=scale;h*=scale;}double x=cx-w/2,y=localCenterY()-h/2;if(!document.infinite()){x=clamp(x,0,document.width-w);y=clamp(y,0,document.height-h);}try{NoteDocument.Item item=new NoteDocument.Item(document.newId(),NoteDocument.IMAGE,Color.WHITE,1,new double[]{x,y,x+w,y+h},name);document.add(item);selected=item.id;tool="select";changed();return true;}catch(IllegalArgumentException e){host.error(e.getMessage());return false;}}
 
     @Override protected void onDraw(Canvas canvas){super.onDraw(canvas);strokeCache.beginFrame();canvas.drawColor(AppColors.CANVAS);if(!initialized)return;
@@ -165,8 +184,8 @@ public final class NoteCanvasView extends View {
     private void drawPage(Canvas canvas,int page){
         renderPage=page;
         int clip=canvas.save();
-        if(document.infinite())canvas.drawColor(AppColors.PAPER);
-        else{float l=sx(0),t=sy(0),r=sx(document.width),b=sy(document.height);paint.setColor(0x17000000);paint.setStyle(Paint.Style.FILL);canvas.drawRect(l-dp(2),t+dp(3),r+dp(2),b+dp(5),paint);paint.setColor(AppColors.PAPER);canvas.drawRect(l,t,r,b,paint);canvas.clipRect(l,t,r,b);}
+        if(document.infinite())canvas.drawColor(nightPageDisplay?NightPageDisplay.PAPER:AppColors.PAPER);
+        else{float l=sx(0),t=sy(0),r=sx(document.width),b=sy(document.height);paint.setColor(0x17000000);paint.setStyle(Paint.Style.FILL);canvas.drawRect(l-dp(2),t+dp(3),r+dp(2),b+dp(5),paint);paint.setColor(nightPageDisplay?NightPageDisplay.PAPER:AppColors.PAPER);canvas.drawRect(l,t,r,b,paint);canvas.clipRect(l,t,r,b);}
         drawPaper(canvas);
         double vl=wx(0),vt=wyGlobal(0)-pageOffset(page),vr=wx(getWidth()),vb=wyGlobal(getHeight())-pageOffset(page);
         List<NoteDocument.Item> items=page==document.currentPage()&&erasePreview!=null?erasePreview:document.pageItems(page);
@@ -174,23 +193,23 @@ public final class NoteCanvasView extends View {
         if(page==document.currentPage()&&preview!=null)drawItem(canvas,preview);
         canvas.restoreToCount(clip);
     }
-    private void drawPaper(Canvas canvas){if("blank".equals(document.template))return;double spacing="grid".equals(document.template)?20:28;while(spacing*zoom<dp(8))spacing*=2;double left=wx(0),top=wyGlobal(0)-pageOffset(renderPage),right=wx(getWidth()),bottom=wyGlobal(getHeight())-pageOffset(renderPage);if(!document.infinite()){left=Math.max(0,left);top=Math.max(0,top);right=Math.min(document.width,right);bottom=Math.min(document.height,bottom);}paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(.7f));paint.setColor("grid".equals(document.template)?0xffe8ded1:0xffe2d5c5);double y=Math.ceil(top/spacing)*spacing;for(int n=0;n<1500&&y<=bottom;n++,y+=spacing)canvas.drawLine(sx(left),sy(y),sx(right),sy(y),paint);if("grid".equals(document.template)){double x=Math.ceil(left/spacing)*spacing;for(int n=0;n<1500&&x<=right;n++,x+=spacing)canvas.drawLine(sx(x),sy(top),sx(x),sy(bottom),paint);}}
+    private void drawPaper(Canvas canvas){if("blank".equals(document.template))return;double spacing="grid".equals(document.template)?20:28;while(spacing*zoom<dp(8))spacing*=2;double left=wx(0),top=wyGlobal(0)-pageOffset(renderPage),right=wx(getWidth()),bottom=wyGlobal(getHeight())-pageOffset(renderPage);if(!document.infinite()){left=Math.max(0,left);top=Math.max(0,top);right=Math.min(document.width,right);bottom=Math.min(document.height,bottom);}paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(.7f));paint.setColor(nightPageDisplay?NightPageDisplay.RULE:"grid".equals(document.template)?0xffe8ded1:0xffe2d5c5);double y=Math.ceil(top/spacing)*spacing;for(int n=0;n<1500&&y<=bottom;n++,y+=spacing)canvas.drawLine(sx(left),sy(y),sx(right),sy(y),paint);if("grid".equals(document.template)){double x=Math.ceil(left/spacing)*spacing;for(int n=0;n<1500&&x<=right;n++,x+=spacing)canvas.drawLine(sx(x),sy(top),sx(x),sy(bottom),paint);}}
     private void drawItem(Canvas canvas,NoteDocument.Item item){
         double[] p=item.points;if(item.type==NoteDocument.IMAGE){drawImage(canvas,item);return;}
         if(item.type==NoteDocument.STROKE){
-            if(p.length==2){paint.setColor(item.color);paint.setStyle(Paint.Style.FILL);canvas.drawCircle(sx(p[0]),sy(p[1]),Math.max(.3f,(float)(item.width*zoom/2)),paint);return;}
+            if(p.length==2){paint.setColor(nightPageDisplay?NightPageDisplay.ink(item.color):item.color);paint.setStyle(Paint.Style.FILL);canvas.drawCircle(sx(p[0]),sy(p[1]),Math.max(.3f,(float)(item.width*zoom/2)),paint);return;}
             // Huge spans cannot safely cancel float translations: preserve the original screen-space path.
             if(Math.max(Math.abs(p[0]-cx),Math.abs(p[1]-renderCenterY()))*zoom>1048576||Math.max(item.right()-item.left(),item.bottom()-item.top())*zoom>1048576){
-                Path path=new Path();path.moveTo(sx(p[0]),sy(p[1]));for(int i=2;i<p.length;i+=2)path.lineTo(sx(p[i]),sy(p[i+1]));paint.setColor(item.color);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth((float)(item.width*zoom));paint.setStrokeCap(Paint.Cap.ROUND);paint.setStrokeJoin(Paint.Join.ROUND);canvas.drawPath(path,paint);return;}
+                Path path=new Path();path.moveTo(sx(p[0]),sy(p[1]));for(int i=2;i<p.length;i+=2)path.lineTo(sx(p[i]),sy(p[i+1]));paint.setColor(nightPageDisplay?NightPageDisplay.ink(item.color):item.color);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth((float)(item.width*zoom));paint.setStrokeCap(Paint.Cap.ROUND);paint.setStrokeJoin(Paint.Join.ROUND);canvas.drawPath(path,paint);return;}
             int saved=canvas.save();canvas.translate(sx(p[0]),sy(p[1]));canvas.scale((float)zoom,(float)zoom);
-            strokeCache.drawNote(canvas,paint,item==preview?null:item,p,item.color,item.width);canvas.restoreToCount(saved);return;}
-        paint.setStyle(Paint.Style.STROKE);paint.setColor(item.color);paint.setStrokeCap(Paint.Cap.ROUND);paint.setStrokeJoin(Paint.Join.ROUND);paint.setStrokeWidth((float)(item.width*zoom));
+            strokeCache.drawNote(canvas,paint,item==preview?null:item,p,nightPageDisplay?NightPageDisplay.ink(item.color):item.color,item.width);canvas.restoreToCount(saved);return;}
+        paint.setStyle(Paint.Style.STROKE);paint.setColor(nightPageDisplay?NightPageDisplay.ink(item.color):item.color);paint.setStrokeCap(Paint.Cap.ROUND);paint.setStrokeJoin(Paint.Join.ROUND);paint.setStrokeWidth((float)(item.width*zoom));
         if(item.type==NoteDocument.RECTANGLE)canvas.drawRect(sx(item.left()),sy(item.top()),sx(item.right()),sy(item.bottom()),paint);
         else if(item.type==NoteDocument.CIRCLE)canvas.drawOval(sx(item.left()),sy(item.top()),sx(item.right()),sy(item.bottom()),paint);
         else{canvas.drawLine(sx(p[0]),sy(p[1]),sx(p[2]),sy(p[3]),paint);if(item.type==NoteDocument.ARROW){double[] a=NoteDocument.arrowHeads(p,item.width);canvas.drawLine(sx(p[2]),sy(p[3]),sx(a[0]),sy(a[1]),paint);canvas.drawLine(sx(p[2]),sy(p[3]),sx(a[2]),sy(a[3]),paint);}}
     }
     private void drawImage(Canvas canvas,NoteDocument.Item item){RectF rect=new RectF(sx(item.left()),sy(item.top()),sx(item.right()),sy(item.bottom()));Bitmap bitmap=bitmaps.get(item.image);paint.setStyle(Paint.Style.FILL);paint.setColor(Color.WHITE);paint.setAlpha(255);if(bitmap!=null&&!bitmap.isRecycled()){canvas.drawBitmap(bitmap,null,rect,paint);return;}paint.setColor(AppColors.SOFT);canvas.drawRect(rect,paint);paint.setColor(AppColors.MUTED);paint.setTextSize(dp(13));canvas.drawText(failedImages.contains(item.image)?"图片无法读取":"加载图片…",rect.left+dp(10),rect.top+dp(24),paint);if(!loading.contains(item.image)&&!failedImages.contains(item.image))loadImage(item.image);}
-    private void drawText(Canvas canvas,NoteDocument.Item item){int save=canvas.save();canvas.translate(sx(item.left()),sy(item.top()));canvas.scale((float)zoom,(float)zoom);canvas.translate((float)-item.left(),(float)-item.top());NoteTextLayout.draw(canvas,item);canvas.restoreToCount(save);}
+    private void drawText(Canvas canvas,NoteDocument.Item item){int save=canvas.save();canvas.translate(sx(item.left()),sy(item.top()));canvas.scale((float)zoom,(float)zoom);canvas.translate((float)-item.left(),(float)-item.top());NoteTextLayout.draw(canvas,item,nightPageDisplay?NightPageDisplay.ink(item.color):item.color);canvas.restoreToCount(save);}
     private void loadImage(String name){loading.add(name);final Context app=getContext().getApplicationContext();imageWorker.execute(()->{Bitmap result=null;try{File file=new File(NoteStore.imagesDirectory(app,noteId),name);BitmapFactory.Options options=new BitmapFactory.Options();options.inJustDecodeBounds=true;BitmapFactory.decodeFile(file.getAbsolutePath(),options);if(options.outWidth>0&&options.outHeight>0){options.inSampleSize=1;while(options.outWidth/options.inSampleSize>2048||options.outHeight/options.inSampleSize>2048)options.inSampleSize*=2;options.inJustDecodeBounds=false;options.inPreferredConfig=Bitmap.Config.ARGB_8888;result=BitmapFactory.decodeFile(file.getAbsolutePath(),options);}}catch(IOException|RuntimeException|OutOfMemoryError ignored){}final Bitmap bitmap=result;post(()->{loading.remove(name);if(disposed){if(bitmap!=null)bitmap.recycle();return;}if(bitmap==null)failedImages.add(name);else bitmaps.put(name,bitmap);invalidate();});});}
     private void drawSelection(Canvas canvas,NoteDocument.Item item){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);canvas.drawRect(sx(item.left()),sy(item.top()),sx(item.right()),sy(item.bottom()),paint);for(int i=0;i<4;i++){float x=sx(i%2==0?item.left():item.right()),y=sy(i<2?item.top():item.bottom());paint.setStyle(Paint.Style.FILL);paint.setColor(Color.WHITE);canvas.drawCircle(x,y,dp(6),paint);paint.setStyle(Paint.Style.STROKE);paint.setColor(AppColors.ACCENT);canvas.drawCircle(x,y,dp(6),paint);}}
     private void drawGroupSelection(Canvas canvas){double[] box=groupPreview.isEmpty()?NoteEditorOps.bounds(document.items(),selection):NoteEditorOps.bounds(new ArrayList<>(groupPreview.values()),selection);if(box==null)return;paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(dp(1.5f));paint.setColor(AppColors.ACCENT);canvas.drawRect(sx(box[0]),sy(box[1]),sx(box[2]),sy(box[3]),paint);paint.setStyle(Paint.Style.FILL);paint.setColor(Color.WHITE);canvas.drawCircle(sx(box[2]),sy(box[3]),dp(7),paint);paint.setStyle(Paint.Style.STROKE);paint.setColor(AppColors.ACCENT);canvas.drawCircle(sx(box[2]),sy(box[3]),dp(7),paint);}
@@ -293,7 +312,7 @@ public final class NoteCanvasView extends View {
             if(!document.infinite()){factor=Math.min(factor,Math.min((document.width-ax)/Math.max(.001,groupBounds[2]-ax),(document.height-ay)/Math.max(.001,groupBounds[3]-ay)));}
         }
         LinkedHashMap<Long,NoteDocument.Item> next=new LinkedHashMap<>();
-        try{for(NoteDocument.Item item:groupOriginal.values())next.put(item.id,actionMode==7?NoteEditorOps.translated(item,dx,dy):NoteEditorOps.scaled(item,groupBounds[0],groupBounds[1],factor));groupPreview.clear();groupPreview.putAll(next);}catch(IllegalArgumentException ignored){}
+        try{for(NoteDocument.Item item:groupOriginal.values()){NoteDocument.Item candidate=actionMode==7?NoteEditorOps.translated(item,dx,dy):scaledItem(item,groupBounds[0],groupBounds[1],factor);if(!fitsFiniteText(candidate))return;next.put(item.id,candidate);}groupPreview.clear();groupPreview.putAll(next);}catch(IllegalArgumentException ignored){}
     }
     private void resizeImage(double x,double y){if(imageOriginal.type==NoteDocument.TEXT){
         double ax=resizeCorner%2==0?imageOriginal.right():imageOriginal.left(),signX=resizeCorner%2==0?-1:1;
@@ -303,7 +322,7 @@ public final class NoteCanvasView extends View {
         double requestedHeight=Math.max(1,topHandle?ay-y:y-ay);
         float size=(float)clamp(imageOriginal.width*requestedHeight/Math.max(1,imageOriginal.bottom()-imageOriginal.top()),8,72);
         double h=NoteTextLayout.height(imageOriginal.text,size,imageOriginal.color,w);
-        double ny=topHandle?ay-h:ay;if(!document.infinite())ny=clamp(ny,0,Math.max(0,document.height-h));
+        double ny=topHandle?ay-h:ay;if(!document.infinite()){if(h>document.height){imagePreview=imageOriginal;return;}ny=clamp(ny,0,Math.max(0,document.height-h));}
         imagePreview=new NoteDocument.Item(imageOriginal.id,NoteDocument.TEXT,imageOriginal.color,size,new double[]{nx,ny,nx+w,ny+h},imageOriginal.image,imageOriginal.text);return;}
         double ratio=(imageOriginal.right()-imageOriginal.left())/(imageOriginal.bottom()-imageOriginal.top());double ax=resizeCorner%2==0?imageOriginal.right():imageOriginal.left(),ay=resizeCorner<2?imageOriginal.bottom():imageOriginal.top();double signX=resizeCorner%2==0?-1:1,signY=resizeCorner<2?-1:1;double w=Math.max(dp(20)/zoom,Math.max((x-ax)*signX,(y-ay)*signY*ratio)),h=w/ratio;if(!document.infinite()){double maxW=signX<0?ax:document.width-ax,maxH=signY<0?ay:document.height-ay;double s=Math.min(1,Math.min(maxW/w,maxH/h));w*=s;h*=s;}if(w>.1&&h>.1)imagePreview=imageOriginal.bounds(signX<0?ax-w:ax,signY<0?ay-h:ay,w,h);}
     private int handleAt(NoteDocument.Item item,float x,float y){for(int i=0;i<4;i++)if(Math.hypot(x-sx(i%2==0?item.left():item.right()),y-sy(i<2?item.top():item.bottom()))<=dp(20))return i;return -1;}
@@ -311,7 +330,7 @@ public final class NoteCanvasView extends View {
     public void finishGesture(){if(disposed)return;boolean didChange=false,selectionChanged=false;try{
         if(actionMode==1&&preview!=null){NoteDocument.Item p=preview;document.add(new NoteDocument.Item(document.newId(),p.type,p.color,p.width,p.points,p.image));didChange=true;}
         else if(actionMode==2&&erasePreview!=null){didChange=document.applyErasure(erasePreview);}
-        else if((actionMode==4||actionMode==5)&&imagePreview!=null&&imageOriginal!=null&&(!Arrays.equals(imagePreview.points,imageOriginal.points)||imagePreview.width!=imageOriginal.width)){document.replace(imagePreview);didChange=true;}
+        else if((actionMode==4||actionMode==5)&&imagePreview!=null&&imageOriginal!=null&&(!Arrays.equals(imagePreview.points,imageOriginal.points)||imagePreview.width!=imageOriginal.width)){if(!fitsFiniteText(imagePreview))host.error("文本超出当前纸张，请先调整文本框");else{document.replace(imagePreview);didChange=true;}}
         else if(actionMode==6){List<double[]> outline=lassoPath;if(!lassoFreeform&&lassoPath.size()>1)outline=Arrays.asList(lassoPath.get(0),lassoPath.get(lassoPath.size()-1));selection.clear();selection.addAll(NoteEditorOps.select(document.items(),outline,lassoFreeform,lassoFilter));selectionChanged=true;}
         else if((actionMode==7||actionMode==8)&&!groupPreview.isEmpty()){
             ArrayList<NoteDocument.Item> next=new ArrayList<>();
